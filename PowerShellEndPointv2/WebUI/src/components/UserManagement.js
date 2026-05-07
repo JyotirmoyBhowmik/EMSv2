@@ -16,7 +16,8 @@ function UserManagement() {
     const loadUsers = async () => {
         try {
             const res = await apiClient.get('/admin/users');
-            setUsers(res.data.users || []);
+            const data = res.data.users || [];
+            setUsers(Array.isArray(data) ? data : []);
         } catch (err) { console.error('Failed to load users:', err); }
         finally { setLoading(false); }
     };
@@ -45,7 +46,8 @@ function UserManagement() {
         setActivityUser(user);
         try {
             const res = await apiClient.get(`/admin/users/${user.user_id}/activity`);
-            setActivities(res.data.events || []);
+            const data = res.data.events || [];
+            setActivities(Array.isArray(data) ? data : []);
         } catch { setActivities([]); }
     };
 

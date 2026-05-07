@@ -20,7 +20,8 @@ function AuditLog() {
         setLoading(true);
         try {
             const res = await apiClient.get(`/admin/audit?type=${logType}&limit=200`);
-            setLogs(res.data.logs || []);
+            const data = res.data.logs || [];
+            setLogs(Array.isArray(data) ? data : []);
         } catch (err) {
             console.error('Failed to load audit logs:', err);
         } finally {

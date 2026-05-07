@@ -20,9 +20,11 @@ function AdminSettings() {
     const loadFeatures = async () => {
         try {
             const res = await apiClient.get('/admin/settings');
-            setFeatures(res.data.features || []);
+            const data = res.data.features || [];
+            setFeatures(Array.isArray(data) ? data : []);
         } catch (err) {
             console.error('Failed to load settings:', err);
+            setFeatures([]);
         } finally {
             setLoading(false);
         }

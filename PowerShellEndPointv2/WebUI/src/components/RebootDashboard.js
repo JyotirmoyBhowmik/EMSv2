@@ -16,7 +16,8 @@ function RebootDashboard() {
     const loadRebootData = async () => {
         try {
             const res = await apiClient.get('/admin/reboot-status');
-            setEndpoints(res.data.endpoints || []);
+            const data = res.data.endpoints || [];
+            setEndpoints(Array.isArray(data) ? data : []);
         } catch (err) {
             console.error('Failed to load reboot data:', err);
         } finally {

@@ -26,7 +26,7 @@ const SystemErrors = () => {
       // Note: The API must support returning audit_api_requests or a specific error table.
       // We assume /api/admin/audit handles this.
       const response = await api.get('/admin/audit?type=ERROR');
-      if (response.data && response.data.logs) {
+      if (response.data && Array.isArray(response.data.logs)) {
         setErrors(response.data.logs.filter(log => log.method === 'ERROR'));
       } else {
         setErrors([]);
