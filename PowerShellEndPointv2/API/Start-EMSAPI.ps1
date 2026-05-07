@@ -1411,6 +1411,59 @@ DO UPDATE SET ip_address=EXCLUDED.ip_address, computer_type=EXCLUDED.computer_ty
                 Write-JsonResponse $request $response 200 @{ success=$true; message='Computer registered successfully'; computer=@{ name=$computerName; ipAddress=$ipAddress; computerType=$computerType; operatingSystem=$osName; domain=$domainName } }
             }
 
+            'GET /admin/settings' {
+                if (-not (Require-AdminAccess -Request $request -Response $response -Config $Global:EMSConfig)) { break }
+                $rows = Invoke-PGQuery -Query "SELECT feature_key, feature_name, description, enabled, category FROM feature_toggles ORDER BY category, feature_name;"
+                Write-JsonResponse $request $response 200 @{ success = $true; features = $rows }
+            }
+
+            'GET /admin/users' {
+                if (-not (Require-AdminAccess -Request $request -Response $response -Config $Global:EMSConfig)) { break }
+                $rows = Invoke-PGQuery -Query "SELECT user_id, username, display_name, email, role, is_active, last_login FROM users ORDER BY username;"
+                Write-JsonResponse $request $response 200 @{ success = $true; users = $rows }
+            }
+
+            'GET /admin/reboot-status' {
+                if (-not (Require-AdminAccess -Request $request -Response $response -Config $Global:EMSConfig)) { break }
+                # Get latest reboot status for all computers
+                $rows = Invoke-PGQuery -Query @"
+SELECT DISTINCT ON (computer_name) computer_name, last_boot_time, uptime_days, uptime_status, notified
+FROM metric_reboot_tracking
+ORDER BY computer_name, timestamp DESC;
+"@
+                Write-JsonResponse $request $response 200 @{ success = $true; endpoints = $rows }
+            }
+
+            'GET /admin/connectors' {
+                if (-not (Require-AdminAccess -Request $request -Response $response -Config $Global:EMSConfig)) { break }
+                # Mock connector health check for now
+                $connectors = @(
+                    @{ name = "PostgreSQL Database"; status = "Healthy"; latency = "2ms"; lastCheck = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss") },
+                    @{ name = "Active Directory"; status = "Healthy"; latency = "45ms"; lastCheck = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss") },
+                    @{ name = "SMTP Relay"; status = "Healthy"; latency = "12ms"; lastCheck = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss") }
+                )
+                Write-JsonResponse $request $response 200 @{ success = $true; connectors = $connectors }
+            }
+
+            'GET /admin/audit' {
+                if (-not (Require-AdminAccess -Request $request -Response $response -Config $Global:EMSConfig)) { break }
+                $type = $request.QueryString['type']
+                $limit = if ($request.QueryString['limit']) { [int]$request.QueryString['limit'] } else { 100 }
+                
+                $query = ""
+                switch ($type) {
+                    "api"     { $query = "SELECT timestamp, username, method, path, status_code, response_time_ms FROM audit_api_requests ORDER BY timestamp DESC LIMIT $limit" }
+                    "auth"    { $query = "SELECT timestamp, username, event_type, provider, risk_level FROM audit_auth_events ORDER BY timestamp DESC LIMIT $limit" }
+                    "config"  { $query = "SELECT timestamp, changed_by, config_section, config_key, old_value, new_value FROM audit_config_changes ORDER BY timestamp DESC LIMIT $limit" }
+                    "feature" { $query = "SELECT timestamp, feature_key, old_value, new_value, changed_by FROM audit_feature_toggles ORDER BY timestamp DESC LIMIT $limit" }
+                    "ERROR"   { $query = "SELECT timestamp, user_id as username, method, endpoint as path, status_code FROM audit_api_requests WHERE method = 'ERROR' ORDER BY timestamp DESC LIMIT $limit" }
+                    default   { $query = "SELECT timestamp, username, method, path, status_code FROM audit_api_requests ORDER BY timestamp DESC LIMIT $limit" }
+                }
+                
+                $rows = Invoke-PGQuery -Query $query
+                Write-JsonResponse $request $response 200 @{ success = $true; logs = $rows }
+            }
+
             'POST /audit/frontend-error' {
                 $body = Read-JsonBody $request
                 $ctx = Get-RequestUserContext -Request $request
