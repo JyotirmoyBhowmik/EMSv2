@@ -1062,7 +1062,7 @@ VALUES (@scanId, @target, 'queued', NOW());
 #region HTTP Listener
 
 $listener = [System.Net.HttpListener]::new()
-$listener.Prefixes.Add('http://*:5000/')
+$listener.Prefixes.Add('http://+:5000/')
 $listener.Start()
 
 Write-Host '========================================'
