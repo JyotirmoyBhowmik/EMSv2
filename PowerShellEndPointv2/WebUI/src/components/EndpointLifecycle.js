@@ -23,8 +23,12 @@ function EndpointLifecycle() {
     const loadEndpoints = async () => {
         try {
             const res = await apiClient.get('/computers?limit=500');
-            setEndpoints(res.data.computers || res.data || []);
-        } catch (err) { console.error(err); }
+            const data = res.data.computers || res.data || [];
+            setEndpoints(Array.isArray(data) ? data : []);
+        } catch (err) { 
+            console.error(err); 
+            setEndpoints([]);
+        }
         finally { setLoading(false); }
     };
 
