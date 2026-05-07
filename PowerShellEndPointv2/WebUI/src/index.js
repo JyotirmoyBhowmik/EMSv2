@@ -155,6 +155,7 @@ import api from './services/api';
         document.addEventListener('DOMContentLoaded', startPolicy);
     } else {
         startPolicy();
+    }
 })();
 
 // Global error handler for uncaught exceptions
