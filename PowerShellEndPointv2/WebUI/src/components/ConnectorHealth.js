@@ -1,91 +1,146 @@
-import React, { useState, useEffect } from 'react';
-import { apiClient } from '../services/api';
+import React, { useState, useEffect, useCallback } from 'react';
+import { adminService, errorLogService } from '../services/api';
+
+const STATUS_COLORS = {
+    Healthy:  { bg: '#f0fdf4', text: '#16a34a', dot: '#22c55e' },
+    Degraded: { bg: '#fefce8', text: '#ca8a04', dot: '#eab308' },
+    Down:     { bg: '#fef2f2', text: '#dc2626', dot: '#ef4444' },
+    Unknown:  { bg: '#f8fafc', text: '#64748b', dot: '#94a3b8' }
+};
+
+function StatusBadge({ status }) {
+    const s = STATUS_COLORS[status] || STATUS_COLORS.Unknown;
+    return (
+        <span style={{
+            display: 'inline-flex', alignItems: 'center', gap: 6,
+            padding: '4px 12px', borderRadius: 12,
+            background: s.bg, color: s.text, fontWeight: 600, fontSize: '0.8rem'
+        }}>
+            <span style={{
+                width: 7, height: 7, borderRadius: '50%', background: s.dot,
+                boxShadow: `0 0 5px ${s.dot}`
+            }} />
+            {status}
+        </span>
+    );
+}
 
 function ConnectorHealth() {
     const [connectors, setConnectors] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading,    setLoading]    = useState(true);
+    const [error,      setError]      = useState(null);
+    const [lastRefresh, setLastRefresh] = useState(null);
 
-    useEffect(() => {
-        loadHealth();
-        const interval = setInterval(loadHealth, 60000);
-        return () => clearInterval(interval);
-    }, []);
-
-    const loadHealth = async () => {
+    const load = useCallback(async () => {
+        setLoading(true);
+        setError(null);
         try {
-            const res = await apiClient.get('/admin/connectors');
-            setConnectors(res.data.connectors || []);
+            const data = await adminService.getConnectors();
+            setConnectors(data);
+            setLastRefresh(new Date());
         } catch (err) {
-            console.error('Failed to load connector health:', err);
+            setError(err.response?.data?.message || 'Failed to load connector health');
+            await errorLogService.logFrontendError(err.message, err.stack, '/admin/health');
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
-    const getStatusIcon = (status) => {
-        switch (status) {
-            case 'Healthy': return '🟢';
-            case 'Down': return '🔴';
-            case 'Not Configured': return '⚪';
-            default: return '🟡';
-        }
-    };
+    useEffect(() => {
+        load();
+        const interval = setInterval(load, 30000);
+        return () => clearInterval(interval);
+    }, [load]);
 
-    const getStatusBg = (status) => {
-        switch (status) {
-            case 'Healthy': return 'linear-gradient(135deg, #1b5e20, #2e7d32)';
-            case 'Down': return 'linear-gradient(135deg, #b71c1c, #d32f2f)';
-            default: return 'linear-gradient(135deg, #424242, #616161)';
-        }
-    };
-
-    if (loading) return <div className="spinner"></div>;
+    const healthy = connectors.filter(c => c.status === 'Healthy').length;
 
     return (
         <div>
-            <h1 style={{ marginBottom: '10px' }}>Connector Health</h1>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: '30px' }}>
-                Real-time health status of all system connectors. Auto-refreshes every 60 seconds.
-            </p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
+                <div>
+                    <h1 style={{ margin: 0, fontSize: '1.6rem', fontWeight: 700, color: '#0f172a' }}>Connector Health</h1>
+                    <p style={{ margin: '6px 0 0', color: '#64748b', fontSize: '0.9rem' }}>
+                        Real-time status of integrated services
+                        {lastRefresh && ` · Updated ${lastRefresh.toLocaleTimeString()}`}
+                    </p>
+                </div>
+                <button
+                    onClick={load}
+                    disabled={loading}
+                    style={{
+                        padding: '8px 18px', background: '#2563eb', color: '#fff',
+                        border: 'none', borderRadius: 8, cursor: loading ? 'not-allowed' : 'pointer',
+                        fontWeight: 600, fontSize: '0.875rem', opacity: loading ? 0.7 : 1
+                    }}
+                >
+                    {loading ? 'Refreshing…' : '⟳ Refresh'}
+                </button>
+            </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
-                {connectors.map((conn, i) => (
-                    <div key={i} style={{
-                        background: getStatusBg(conn.status), borderRadius: '12px',
-                        padding: '24px', color: '#fff', position: 'relative', overflow: 'hidden'
+            {/* Summary cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
+                {[
+                    { label: 'Total Connectors', value: connectors.length, color: '#2563eb' },
+                    { label: 'Healthy',          value: healthy,           color: '#16a34a' },
+                    { label: 'Issues',           value: connectors.length - healthy, color: connectors.length - healthy > 0 ? '#dc2626' : '#94a3b8' }
+                ].map(card => (
+                    <div key={card.label} style={{
+                        background: '#fff', borderRadius: 12, padding: '18px 20px',
+                        border: '1px solid #e2e8f0', boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
                     }}>
-                        <div style={{ fontSize: '2rem', marginBottom: '10px' }}>
-                            {getStatusIcon(conn.status)}
+                        <div style={{ fontSize: '0.78rem', color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                            {card.label}
                         </div>
-                        <div style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '6px' }}>
-                            {conn.connector}
-                        </div>
-                        <div style={{
-                            fontSize: '0.9rem', opacity: 0.9, marginBottom: '12px',
-                            display: 'flex', alignItems: 'center', gap: '8px'
-                        }}>
-                            <span style={{
-                                padding: '2px 10px', borderRadius: '10px', fontSize: '0.8rem',
-                                fontWeight: '600', background: 'rgba(255,255,255,0.2)'
-                            }}>{conn.status}</span>
-                            {conn.latency && <span>• {conn.latency}</span>}
-                        </div>
-                        <div style={{ fontSize: '0.85rem', opacity: 0.8, lineHeight: '1.4' }}>
-                            {conn.message}
-                        </div>
-                        <div style={{ fontSize: '0.75rem', opacity: 0.6, marginTop: '12px' }}>
-                            Last checked: {conn.last_check || conn.lastCheck || '—'}
+                        <div style={{ fontSize: '2rem', fontWeight: 800, color: card.color, marginTop: 4 }}>
+                            {card.value}
                         </div>
                     </div>
                 ))}
             </div>
 
-            <div style={{ marginTop: '20px', textAlign: 'center' }}>
-                <button onClick={loadHealth} style={{
-                    padding: '10px 24px', background: 'var(--primary-color)', color: '#fff',
-                    border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '600'
-                }}>Refresh Now</button>
-            </div>
+            {error && (
+                <div style={{
+                    padding: '12px 16px', borderRadius: 8, background: '#fef2f2',
+                    border: '1px solid #fecaca', color: '#991b1b', marginBottom: 16, fontSize: '0.875rem'
+                }}>
+                    ⚠️ {error}
+                </div>
+            )}
+
+            {loading && connectors.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: 60, color: '#94a3b8' }}>Loading connectors…</div>
+            ) : connectors.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: 60, color: '#94a3b8' }}>No connectors found.</div>
+            ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
+                    {connectors.map((c, i) => (
+                        <div key={i} style={{
+                            background: '#fff', borderRadius: 12, padding: '20px',
+                            border: '1px solid #e2e8f0', boxShadow: '0 1px 4px rgba(0,0,0,0.04)'
+                        }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
+                                <div style={{ fontWeight: 700, color: '#1e293b', fontSize: '0.95rem' }}>{c.name}</div>
+                                <StatusBadge status={c.status} />
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+                                <Metric label="Latency"    value={c.latency    || 'N/A'} />
+                                <Metric label="Last Check" value={c.lastCheck  || 'N/A'} />
+                                {c.version && <Metric label="Version" value={c.version} />}
+                                {c.host    && <Metric label="Host"    value={c.host} />}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
+function Metric({ label, value }) {
+    return (
+        <div style={{ background: '#f8fafc', borderRadius: 8, padding: '8px 12px' }}>
+            <div style={{ fontSize: '0.7rem', color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', marginBottom: 2 }}>{label}</div>
+            <div style={{ fontSize: '0.875rem', fontWeight: 600, color: '#1e293b' }}>{value}</div>
         </div>
     );
 }

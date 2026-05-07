@@ -1,25 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { apiClient } from '../services/api';
+import { adminService, apiClient } from '../services/api';
 
 function RebootDashboard() {
     const [endpoints, setEndpoints] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [selected, setSelected] = useState([]);
-    const [filter, setFilter] = useState('all');
-    const [search, setSearch] = useState('');
+    const [loading,   setLoading]   = useState(true);
+    const [selected,  setSelected]  = useState([]);
+    const [filter,    setFilter]    = useState('all');
+    const [search,    setSearch]    = useState('');
     const [mailModal, setMailModal] = useState(false);
-    const [mailForm, setMailForm] = useState({ message: '', dueDate: '' });
-    const [sending, setSending] = useState(false);
+    const [mailForm,  setMailForm]  = useState({ message: '', dueDate: '' });
+    const [sending,   setSending]   = useState(false);
 
     useEffect(() => { loadRebootData(); }, []);
 
     const loadRebootData = async () => {
+        setLoading(true);
         try {
-            const res = await apiClient.get('/admin/reboot-status');
-            const data = res.data.endpoints || [];
+            const data = await adminService.getRebootStatus();
             setEndpoints(Array.isArray(data) ? data : []);
         } catch (err) {
             console.error('Failed to load reboot data:', err);
+            setEndpoints([]);
         } finally {
             setLoading(false);
         }

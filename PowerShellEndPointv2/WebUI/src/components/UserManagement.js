@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { apiClient } from '../services/api';
+import { adminService, apiClient } from '../services/api';
 
 function UserManagement() {
     const [users, setUsers] = useState([]);
@@ -14,12 +14,16 @@ function UserManagement() {
     useEffect(() => { loadUsers(); }, []);
 
     const loadUsers = async () => {
+        setLoading(true);
         try {
-            const res = await apiClient.get('/admin/users');
-            const data = res.data.users || [];
+            const data = await adminService.getUsers();
             setUsers(Array.isArray(data) ? data : []);
-        } catch (err) { console.error('Failed to load users:', err); }
-        finally { setLoading(false); }
+        } catch (err) {
+            console.error('Failed to load users:', err);
+            setUsers([]);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const saveUser = async () => {

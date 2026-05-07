@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { apiClient } from '../services/api';
+import { adminService, apiClient } from '../services/api';
 
 function EndpointLifecycle() {
     const [endpoints, setEndpoints] = useState([]);
@@ -21,12 +21,12 @@ function EndpointLifecycle() {
     useEffect(() => { loadEndpoints(); }, []);
 
     const loadEndpoints = async () => {
+        setLoading(true);
         try {
-            const res = await apiClient.get('/computers?limit=500');
-            const data = res.data.computers || res.data || [];
+            const data = await adminService.getEndpoints();
             setEndpoints(Array.isArray(data) ? data : []);
-        } catch (err) { 
-            console.error(err); 
+        } catch (err) {
+            console.error('Failed to load endpoints:', err);
             setEndpoints([]);
         }
         finally { setLoading(false); }

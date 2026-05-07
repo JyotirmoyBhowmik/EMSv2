@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import ErrorBoundary from './components/ErrorBoundary';
-import api from './services/api';
+import { errorLogService } from './services/api';
 
 /*
   EMS RBAC UI Enforcement:
@@ -160,32 +160,19 @@ import api from './services/api';
 
 // Global error handler for uncaught exceptions
 window.onerror = function (message, source, lineno, colno, error) {
-    try {
-        api.post('/audit/frontend-error', {
-            message: message,
-            stack: error?.stack || 'No stack trace',
-            source: source,
-            lineno: lineno,
-            colno: colno,
-            url: window.location.href,
-            userAgent: navigator.userAgent
-        }).catch(err => console.error("Failed to log error to backend", err));
-    } catch (e) {
-        console.error("Failed to invoke API to log error", e);
-    }
+    errorLogService.logFrontendError(
+        `${message} (${source}:${lineno}:${colno})`,
+        error?.stack || 'No stack trace',
+        window.location.href
+    );
 };
 
 window.addEventListener("unhandledrejection", function (event) {
-    try {
-        api.post('/audit/frontend-error', {
-            message: event.reason?.message || 'Unhandled Promise Rejection',
-            stack: event.reason?.stack || 'No stack trace',
-            url: window.location.href,
-            userAgent: navigator.userAgent
-        }).catch(err => console.error("Failed to log promise rejection", err));
-    } catch (e) {
-        console.error("Failed to invoke API to log promise rejection", e);
-    }
+    errorLogService.logFrontendError(
+        event.reason?.message || 'Unhandled Promise Rejection',
+        event.reason?.stack || 'No stack trace',
+        window.location.href
+    );
 });
 
 var root = ReactDOM.createRoot(document.getElementById('root'));

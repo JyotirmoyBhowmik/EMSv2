@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { apiClient } from '../services/api';
+import { adminService } from '../services/api';
 
 function AuditLog() {
     const [logs, setLogs] = useState([]);
@@ -8,10 +8,10 @@ function AuditLog() {
     const [logType, setLogType] = useState('api');
 
     const logTypes = [
-        { key: 'api', label: 'API Requests' },
-        { key: 'auth', label: 'Authentication' },
-        { key: 'config', label: 'Config Changes' },
-        { key: 'feature', label: 'Feature Toggles' }
+        { key: 'api',     label: 'API Requests'    },
+        { key: 'auth',    label: 'Authentication'   },
+        { key: 'config',  label: 'Config Changes'   },
+        { key: 'feature', label: 'Feature Toggles'  }
     ];
 
     useEffect(() => { loadLogs(); }, [logType]);
@@ -19,11 +19,11 @@ function AuditLog() {
     const loadLogs = async () => {
         setLoading(true);
         try {
-            const res = await apiClient.get(`/admin/audit?type=${logType}&limit=200`);
-            const data = res.data.logs || [];
+            const data = await adminService.getAuditLogs(logType, 200);
             setLogs(Array.isArray(data) ? data : []);
         } catch (err) {
             console.error('Failed to load audit logs:', err);
+            setLogs([]);
         } finally {
             setLoading(false);
         }

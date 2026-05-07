@@ -1,202 +1,270 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  Box, Typography, Paper, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, Chip, IconButton,
-  Tooltip, Dialog, DialogTitle, DialogContent, DialogActions, Button,
-  LinearProgress, Alert, TextField
-} from '@mui/material';
-import {
-  MdRefresh, MdCode, MdBugReport, MdDownload
-} from 'react-icons/md';
-import { format } from 'date-fns';
-import api from '../services/api';
+import { adminService, errorLogService } from '../services/api';
 
-const SystemErrors = () => {
-  const [errors, setErrors] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedError, setSelectedError] = useState(null);
-  const [search, setSearch] = useState('');
+function SystemErrors() {
+    const [errors,   setErrors]   = useState([]);
+    const [loading,  setLoading]  = useState(true);
+    const [apiError, setApiError] = useState(null);
+    const [selected, setSelected] = useState(null);
+    const [search,   setSearch]   = useState('');
 
-  const fetchErrors = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      // We leverage the existing audit API but filter specifically for frontend errors
-      // Note: The API must support returning audit_api_requests or a specific error table.
-      // We assume /api/admin/audit handles this.
-      const response = await api.get('/admin/audit?type=ERROR');
-      if (response.data && Array.isArray(response.data.logs)) {
-        setErrors(response.data.logs.filter(log => log.method === 'ERROR'));
-      } else {
-        setErrors([]);
-      }
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to fetch system errors');
-      // For demo purposes, we will populate with some dummy data if API fails to load real errors yet
-      if (errors.length === 0) {
-        setErrors([
-          {
-            request_id: 'e1',
-            timestamp: new Date().toISOString(),
-            user_id: 'TestAdmin',
-            endpoint: '[FRONTEND CRASH] TypeError: Cannot read properties of undefined (reading "map")',
-            ip_address: '10.0.0.5'
-          }
-        ]);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [errors.length]);
+    const fetchErrors = useCallback(async () => {
+        setLoading(true);
+        setApiError(null);
+        try {
+            const data = await adminService.getSystemErrors();
+            setErrors(Array.isArray(data) ? data : []);
+        } catch (err) {
+            setApiError(err.response?.data?.message || 'Unable to fetch system errors');
+            await errorLogService.logFrontendError(err.message, err.stack, '/admin/errors');
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
-  useEffect(() => {
-    fetchErrors();
-    const interval = setInterval(fetchErrors, 30000);
-    return () => clearInterval(interval);
-  }, [fetchErrors]);
+    useEffect(() => {
+        fetchErrors();
+        const t = setInterval(fetchErrors, 30000);
+        return () => clearInterval(t);
+    }, [fetchErrors]);
 
-  const handleExport = () => {
-    if (errors.length === 0) return;
-    const csvRows = [];
-    const headers = ['Timestamp', 'User', 'IP Address', 'Error Message'];
-    csvRows.push(headers.join(','));
+    const handleExport = () => {
+        const rows = [
+            ['Timestamp', 'User', 'IP Address', 'Error Message'].join(','),
+            ...filtered.map(e => [
+                `"${e.timestamp || ''}"`,
+                `"${e.username  || ''}"`,
+                `"${e.ip_address || ''}"`,
+                `"${(e.error_message || e.path || '').replace(/"/g, '""')}"`
+            ].join(','))
+        ];
+        const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href = url;
+        a.download = `System_Errors_${new Date().toISOString().slice(0,10)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
 
-    filteredErrors.forEach(err => {
-      const row = [
-        err.timestamp,
-        err.username,
-        err.ip_address,
-        `"${(err.error_message || err.path || '').replace(/"/g, '""')}"`
-      ];
-      csvRows.push(row.join(','));
-    });
+    const filtered = errors.filter(e =>
+        [e.error_message, e.path, e.username].some(v =>
+            (v || '').toLowerCase().includes(search.toLowerCase())
+        )
+    );
 
-    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.setAttribute('hidden', '');
-    a.setAttribute('href', url);
-    a.setAttribute('download', `System_Errors_Export_${format(new Date(), 'yyyyMMdd_HHmmss')}.csv`);
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
+    const formatTime = (ts) => {
+        try { return new Date(ts).toLocaleString(); } catch { return ts || '—'; }
+    };
 
-  const filteredErrors = errors.filter(err =>
-    (err.error_message || '').toLowerCase().includes(search.toLowerCase()) ||
-    (err.path || '').toLowerCase().includes(search.toLowerCase()) ||
-    (err.username || '').toLowerCase().includes(search.toLowerCase())
-  );
+    return (
+        <div>
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
+                <div>
+                    <h1 style={{ margin: 0, fontSize: '1.6rem', fontWeight: 700, color: '#0f172a' }}>
+                        🐛 System Errors
+                    </h1>
+                    <p style={{ margin: '6px 0 0', color: '#64748b', fontSize: '0.9rem' }}>
+                        Frontend crash logs &amp; backend exceptions · Auto-refreshes every 30 s
+                    </p>
+                </div>
+                <div style={{ display: 'flex', gap: 10 }}>
+                    <button
+                        onClick={handleExport}
+                        disabled={filtered.length === 0}
+                        style={{
+                            padding: '8px 16px', background: '#f1f5f9',
+                            border: '1px solid #e2e8f0', borderRadius: 8,
+                            cursor: filtered.length === 0 ? 'not-allowed' : 'pointer',
+                            fontWeight: 600, fontSize: '0.875rem', color: '#475569',
+                            opacity: filtered.length === 0 ? 0.5 : 1
+                        }}
+                    >
+                        ↓ Export CSV
+                    </button>
+                    <button
+                        onClick={fetchErrors}
+                        disabled={loading}
+                        style={{
+                            padding: '8px 16px', background: '#2563eb', color: '#fff',
+                            border: 'none', borderRadius: 8, cursor: loading ? 'not-allowed' : 'pointer',
+                            fontWeight: 600, fontSize: '0.875rem', opacity: loading ? 0.7 : 1
+                        }}
+                    >
+                        {loading ? 'Loading…' : '⟳ Refresh'}
+                    </button>
+                </div>
+            </div>
 
-  return (
-    <Box sx={{ p: 3 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" sx={{ display: 'flex', alignItems: 'center', fontWeight: 'bold' }}>
-          <MdBugReport style={{ marginRight: '10px', color: '#dc3545' }} />
-          Frontend System Errors
-        </Typography>
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button
-            variant="outlined"
-            startIcon={<MdDownload />}
-            onClick={handleExport}
-            disabled={filteredErrors.length === 0}
-          >
-            Export CSV
-          </Button>
-          <IconButton onClick={fetchErrors} color="primary" title="Refresh">
-            <MdRefresh size={28} />
-          </IconButton>
-        </Box>
-      </Box>
-
-      {error && (
-        <Alert severity="warning" sx={{ mb: 3 }}>
-          {error} - Showing cached/mock data.
-        </Alert>
-      )}
-
-      <Paper sx={{ mb: 3, p: 2, display: 'flex', gap: 2 }}>
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder="Search errors by message or user..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          size="small"
-        />
-      </Paper>
-
-      <TableContainer component={Paper} sx={{ boxShadow: 3, borderRadius: 2 }}>
-        {loading && <LinearProgress />}
-        <Table>
-          <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
-            <TableRow>
-              <TableCell sx={{ fontWeight: 'bold' }}>Timestamp</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>User</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>IP Address</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>Error Message</TableCell>
-              <TableCell sx={{ fontWeight: 'bold', textAlign: 'center' }}>Stack Trace</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredErrors.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
-                  <Typography variant="body1" color="textSecondary">
-                    No errors logged. Everything is running smoothly!
-                  </Typography>
-                </TableCell>
-              </TableRow>
-            ) : (
-              filteredErrors.map((err) => (
-                <TableRow key={err.request_id} hover>
-                  <TableCell>
-                    {format(new Date(err.timestamp), 'MMM dd, yyyy HH:mm:ss')}
-                  </TableCell>
-                  <TableCell>
-                    <Chip label={err.username} size="small" color="primary" variant="outlined" />
-                  </TableCell>
-                  <TableCell>{err.ip_address}</TableCell>
-                  <TableCell sx={{ maxWidth: '400px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    <Typography variant="body2" color="error" sx={{ fontFamily: 'monospace' }}>
-                      {err.error_message || err.path}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Tooltip title="View Stack Trace">
-                      <IconButton color="primary" onClick={() => setSelectedError(err)}>
-                        <MdCode />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
-                </TableRow>
-              ))
+            {apiError && (
+                <div style={{
+                    padding: '12px 16px', borderRadius: 8, background: '#fef2f2',
+                    border: '1px solid #fecaca', color: '#991b1b', marginBottom: 16, fontSize: '0.875rem'
+                }}>
+                    ⚠️ {apiError} — Showing cached results.
+                </div>
             )}
-          </TableBody>
-        </Table>
-      </TableContainer>
 
-      {/* Stack Trace Dialog */}
-      <Dialog open={!!selectedError} onClose={() => setSelectedError(null)} maxWidth="md" fullWidth>
-        <DialogTitle sx={{ backgroundColor: '#dc3545', color: 'white', display: 'flex', alignItems: 'center' }}>
-          <MdBugReport style={{ marginRight: '8px' }} /> Error Details
-        </DialogTitle>
-        <DialogContent dividers sx={{ backgroundColor: '#2d2d2d' }}>
-          <Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#ff6b6b', mb: 2, whiteSpace: 'pre-wrap' }}>
-            {selectedError?.error_message || selectedError?.path}
-          </Typography>
-          <Typography variant="caption" sx={{ color: '#a8a8a8' }}>
-            User: {selectedError?.username} | IP: {selectedError?.ip_address} | Time: {selectedError && format(new Date(selectedError.timestamp), 'PPpp')}
-          </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setSelectedError(null)} color="inherit">Close</Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
-  );
-};
+            {/* Search */}
+            <div style={{ marginBottom: 20 }}>
+                <input
+                    type="text"
+                    placeholder="🔍 Search by error message, path, or user…"
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    style={{
+                        width: '100%', padding: '10px 14px', border: '1px solid #e2e8f0',
+                        borderRadius: 8, fontSize: '0.875rem', outline: 'none',
+                        background: '#f8fafc', boxSizing: 'border-box'
+                    }}
+                />
+            </div>
+
+            {/* Table */}
+            <div style={{
+                background: '#fff', borderRadius: 12, border: '1px solid #e2e8f0',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.04)', overflow: 'hidden'
+            }}>
+                {loading && (
+                    <div style={{ height: 3, background: 'linear-gradient(90deg,#2563eb,#7c3aed)', animation: 'none' }} />
+                )}
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                        <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
+                            {['Timestamp', 'User', 'IP Address', 'Error Message', 'Details'].map(h => (
+                                <th key={h} style={{
+                                    padding: '12px 16px', textAlign: 'left', fontSize: '0.75rem',
+                                    fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px'
+                                }}>
+                                    {h}
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filtered.length === 0 ? (
+                            <tr>
+                                <td colSpan={5} style={{ textAlign: 'center', padding: 48, color: '#94a3b8' }}>
+                                    {loading ? 'Loading…' : '✅ No errors found. Everything looks healthy!'}
+                                </td>
+                            </tr>
+                        ) : (
+                            filtered.map((err, i) => (
+                                <tr key={err.request_id || i} style={{
+                                    borderBottom: '1px solid #f1f5f9',
+                                    cursor: 'pointer'
+                                }}
+                                    onMouseOver={e => e.currentTarget.style.background = '#fef2f2'}
+                                    onMouseOut={e => e.currentTarget.style.background = 'transparent'}
+                                >
+                                    <td style={{ padding: '12px 16px', fontSize: '0.8rem', color: '#64748b', whiteSpace: 'nowrap' }}>
+                                        {formatTime(err.timestamp)}
+                                    </td>
+                                    <td style={{ padding: '12px 16px' }}>
+                                        <span style={{
+                                            background: '#eff6ff', color: '#2563eb',
+                                            padding: '3px 8px', borderRadius: 6,
+                                            fontSize: '0.78rem', fontWeight: 600
+                                        }}>
+                                            {err.username || 'anonymous'}
+                                        </span>
+                                    </td>
+                                    <td style={{ padding: '12px 16px', fontSize: '0.8rem', color: '#64748b' }}>
+                                        {err.ip_address || '—'}
+                                    </td>
+                                    <td style={{ padding: '12px 16px', maxWidth: 400 }}>
+                                        <div style={{
+                                            fontFamily: 'monospace', fontSize: '0.78rem', color: '#dc2626',
+                                            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
+                                        }}>
+                                            {err.error_message || err.path || '—'}
+                                        </div>
+                                    </td>
+                                    <td style={{ padding: '12px 16px', textAlign: 'center' }}>
+                                        <button
+                                            onClick={() => setSelected(err)}
+                                            style={{
+                                                padding: '5px 12px', background: '#eff6ff',
+                                                border: '1px solid #bfdbfe', borderRadius: 6,
+                                                cursor: 'pointer', fontSize: '0.78rem', color: '#2563eb', fontWeight: 600
+                                            }}
+                                        >
+                                            View
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* Detail Modal */}
+            {selected && (
+                <div
+                    onClick={() => setSelected(null)}
+                    style={{
+                        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+                    }}
+                >
+                    <div
+                        onClick={e => e.stopPropagation()}
+                        style={{
+                            background: '#fff', borderRadius: 16, width: '90%', maxWidth: 720,
+                            maxHeight: '80vh', display: 'flex', flexDirection: 'column',
+                            boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+                        }}
+                    >
+                        <div style={{
+                            padding: '16px 20px', borderBottom: '1px solid #e2e8f0',
+                            display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+                        }}>
+                            <div style={{ fontWeight: 700, color: '#dc2626', fontSize: '1rem' }}>
+                                🐛 Error Details
+                            </div>
+                            <button
+                                onClick={() => setSelected(null)}
+                                style={{
+                                    border: 'none', background: '#f1f5f9', borderRadius: 6,
+                                    padding: '5px 10px', cursor: 'pointer', color: '#64748b', fontWeight: 700
+                                }}
+                            >
+                                ✕
+                            </button>
+                        </div>
+                        <div style={{ padding: '20px', overflowY: 'auto', flex: 1 }}>
+                            <div style={{ marginBottom: 16 }}>
+                                <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', marginBottom: 4 }}>Time</div>
+                                <div style={{ color: '#1e293b' }}>{formatTime(selected.timestamp)}</div>
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+                                <div>
+                                    <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', marginBottom: 4 }}>User</div>
+                                    <div style={{ color: '#1e293b', fontWeight: 600 }}>{selected.username || '—'}</div>
+                                </div>
+                                <div>
+                                    <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', marginBottom: 4 }}>IP Address</div>
+                                    <div style={{ color: '#1e293b' }}>{selected.ip_address || '—'}</div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', marginBottom: 8 }}>Error / Stack Trace</div>
+                                <pre style={{
+                                    background: '#1e293b', color: '#f87171', padding: 16,
+                                    borderRadius: 8, fontSize: '0.78rem', overflowX: 'auto',
+                                    whiteSpace: 'pre-wrap', wordBreak: 'break-word', margin: 0
+                                }}>
+                                    {selected.error_message || selected.path || 'No details available'}
+                                </pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
 
 export default SystemErrors;

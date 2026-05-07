@@ -1,30 +1,57 @@
 import React, { useState, useEffect } from 'react';
-import { apiClient } from '../services/api';
+import { adminService } from '../services/api';
+
+const categoryColors = {
+    Scanning:       { bg: '#eff6ff', border: '#bfdbfe', badge: '#2563eb' },
+    Security:       { bg: '#f0fdf4', border: '#bbf7d0', badge: '#16a34a' },
+    Reporting:      { bg: '#fff7ed', border: '#fed7aa', badge: '#ea580c' },
+    Notifications:  { bg: '#fdf4ff', border: '#e9d5ff', badge: '#9333ea' },
+    Administration: { bg: '#fef2f2', border: '#fecaca', badge: '#dc2626' }
+};
+
+function ToggleSwitch({ enabled, onChange, disabled }) {
+    return (
+        <button
+            onClick={onChange}
+            disabled={disabled}
+            aria-pressed={enabled}
+            style={{
+                position: 'relative', width: 48, height: 26, borderRadius: 13,
+                border: 'none', cursor: disabled ? 'not-allowed' : 'pointer',
+                background: enabled ? 'linear-gradient(135deg,#16a34a,#4ade80)' : '#d1d5db',
+                transition: 'background 0.25s', outline: 'none', flexShrink: 0,
+                opacity: disabled ? 0.6 : 1
+            }}
+        >
+            <span style={{
+                position: 'absolute', top: 3, left: enabled ? 25 : 3,
+                width: 20, height: 20, borderRadius: '50%',
+                background: '#fff', boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
+                transition: 'left 0.25s'
+            }} />
+        </button>
+    );
+}
 
 function AdminSettings() {
-    const [features, setFeatures] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [saving, setSaving] = useState(null);
+    const [features, setFeatures]     = useState([]);
+    const [loading, setLoading]       = useState(true);
+    const [saving, setSaving]         = useState(null);
+    const [message, setMessage]       = useState(null);
+    const [activeTab, setActiveTab]   = useState('all');
 
-    const categories = ['Scanning', 'Security', 'Reporting', 'Notifications', 'Administration'];
-    const categoryColors = {
-        Scanning: '#1976d2',
-        Security: '#2e7d32',
-        Reporting: '#f57c00',
-        Notifications: '#7b1fa2',
-        Administration: '#c62828'
-    };
+    const categories = ['all', ...Object.keys(categoryColors)];
 
     useEffect(() => { loadFeatures(); }, []);
 
     const loadFeatures = async () => {
+        setLoading(true);
         try {
-            const res = await apiClient.get('/admin/settings');
-            const data = res.data.features || [];
-            setFeatures(Array.isArray(data) ? data : []);
+            const data = await adminService.getSettings();
+            setFeatures(data);
         } catch (err) {
             console.error('Failed to load settings:', err);
-            setFeatures([]);
+            setMessage({ type: 'error', text: 'Could not load settings from server.' });
         } finally {
             setLoading(false);
         }
@@ -33,78 +60,149 @@ function AdminSettings() {
     const toggleFeature = async (featureKey, currentValue) => {
         setSaving(featureKey);
         try {
-            await apiClient.put(`/admin/settings/${featureKey}`, { enabled: !currentValue });
+            await adminService.updateSetting(featureKey, !currentValue);
             setFeatures(prev =>
                 prev.map(f => f.feature_key === featureKey ? { ...f, enabled: !currentValue } : f)
             );
+            setMessage({ type: 'success', text: `Feature "${featureKey}" ${!currentValue ? 'enabled' : 'disabled'}.` });
+            setTimeout(() => setMessage(null), 3000);
         } catch (err) {
-            alert('Failed to update feature: ' + (err.response?.data?.message || err.message));
+            setMessage({ type: 'error', text: 'Failed to update feature: ' + (err.response?.data?.message || err.message) });
         } finally {
             setSaving(null);
         }
     };
 
-    if (loading) return <div className="spinner"></div>;
+    const visibleFeatures = features.filter(f => activeTab === 'all' || f.category === activeTab);
+    const grouped = categories.slice(1).reduce((acc, cat) => {
+        const items = visibleFeatures.filter(f => f.category === cat);
+        if (items.length) acc[cat] = items;
+        return acc;
+    }, {});
+    const ungrouped = activeTab === 'all' ? [] : visibleFeatures;
 
     return (
         <div>
-            <h1 style={{ marginBottom: '10px' }}>Admin Settings</h1>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: '30px' }}>
-                Enable or disable system features. Changes take effect immediately.
-            </p>
+            {/* Header */}
+            <div style={{ marginBottom: 24 }}>
+                <h1 style={{ margin: 0, fontSize: '1.6rem', fontWeight: 700, color: '#0f172a' }}>
+                    Settings &amp; Features
+                </h1>
+                <p style={{ margin: '6px 0 0', color: '#64748b', fontSize: '0.9rem' }}>
+                    Enable or disable system features. Changes take effect immediately.
+                </p>
+            </div>
 
-            {categories.map(cat => {
-                const catFeatures = features.filter(f => f.category === cat);
-                if (catFeatures.length === 0) return null;
+            {/* Notification */}
+            {message && (
+                <div style={{
+                    marginBottom: 16, padding: '12px 16px', borderRadius: 8,
+                    background: message.type === 'success' ? '#f0fdf4' : '#fef2f2',
+                    border: `1px solid ${message.type === 'success' ? '#bbf7d0' : '#fecaca'}`,
+                    color: message.type === 'success' ? '#166534' : '#991b1b',
+                    fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: 8
+                }}>
+                    {message.type === 'success' ? '✅' : '⚠️'} {message.text}
+                </div>
+            )}
 
-                return (
-                    <div key={cat} className="card" style={{ marginBottom: '20px' }}>
-                        <h3 style={{
-                            marginBottom: '20px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '10px'
-                        }}>
-                            <span style={{
-                                width: '12px', height: '12px', borderRadius: '50%',
-                                background: categoryColors[cat] || '#666', display: 'inline-block'
-                            }}></span>
-                            {cat}
-                        </h3>
+            {/* Tab bar */}
+            <div style={{ display: 'flex', gap: 6, marginBottom: 24, flexWrap: 'wrap' }}>
+                {categories.map(cat => {
+                    const count = cat === 'all' ? features.length : features.filter(f => f.category === cat).length;
+                    const col = categoryColors[cat];
+                    return (
+                        <button
+                            key={cat}
+                            onClick={() => setActiveTab(cat)}
+                            style={{
+                                padding: '7px 16px', borderRadius: 20, border: 'none',
+                                cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600,
+                                background: activeTab === cat ? (col?.badge || '#1e293b') : '#f1f5f9',
+                                color: activeTab === cat ? '#fff' : '#64748b',
+                                transition: 'all 0.15s'
+                            }}
+                        >
+                            {cat === 'all' ? 'All' : cat} ({count})
+                        </button>
+                    );
+                })}
+            </div>
 
-                        {catFeatures.map(feature => (
-                            <div key={feature.feature_key} style={{
-                                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                                padding: '12px 0', borderBottom: '1px solid var(--border-color)'
-                            }}>
-                                <div>
-                                    <div style={{ fontWeight: '600', marginBottom: '4px' }}>
-                                        {feature.feature_name}
-                                    </div>
-                                    <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                                        {feature.description}
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={() => toggleFeature(feature.feature_key, feature.enabled)}
-                                    disabled={saving === feature.feature_key}
-                                    style={{
-                                        minWidth: '60px', padding: '6px 16px', border: 'none',
-                                        borderRadius: '20px', cursor: 'pointer', fontWeight: '600',
-                                        fontSize: '0.8rem', transition: 'all 0.3s',
-                                        background: feature.enabled
-                                            ? 'linear-gradient(135deg, #2e7d32, #66bb6a)' : '#555',
-                                        color: '#fff',
-                                        opacity: saving === feature.feature_key ? 0.5 : 1
-                                    }}
-                                >
-                                    {saving === feature.feature_key ? '...' : (feature.enabled ? 'ON' : 'OFF')}
-                                </button>
-                            </div>
-                        ))}
+            {loading ? (
+                <div style={{ textAlign: 'center', padding: 60, color: '#94a3b8' }}>Loading features…</div>
+            ) : (
+                activeTab === 'all'
+                    ? Object.entries(grouped).map(([cat, items]) => (
+                        <FeatureCard key={cat} category={cat} features={items} saving={saving} onToggle={toggleFeature} />
+                    ))
+                    : <FeatureCard category={activeTab} features={ungrouped} saving={saving} onToggle={toggleFeature} />
+            )}
+
+            {!loading && features.length === 0 && (
+                <div style={{ textAlign: 'center', padding: 60, color: '#94a3b8' }}>
+                    No features configured in the database.
+                </div>
+            )}
+        </div>
+    );
+}
+
+function FeatureCard({ category, features, saving, onToggle }) {
+    const col = categoryColors[category] || { bg: '#f8fafc', border: '#e2e8f0', badge: '#64748b' };
+    const enabledCount = features.filter(f => f.enabled).length;
+
+    return (
+        <div style={{
+            marginBottom: 20, borderRadius: 12, border: `1px solid ${col.border}`,
+            background: '#fff', overflow: 'hidden'
+        }}>
+            <div style={{
+                padding: '14px 20px', background: col.bg,
+                borderBottom: `1px solid ${col.border}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between'
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <span style={{
+                        width: 10, height: 10, borderRadius: '50%', background: col.badge, display: 'inline-block'
+                    }} />
+                    <span style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.95rem' }}>{category}</span>
+                </div>
+                <span style={{
+                    fontSize: '0.75rem', fontWeight: 600, color: col.badge,
+                    background: '#fff', padding: '3px 10px', borderRadius: 12, border: `1px solid ${col.border}`
+                }}>
+                    {enabledCount}/{features.length} enabled
+                </span>
+            </div>
+
+            {features.map((f, idx) => (
+                <div key={f.feature_key} style={{
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    padding: '14px 20px',
+                    borderBottom: idx < features.length - 1 ? '1px solid #f1f5f9' : 'none'
+                }}>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 600, color: '#1e293b', marginBottom: 2, fontSize: '0.875rem' }}>
+                            {f.feature_name}
+                        </div>
+                        <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>{f.description}</div>
                     </div>
-                );
-            })}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginLeft: 20 }}>
+                        <span style={{
+                            fontSize: '0.75rem', fontWeight: 600,
+                            color: f.enabled ? '#16a34a' : '#94a3b8'
+                        }}>
+                            {saving === f.feature_key ? '...' : (f.enabled ? 'ON' : 'OFF')}
+                        </span>
+                        <ToggleSwitch
+                            enabled={f.enabled}
+                            disabled={saving === f.feature_key}
+                            onChange={() => onToggle(f.feature_key, f.enabled)}
+                        />
+                    </div>
+                </div>
+            ))}
         </div>
     );
 }
