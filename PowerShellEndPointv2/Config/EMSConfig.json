@@ -83,7 +83,7 @@
     "Port": 5432,
     "DatabaseName": "ems_production",
     "Username": "ems_service",
-    "Password": "Annapurna@2026",
+    "Password": "YOUR_PRODUCTION_PASSWORD",
     "ConnectionTimeout": 30,
     "CommandTimeout": 300,
     "EnableSSL": false

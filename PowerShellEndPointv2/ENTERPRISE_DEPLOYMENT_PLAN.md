@@ -31,7 +31,7 @@ Log into `psql` as the `postgres` superuser and execute:
 
 ```sql
 -- 1. Create the dedicated service user
-CREATE USER ems_service WITH PASSWORD 'Annapurna@2026';
+CREATE USER ems_service WITH PASSWORD 'YOUR_PASSWORD';
 
 -- 2. Create the production database
 CREATE DATABASE ems_production OWNER ems_service;
@@ -45,7 +45,7 @@ Navigate to the `Database` folder in the project root and run the scripts in ord
 
 ```powershell
 # Run from PowerShell (replace with your path)
-$env:PGPASSWORD = 'Annapurna@2026'
+$env:PGPASSWORD = 'YOUR_PASSWORD'
 psql -U ems_service -d ems_production -f ".\Database\schema.sql"
 psql -U ems_service -d ems_production -f ".\Database\schema_granular_metrics_part1.sql"
 psql -U ems_service -d ems_production -f ".\Database\schema_granular_metrics_part2.sql"
@@ -64,7 +64,7 @@ Located in `PowerShellEndPointv2\Config\EMSConfig.json`. Update the following:
     "Host": "localhost",
     "DatabaseName": "ems_production",
     "Username": "ems_service",
-    "Password": "Annapurna@2026"
+    "Password": "YOUR_PASSWORD"
   },
   "API": {
     "ListenAddress": "http://+:5000",
