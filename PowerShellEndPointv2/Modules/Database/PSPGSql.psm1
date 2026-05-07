@@ -25,7 +25,7 @@ foreach ($asm in $assemblies) {
         } catch {
             # Only warn if it's not already loaded
             if (-not ([AppDomain]::CurrentDomain.GetAssemblies() | Where-Object { $_.Location -eq $path })) {
-                Write-Warning "Failed to load assembly $asm: $($_.Exception.Message)"
+                Write-Warning "Failed to load assembly ${asm}: $($_.Exception.Message)"
             }
         }
     }
