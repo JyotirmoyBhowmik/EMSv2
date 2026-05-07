@@ -1,0 +1,164 @@
+{
+  "Topology": {
+    "HOSubnets": [
+      "10.192.10.0/23",
+    ],
+    "RemoteSubnets": [
+      "10.192.15.0/24",
+      "10.192.19.0/24",
+      "10.192.20.0/24",
+      "10.192.13.0/24",
+      "10.192.26.0/24",
+	  "10.192.27.0/24",
+	  "10.192.28.0/24",
+	  "10.192.29.0/24",
+	  "10.192.30.0/24",
+      "10.192.31.0/24",
+      "10.192.32.0/24",
+	  "10.192.33.0/24",
+	  "10.192.34.0/24"
+	  "10.192.35.0/24"
+	  "10.192.36.0/24"
+      "10.192.37.0/24"
+
+    ],
+    "HOThrottleLimit": 40,
+    "RemoteThrottleLimit": 4,
+    "CIMSessionTimeout": 15,
+    "InvokeCommandTimeout": 30
+  },
+  "Security": {
+    "AdminGroup": "EMS_Admins",
+    "AuditLogPath": "C:\\EMSLogs",
+    "EnableRemediation": true,
+    "RequireConfirmation": true
+  },
+  "UserResolution": {
+    "UseSCCM": false,
+    "SCCMSiteServer": "",
+    "EventLogTimeWindowMinutes": 60,
+    "TimeoutSeconds": 30,
+    "FallbackToDC": true
+  },
+  "Authentication": {
+    "Providers": [
+      {
+        "Name": "Standalone",
+        "Enabled": true,
+        "Priority": 1,
+        "AllowRegistration": false
+      },
+      {
+        "Name": "ActiveDirectory",
+        "Enabled": true,
+        "Domain": "snpl.com.np",
+        "Priority": 2
+		"RequireGroup": "EMS_Admins"
+      },
+      {
+        "Name": "LDAP",
+        "Enabled": false,
+        "Server": "ldap.snpl.com.np",
+        "Port": 389,
+        "BaseDN": "dc=snpl,dc=com,dc=np",
+        "BindDN": "cn=ems_svc,ou=services,dc=snpl,dc=com,dc=np",
+        "BindPassword": "",
+        "Priority": 3
+      },
+      {
+        "Name": "setu",
+        "Enabled": false,
+        "ServerURL": "https://setu.snpl.com.np",
+        "RelyingPartyIdentifier": "urn:ems:app",
+        "Priority": 4
+      },
+      {
+        "Name": "SSO",
+        "Enabled": false,
+        "Provider": "AzureAD",
+        "TenantID": "",
+        "ClientID": "",
+        "ClientSecret": "",
+        "Priority": 5
+      }
+    ],
+    "FallbackChain": true,
+    "SessionTimeoutMinutes": 480,
+    "MaxFailedAttempts": 5,
+    "LockoutDurationMinutes": 30
+  },
+  "Monitoring": {
+    "AllowStandaloneSystems": true,
+    "RequireDomainJoin": false,
+    "AutoDiscoverComputers": false,
+    "ScanIntervalMinutes": 60,
+    "MetricRetentionDays": 90
+  },
+  "Database": {
+    "Provider": "PostgreSQL",
+    "Host": "10.192.6.87",
+    "Port": 5432,
+    "DatabaseName": "ems_production",
+    "Username": "ems_service",
+    "Password": "Annapurna@2026",
+    "PasswordFile": "",
+	"ConnectionTimeout": 30,
+	"CommandTimeout": 300,
+	"EnableSSL": false
+    #"UseSSL": false,
+    #"ConnectionPoolSize": 20
+  },
+  "API": {
+    "Enabled": true,
+    "ListenAddress": "http://localhost:5000",
+    "EnableSwagger": true,
+    "JWTSecretKey": "REPLACE_WITH_SECURE_RANDOM_KEY_MIN_32_CHARS",
+    "TokenExpirationMinutes": 60,
+    "EnableCORS": true,
+    "AllowedOrigins": [
+      "http://localhost:3000",
+      "http://localhost:8080"
+    ]
+  },
+  "WebUI": {
+    "URL": "http://localhost:3000",
+    "SessionTimeoutMinutes": 30,
+    "EnableRealTimeUpdates": true,
+    "RefreshIntervalSeconds": 30
+  },
+  "BlacklistedSoftware": [
+    "Dropbox",
+    "Steam",
+    "Tor Browser",
+    "TeamViewer",
+    "AnyDesk"
+  ],
+  "Diagnostics": {
+    "UptimeThresholdDays": 30,
+    "DiskSpaceThresholdPercent": 10,
+    "CPUThresholdPercent": 90,
+    "MemoryThresholdPercent": 85,
+    "TempFolderSizeThresholdGB": 1,
+    "ProfileSizeThresholdGB": 5
+  },
+  "Remediation": {
+    "CriticalServices": [
+      "Spooler",
+      "WinRM",
+      "wuauserv",
+      "CcmExec"
+    ],
+    "AllowServiceRestart": true,
+    "AllowProcessKill": true,
+    "AllowDiskCleanup": true,
+    "AllowGPORefresh": true,
+    "AllowReboot": false
+  },
+  "BulkProcessing": {
+    "EnableBulkImport": true,
+    "MaxTargetsPerBatch": 500,
+    "HOBatchSize": 40,
+    "RemoteBatchSize": 4,
+    "DelayBetweenRemoteBatchesSeconds": 5
+  }
+}
