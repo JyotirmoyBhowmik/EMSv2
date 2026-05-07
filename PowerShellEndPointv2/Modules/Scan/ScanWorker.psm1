@@ -5,9 +5,9 @@
  Executes endpoint scans runspaces
 #>
 
-Import-Module "$PSScriptRoot\ScanRunspacePool.psm1" -Force
-Import-Module "$PSScriptRoot\..\Database\PSPGSql.psm1" -Force
-Import-Module "$PSScriptRoot\..\Logging.psm1" -Force
+Import-Module "$PSScriptRoot\ScanRunspacePool.psm1"
+Import-Module "$PSScriptRoot\..\Database\PSPGSql.psm1"
+Import-Module "$PSScriptRoot\..\Logging.psm1"
 
 # -------------------------
 # Start EMS Scan

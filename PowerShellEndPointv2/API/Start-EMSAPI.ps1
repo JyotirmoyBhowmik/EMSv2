@@ -48,10 +48,16 @@ try {
 }
 
 # Ensure Database Connection
+$dbModule = Import-Module "$ModuleRoot\Database\PSPGSql.psm1" -Force -PassThru
+if ($dbModule) {
+    Write-Host "[DEBUG] Database module loaded. Exported commands: $($dbModule.ExportedCommands.Keys -join ', ')" -ForegroundColor Gray
+}
+
 if (Get-Command Initialize-PostgreSQLConnection -ErrorAction SilentlyContinue) {
     Initialize-PostgreSQLConnection -Config $Global:EMSConfig
 } else {
     Write-Host "[ERROR] Initialize-PostgreSQLConnection command not found. Database module failed to load." -ForegroundColor Red
+    Write-Host "[DEBUG] Available modules: $((Get-Module).Name -join ', ')" -ForegroundColor Gray
     exit 1
 }
 

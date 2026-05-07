@@ -43,7 +43,7 @@ function Get-ScanRunspacePool {
 # -------------------------
 # Shutdown (Graceful)
 # -------------------------
-function Shutdown-ScanRunspacePool {
+function Stop-ScanRunspacePool {
     if ($script:RunspacePool) {
         Write-EMSLog -Message "Shutting down scan runspace pool" -Category Scan
         $script:RunspacePool.Close()
@@ -55,5 +55,5 @@ function Shutdown-ScanRunspacePool {
 Export-ModuleMember -Function @(
     'Start-ScanRunspacePool',
     'Get-ScanRunspacePool',
-    'Shutdown-ScanRunspacePool'
+    'Stop-ScanRunspacePool'
 )
