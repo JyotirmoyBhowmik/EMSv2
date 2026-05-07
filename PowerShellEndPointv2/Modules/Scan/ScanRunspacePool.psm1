@@ -14,7 +14,7 @@ $script:MinRunspaces = 1
 # -------------------------
 # Initialize Runspace Pool
 # -------------------------
-function Initialize-ScanRunspacePool {
+function Start-ScanRunspacePool {
     if ($script:RunspacePool) {
         return
     }
@@ -35,7 +35,7 @@ function Initialize-ScanRunspacePool {
 # -------------------------
 function Get-ScanRunspacePool {
     if (-not $script:RunspacePool) {
-        Initialize-ScanRunspacePool
+        Start-ScanRunspacePool
     }
     return $script:RunspacePool
 }
@@ -53,7 +53,7 @@ function Shutdown-ScanRunspacePool {
 }
 
 Export-ModuleMember -Function @(
-    'Initialize-ScanRunspacePool',
+    'Start-ScanRunspacePool',
     'Get-ScanRunspacePool',
     'Shutdown-ScanRunspacePool'
 )

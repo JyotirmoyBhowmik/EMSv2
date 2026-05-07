@@ -121,7 +121,7 @@ function Test-AdminAccess {
     return $role -eq 'Admin'
 }
 
-function Require-ViewerAccess {
+function Test-ViewerAccessRequirement {
     param(
         [System.Net.HttpListenerRequest]$Request,
         [System.Net.HttpListenerResponse]$Response,
@@ -136,7 +136,7 @@ function Require-ViewerAccess {
     return $true
 }
 
-function Require-AdminAccess {
+function Test-AdminAccessRequirement {
     param(
         [System.Net.HttpListenerRequest]$Request,
         [System.Net.HttpListenerResponse]$Response,
@@ -151,4 +151,4 @@ function Require-AdminAccess {
     return $true
 }
 
-Export-ModuleMember -Function Get-RequestUserContext, Test-GroupMembership, Resolve-UserRole, Get-UserPermissionsObject, Test-ViewerAccess, Test-AdminAccess, Require-ViewerAccess, Require-AdminAccess
+Export-ModuleMember -Function Get-RequestUserContext, Test-GroupMembership, Resolve-UserRole, Get-UserPermissionsObject, Test-ViewerAccess, Test-AdminAccess, Test-ViewerAccessRequirement, Test-AdminAccessRequirement

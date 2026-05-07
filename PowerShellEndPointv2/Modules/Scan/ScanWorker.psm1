@@ -101,4 +101,3 @@ function Start-EMSScan {
 }
 
 Export-ModuleMember -Function Start-EMSScan
-``

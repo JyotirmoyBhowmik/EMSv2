@@ -20,7 +20,14 @@ $assemblies = @(
 foreach ($asm in $assemblies) {
     $path = Join-Path $LibRoot $asm
     if (Test-Path $path) {
-        Add-Type -Path $path -ErrorAction Stop
+        try {
+            [Reflection.Assembly]::LoadFrom($path) | Out-Null
+        } catch {
+            # Only warn if it's not already loaded
+            if (-not ([AppDomain]::CurrentDomain.GetAssemblies() | Where-Object { $_.Location -eq $path })) {
+                Write-Warning "Failed to load assembly $asm: $($_.Exception.Message)"
+            }
+        }
     }
 }
 
