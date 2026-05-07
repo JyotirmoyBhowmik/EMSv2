@@ -174,5 +174,10 @@ catch {
     Write-EMSLog -Message "Critical Service Failure: $($_.Exception.Message)" -Severity Error
 }
 finally {
-    if ($listener) { $listener.Stop(); $listener.Close() }
+    if ($null -ne $listener) {
+        try {
+            if ($listener.IsListening) { $listener.Stop() }
+            $listener.Close()
+        } catch { }
+    }
 }
