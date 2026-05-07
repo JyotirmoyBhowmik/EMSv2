@@ -57,13 +57,41 @@ function SystemErrors() {
         try { return new Date(ts).toLocaleString(); } catch { return ts || '—'; }
     };
 
+    const InfoIcon = ({ text }) => (
+        <span className="tooltip-container" style={{ marginLeft: '6px', cursor: 'help', verticalAlign: 'middle', display: 'inline-flex' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.6 }}>
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span className="tooltip-text">{text}</span>
+        </span>
+    );
+
     return (
         <div>
+            <style>{`
+                .tooltip-container { position: relative; display: inline-block; }
+                .tooltip-text {
+                    visibility: hidden; width: 180px; background-color: #1e293b; color: #fff;
+                    text-align: center; border-radius: 6px; padding: 6px 10px; position: absolute;
+                    z-index: 10; bottom: 125%; left: 50%; margin-left: -90px; opacity: 0;
+                    transition: opacity 0.3s; font-size: 0.7rem; font-weight: 400; line-height: 1.3;
+                    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); pointer-events: none;
+                }
+                .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+                .tooltip-text::after {
+                    content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px;
+                    border-width: 5px; border-style: solid; border-color: #1e293b transparent transparent transparent;
+                }
+            `}</style>
+
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
                 <div>
                     <h1 style={{ margin: 0, fontSize: '1.6rem', fontWeight: 700, color: '#0f172a' }}>
                         🐛 System Errors
+                        <InfoIcon text="Centralized view of all API failures, database errors, and frontend exceptions." />
                     </h1>
                     <p style={{ margin: '6px 0 0', color: '#64748b', fontSize: '0.9rem' }}>
                         Frontend crash logs &amp; backend exceptions · Auto-refreshes every 30 s
