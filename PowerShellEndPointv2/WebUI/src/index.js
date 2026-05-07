@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
+import ErrorBoundary from './components/ErrorBoundary';
+import api from './services/api';
 
 /*
   EMS RBAC UI Enforcement:
@@ -153,8 +155,37 @@ import App from './App';
         document.addEventListener('DOMContentLoaded', startPolicy);
     } else {
         startPolicy();
-    }
 })();
+
+// Global error handler for uncaught exceptions
+window.onerror = function (message, source, lineno, colno, error) {
+    try {
+        api.post('/audit/frontend-error', {
+            message: message,
+            stack: error?.stack || 'No stack trace',
+            source: source,
+            lineno: lineno,
+            colno: colno,
+            url: window.location.href,
+            userAgent: navigator.userAgent
+        }).catch(err => console.error("Failed to log error to backend", err));
+    } catch (e) {
+        console.error("Failed to invoke API to log error", e);
+    }
+};
+
+window.addEventListener("unhandledrejection", function (event) {
+    try {
+        api.post('/audit/frontend-error', {
+            message: event.reason?.message || 'Unhandled Promise Rejection',
+            stack: event.reason?.stack || 'No stack trace',
+            url: window.location.href,
+            userAgent: navigator.userAgent
+        }).catch(err => console.error("Failed to log promise rejection", err));
+    } catch (e) {
+        console.error("Failed to invoke API to log promise rejection", e);
+    }
+});
 
 var root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -162,7 +193,11 @@ root.render(
     React.createElement(
         React.StrictMode,
         null,
-        React.createElement(App, null)
+        React.createElement(
+            ErrorBoundary,
+            null,
+            React.createElement(App, null)
+        )
     )
 );
 

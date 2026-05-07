@@ -18,6 +18,7 @@ import RebootDashboard from './components/RebootDashboard';
 import ConnectorHealth from './components/ConnectorHealth';
 import UserManagement from './components/UserManagement';
 import EndpointLifecycle from './components/EndpointLifecycle';
+import SystemErrors from './components/SystemErrors';
 
 function Computers() {
     return (
@@ -135,6 +136,7 @@ function Layout() {
                             <NavLink to="/admin/endpoints" style={navLinkStyle}>Endpoint Lifecycle</NavLink>
                             <NavLink to="/admin/reboot" style={navLinkStyle}>Reboot Monitoring</NavLink>
                             <NavLink to="/admin/health" style={navLinkStyle}>Connector Health</NavLink>
+                            <NavLink to="/admin/errors" style={navLinkStyle}>System Errors</NavLink>
                             <NavLink to="/admin/audit" style={navLinkStyle}>Audit Logs</NavLink>
                             <div style={{ padding: '15px 14px 5px', fontSize: '0.75rem', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)', fontWeight: 700, letterSpacing: '1px' }}>Legacy</div>
                             <NavLink to="/computers" style={navLinkStyle}>Computers (Legacy)</NavLink>
@@ -247,6 +249,7 @@ function AppRoutes() {
                 <Route path="admin/endpoints" element={<ProtectedRoute requireAdmin={true}><EndpointLifecycle /></ProtectedRoute>} />
                 <Route path="admin/reboot" element={<ProtectedRoute requireAdmin={true}><RebootDashboard /></ProtectedRoute>} />
                 <Route path="admin/health" element={<ProtectedRoute requireAdmin={true}><ConnectorHealth /></ProtectedRoute>} />
+                <Route path="admin/errors" element={<ProtectedRoute requireAdmin={true}><SystemErrors /></ProtectedRoute>} />
                 <Route path="admin/audit" element={<ProtectedRoute requireAdmin={true}><AuditLog /></ProtectedRoute>} />
             </Route>
 

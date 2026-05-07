@@ -1411,6 +1411,29 @@ DO UPDATE SET ip_address=EXCLUDED.ip_address, computer_type=EXCLUDED.computer_ty
                 Write-JsonResponse $request $response 200 @{ success=$true; message='Computer registered successfully'; computer=@{ name=$computerName; ipAddress=$ipAddress; computerType=$computerType; operatingSystem=$osName; domain=$domainName } }
             }
 
+            'POST /audit/frontend-error' {
+                $body = Read-JsonBody $request
+                $ctx = Get-RequestUserContext -Request $request
+                $performedBy = if ($ctx.Username) { $ctx.Username } else { 'FrontendApp' }
+                
+                # We log this into audit_api_requests with a special method and endpoint to distinguish it
+                Invoke-PGQuery -NonQuery -Query @"
+INSERT INTO audit_api_requests (request_id, method, endpoint, user_id, ip_address, status_code, execution_ms, timestamp)
+VALUES (@reqId, 'ERROR', @errorMessage, @userId, @ip, 500, 0, NOW());
+"@ -Parameters @{ 
+                    reqId = [guid]::NewGuid().ToString();
+                    errorMessage = "[FRONTEND CRASH] " + ($body.message | Out-String).Trim();
+                    userId = $performedBy;
+                    ip = if ($request.RemoteEndPoint) { $request.RemoteEndPoint.Address.ToString() } else { '0.0.0.0' }
+                }
+
+                # If you have an error log file, we can also write to it
+                $logMsg = "[FRONTEND ERROR] User: $performedBy, URL: $($body.url), Message: $($body.message), Stack: $($body.stack)"
+                Write-Host $logMsg -ForegroundColor Red
+
+                Write-JsonResponse $request $response 200 @{ success = $true; message = 'Error logged successfully' }
+            }
+
             'POST /scan/single' {
                 if (-not (Require-AdminAccess -Request $request -Response $response -Config $Global:EMSConfig)) { break }
                 $body = Read-JsonBody $request

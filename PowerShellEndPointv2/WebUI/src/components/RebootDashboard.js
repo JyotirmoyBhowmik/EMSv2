@@ -73,6 +73,24 @@ function RebootDashboard() {
         }
     };
 
+    const exportToCsv = () => {
+        if (filtered.length === 0) return;
+        const csvRows = ['Computer Name,Last Reboot,Uptime (Days),Status,Notified'];
+        filtered.forEach(ep => {
+            const date = ep.last_boot_time ? new Date(ep.last_boot_time).toLocaleDateString() : '—';
+            csvRows.push(`${ep.computer_name},${date},${ep.uptime_days >= 0 ? ep.uptime_days : '—'},${ep.uptime_status},${ep.notified ? 'Yes' : 'No'}`);
+        });
+        const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.setAttribute('hidden', '');
+        a.setAttribute('href', url);
+        a.setAttribute('download', 'Reboot_Monitoring_Export.csv');
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    };
+
     if (loading) return <div className="spinner"></div>;
 
     return (
@@ -107,14 +125,23 @@ function RebootDashboard() {
                         color: filter === f ? '#fff' : 'var(--text-primary)', fontWeight: '600'
                     }}>{f === 'all' ? 'All' : f}</button>
                 ))}
-                {selected.length > 0 && (
-                    <button onClick={() => setMailModal(true)} style={{
-                        padding: '10px 20px', background: 'linear-gradient(135deg, #7b1fa2, #ab47bc)',
-                        color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', marginLeft: 'auto'
+                
+                <div style={{ marginLeft: 'auto', display: 'flex', gap: '10px' }}>
+                    <button onClick={exportToCsv} disabled={filtered.length === 0} style={{
+                        padding: '10px 20px', background: 'var(--bg-tertiary)',
+                        color: 'var(--text-primary)', border: '1px solid var(--border-color)', borderRadius: '6px', cursor: 'pointer', fontWeight: '600'
                     }}>
-                        📧 Send Reboot Mail ({selected.length})
+                        📥 Export CSV
                     </button>
-                )}
+                    {selected.length > 0 && (
+                        <button onClick={() => setMailModal(true)} style={{
+                            padding: '10px 20px', background: 'linear-gradient(135deg, #7b1fa2, #ab47bc)',
+                            color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '600'
+                        }}>
+                            📧 Send Reboot Mail ({selected.length})
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* Data Table */}
