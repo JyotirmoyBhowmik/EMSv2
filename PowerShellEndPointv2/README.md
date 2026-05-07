@@ -36,6 +36,11 @@ The Enterprise Endpoint Monitoring System (EMS) has been migrated from a WPF des
   - Real-time dashboard
   - Scan execution interface
   - Results history browser
+  - **[v3.0]** Admin Settings Console (Feature Toggles)
+  - **[v3.0]** Comprehensive Audit Log Viewer
+  - **[v3.0]** Reboot Monitoring & Mail Dashboard
+  - **[v3.0]** User & Endpoint Lifecycle Management
+  - **[v3.0]** Connector Health Monitoring
 - **Build**: `npm run build`
 - **Dev Server**: `npm start` (port 3000)
 
@@ -285,6 +290,12 @@ PowerShellEndPointv2/
 ├── Modules/
 │   ├── Database/
 │   │   └── PSPGSql.psm1        # Database connectivity
+│   ├── Health/
+│   │   └── Get-ConnectorHealth.psm1 # [v3.0] Connector health monitoring
+│   ├── Notifications/
+│   │   └── Send-EMSMail.psm1   # [v3.0] Email notifications
+│   ├── Scan/
+│   │   └── Get-LastReboot.psm1 # [v3.0] Reboot monitoring
 │   ├── Authentication.psm1
 │   ├── DataFetcher.psm1
 │   └── ... (existing modules)
@@ -295,7 +306,13 @@ PowerShellEndPointv2/
 │   │   │   ├── Login.js
 │   │   │   ├── Dashboard.js
 │   │   │   ├── ScanEndpoint.js
-│   │   │   └── ResultsHistory.js
+│   │   │   ├── ResultsHistory.js
+│   │   │   ├── AdminSettings.js    # [v3.0] Feature toggles
+│   │   │   ├── AuditLog.js         # [v3.0] Audit viewer
+│   │   │   ├── RebootDashboard.js  # [v3.0] Reboot monitoring
+│   │   │   ├── ConnectorHealth.js  # [v3.0] Connector health
+│   │   │   ├── UserManagement.js   # [v3.0] User lifecycle
+│   │   │   └── EndpointLifecycle.js# [v3.0] Endpoint lifecycle
 │   │   ├── services/
 │   │   │   └── api.js
 │   │   ├── App.js
@@ -322,6 +339,7 @@ For issues or questions:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 3.0.0 | 2026-05-07 | Enterprise Feature Expansion (99 features, Admin Console, Lifecycle, Audit, Reboot Mon) |
 | 2.0.0 | 2025-12-23 | Web architecture migration (PostgreSQL + React + API) |
 | 1.0.0 | 2025-12-23 | Initial WPF desktop application |
 

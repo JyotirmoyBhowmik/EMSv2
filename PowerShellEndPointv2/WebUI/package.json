@@ -1,15 +1,18 @@
 {
     "name": "ems-web-ui",
-    "version": "1.0.0",
-    "description": "Enterprise Endpoint Monitoring System - Web UI",
+    "version": "3.0.0",
+    "description": "Enterprise Endpoint Monitoring System - Web UI v3.0",
     "private": true,
     "dependencies": {
-        "axios": "^1.6.2",
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0",
-        "react-icons": "file:react-icons-5.6.0.tgz",
-        "react-router-dom": "^6.20.0",
-        "react-scripts": "5.0.1"
+        "axios": "^1.7.9",
+        "date-fns": "^4.1.0",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+        "react-hot-toast": "^2.5.1",
+        "react-icons": "^5.4.0",
+        "react-router-dom": "^6.28.0",
+        "react-scripts": "5.0.1",
+        "recharts": "^2.15.0"
     },
     "scripts": {
         "start": "react-scripts start",

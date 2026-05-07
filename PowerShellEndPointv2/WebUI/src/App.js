@@ -12,6 +12,12 @@ import Dashboard from './components/Dashboard';
 import ScanEndpoint from './components/ScanEndpoint';
 import ResultsHistory from './components/ResultsHistory';
 import Login from './components/Login';
+import AdminSettings from './components/AdminSettings';
+import AuditLog from './components/AuditLog';
+import RebootDashboard from './components/RebootDashboard';
+import ConnectorHealth from './components/ConnectorHealth';
+import UserManagement from './components/UserManagement';
+import EndpointLifecycle from './components/EndpointLifecycle';
 
 function Computers() {
     return (
@@ -123,7 +129,15 @@ function Layout() {
 
                     {permissions.canAdmin && (
                         <>
-                            <NavLink to="/computers" style={navLinkStyle}>Computers</NavLink>
+                            <div style={{ padding: '15px 14px 5px', fontSize: '0.75rem', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)', fontWeight: 700, letterSpacing: '1px' }}>Administration</div>
+                            <NavLink to="/admin/settings" style={navLinkStyle}>Settings & Features</NavLink>
+                            <NavLink to="/admin/users" style={navLinkStyle}>User Management</NavLink>
+                            <NavLink to="/admin/endpoints" style={navLinkStyle}>Endpoint Lifecycle</NavLink>
+                            <NavLink to="/admin/reboot" style={navLinkStyle}>Reboot Monitoring</NavLink>
+                            <NavLink to="/admin/health" style={navLinkStyle}>Connector Health</NavLink>
+                            <NavLink to="/admin/audit" style={navLinkStyle}>Audit Logs</NavLink>
+                            <div style={{ padding: '15px 14px 5px', fontSize: '0.75rem', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)', fontWeight: 700, letterSpacing: '1px' }}>Legacy</div>
+                            <NavLink to="/computers" style={navLinkStyle}>Computers (Legacy)</NavLink>
                             <NavLink to="/metrics" style={navLinkStyle}>Metrics Explorer</NavLink>
                         </>
                     )}
@@ -227,6 +241,13 @@ function AppRoutes() {
                         </ProtectedRoute>
                     }
                 />
+                {/* V3 Administration Routes */}
+                <Route path="admin/settings" element={<ProtectedRoute requireAdmin={true}><AdminSettings /></ProtectedRoute>} />
+                <Route path="admin/users" element={<ProtectedRoute requireAdmin={true}><UserManagement /></ProtectedRoute>} />
+                <Route path="admin/endpoints" element={<ProtectedRoute requireAdmin={true}><EndpointLifecycle /></ProtectedRoute>} />
+                <Route path="admin/reboot" element={<ProtectedRoute requireAdmin={true}><RebootDashboard /></ProtectedRoute>} />
+                <Route path="admin/health" element={<ProtectedRoute requireAdmin={true}><ConnectorHealth /></ProtectedRoute>} />
+                <Route path="admin/audit" element={<ProtectedRoute requireAdmin={true}><AuditLog /></ProtectedRoute>} />
             </Route>
 
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
