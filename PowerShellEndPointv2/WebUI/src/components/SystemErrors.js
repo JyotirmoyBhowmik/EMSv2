@@ -65,9 +65,9 @@ const SystemErrors = () => {
     filteredErrors.forEach(err => {
       const row = [
         err.timestamp,
-        err.user_id,
+        err.username,
         err.ip_address,
-        `"${err.endpoint.replace(/"/g, '""')}"`
+        `"${(err.error_message || err.path || '').replace(/"/g, '""')}"`
       ];
       csvRows.push(row.join(','));
     });
@@ -84,8 +84,9 @@ const SystemErrors = () => {
   };
 
   const filteredErrors = errors.filter(err =>
-    err.endpoint?.toLowerCase().includes(search.toLowerCase()) ||
-    err.user_id?.toLowerCase().includes(search.toLowerCase())
+    (err.error_message || '').toLowerCase().includes(search.toLowerCase()) ||
+    (err.path || '').toLowerCase().includes(search.toLowerCase()) ||
+    (err.username || '').toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -155,12 +156,12 @@ const SystemErrors = () => {
                     {format(new Date(err.timestamp), 'MMM dd, yyyy HH:mm:ss')}
                   </TableCell>
                   <TableCell>
-                    <Chip label={err.user_id} size="small" color="primary" variant="outlined" />
+                    <Chip label={err.username} size="small" color="primary" variant="outlined" />
                   </TableCell>
                   <TableCell>{err.ip_address}</TableCell>
                   <TableCell sx={{ maxWidth: '400px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     <Typography variant="body2" color="error" sx={{ fontFamily: 'monospace' }}>
-                      {err.endpoint}
+                      {err.error_message || err.path}
                     </Typography>
                   </TableCell>
                   <TableCell align="center">
@@ -184,10 +185,10 @@ const SystemErrors = () => {
         </DialogTitle>
         <DialogContent dividers sx={{ backgroundColor: '#2d2d2d' }}>
           <Typography variant="body2" sx={{ fontFamily: 'monospace', color: '#ff6b6b', mb: 2, whiteSpace: 'pre-wrap' }}>
-            {selectedError?.endpoint}
+            {selectedError?.error_message || selectedError?.path}
           </Typography>
           <Typography variant="caption" sx={{ color: '#a8a8a8' }}>
-            User: {selectedError?.user_id} | IP: {selectedError?.ip_address} | Time: {selectedError && format(new Date(selectedError.timestamp), 'PPpp')}
+            User: {selectedError?.username} | IP: {selectedError?.ip_address} | Time: {selectedError && format(new Date(selectedError.timestamp), 'PPpp')}
           </Typography>
         </DialogContent>
         <DialogActions>

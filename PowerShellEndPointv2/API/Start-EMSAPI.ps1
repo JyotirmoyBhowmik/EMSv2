@@ -1456,7 +1456,7 @@ ORDER BY computer_name, timestamp DESC;
                     "auth"    { $query = "SELECT timestamp, username, event_type, provider, risk_level FROM audit_auth_events ORDER BY timestamp DESC LIMIT $limit" }
                     "config"  { $query = "SELECT timestamp, changed_by, config_section, config_key, old_value, new_value FROM audit_config_changes ORDER BY timestamp DESC LIMIT $limit" }
                     "feature" { $query = "SELECT timestamp, feature_key, old_value, new_value, changed_by FROM audit_feature_toggles ORDER BY timestamp DESC LIMIT $limit" }
-                    "ERROR"   { $query = "SELECT timestamp, user_id as username, method, endpoint as path, status_code FROM audit_api_requests WHERE method = 'ERROR' ORDER BY timestamp DESC LIMIT $limit" }
+                    "ERROR"   { $query = "SELECT timestamp, username, method, path, status_code, error_message FROM audit_api_requests WHERE method = 'ERROR' ORDER BY timestamp DESC LIMIT $limit" }
                     default   { $query = "SELECT timestamp, username, method, path, status_code FROM audit_api_requests ORDER BY timestamp DESC LIMIT $limit" }
                 }
                 
@@ -1469,14 +1469,14 @@ ORDER BY computer_name, timestamp DESC;
                 $ctx = Get-RequestUserContext -Request $request
                 $performedBy = if ($ctx.Username) { $ctx.Username } else { 'FrontendApp' }
                 
-                # We log this into audit_api_requests with a special method and endpoint to distinguish it
+                # We log this into audit_api_requests with a special method and path to distinguish it
                 Invoke-PGQuery -NonQuery -Query @"
-INSERT INTO audit_api_requests (request_id, method, endpoint, user_id, ip_address, status_code, execution_ms, timestamp)
-VALUES (@reqId, 'ERROR', @errorMessage, @userId, @ip, 500, 0, NOW());
+INSERT INTO audit_api_requests (method, path, username, ip_address, status_code, response_time_ms, timestamp, error_message)
+VALUES ('ERROR', @path, @username, CAST(@ip AS inet), 500, 0, NOW(), @errorMsg);
 "@ -Parameters @{ 
-                    reqId = [guid]::NewGuid().ToString();
-                    errorMessage = "[FRONTEND CRASH] " + ($body.message | Out-String).Trim();
-                    userId = $performedBy;
+                    path = if ($body.url) { $body.url } else { '/frontend' };
+                    errorMsg = "[FRONTEND CRASH] " + ($body.message | Out-String).Trim() + " | Stack: " + ($body.stack | Out-String).Trim();
+                    username = $performedBy;
                     ip = if ($request.RemoteEndPoint) { $request.RemoteEndPoint.Address.ToString() } else { '0.0.0.0' }
                 }
 
