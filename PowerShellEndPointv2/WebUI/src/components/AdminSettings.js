@@ -33,6 +33,19 @@ function ToggleSwitch({ enabled, onChange, disabled }) {
     );
 }
 
+function InfoIcon({ text }) {
+    return (
+        <span className="tooltip-container" style={{ marginLeft: '6px', cursor: 'help', verticalAlign: 'middle', display: 'inline-flex' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.6 }}>
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span className="tooltip-text">{text}</span>
+        </span>
+    );
+}
+
 function AdminSettings() {
     const [features, setFeatures]     = useState([]);
     const [loading, setLoading]       = useState(true);
@@ -82,7 +95,22 @@ function AdminSettings() {
     const ungrouped = activeTab === 'all' ? [] : visibleFeatures;
 
     return (
-        <div>
+        <div className="admin-settings-container">
+            <style>{`
+                .tooltip-container { position: relative; display: inline-block; }
+                .tooltip-text {
+                    visibility: hidden; width: 200px; background-color: #1e293b; color: #fff;
+                    text-align: center; border-radius: 6px; padding: 8px 12px; position: absolute;
+                    z-index: 10; bottom: 125%; left: 50%; margin-left: -100px; opacity: 0;
+                    transition: opacity 0.3s; font-size: 0.75rem; font-weight: 400; line-height: 1.4;
+                    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); pointer-events: none;
+                }
+                .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+                .tooltip-text::after {
+                    content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px;
+                    border-width: 5px; border-style: solid; border-color: #1e293b transparent transparent transparent;
+                }
+            `}</style>
             {/* Header */}
             <div style={{ marginBottom: 24 }}>
                 <h1 style={{ margin: 0, fontSize: '1.6rem', fontWeight: 700, color: '#0f172a' }}>
@@ -152,6 +180,14 @@ function FeatureCard({ category, features, saving, onToggle }) {
     const col = categoryColors[category] || { bg: '#f8fafc', border: '#e2e8f0', badge: '#64748b' };
     const enabledCount = features.filter(f => f.enabled).length;
 
+    const catDesc = {
+        Scanning: "Control the frequency and depth of endpoint inventory scans.",
+        Security: "Manage authentication, RBAC, and system-wide security policies.",
+        Reporting: "Configure automated reports and data export schedules.",
+        Notifications: "Set up email alerts and system health notifications.",
+        Administration: "Core system management and database maintenance tools."
+    };
+
     return (
         <div style={{
             marginBottom: 20, borderRadius: 12, border: `1px solid ${col.border}`,
@@ -166,7 +202,10 @@ function FeatureCard({ category, features, saving, onToggle }) {
                     <span style={{
                         width: 10, height: 10, borderRadius: '50%', background: col.badge, display: 'inline-block'
                     }} />
-                    <span style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.95rem' }}>{category}</span>
+                    <span style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.95rem' }}>
+                        {category}
+                        <InfoIcon text={catDesc[category] || `Manage ${category} related features.`} />
+                    </span>
                 </div>
                 <span style={{
                     fontSize: '0.75rem', fontWeight: 600, color: col.badge,
@@ -185,6 +224,7 @@ function FeatureCard({ category, features, saving, onToggle }) {
                     <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontWeight: 600, color: '#1e293b', marginBottom: 2, fontSize: '0.875rem' }}>
                             {f.feature_name}
+                            <InfoIcon text={f.description || "No additional details available."} />
                         </div>
                         <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>{f.description}</div>
                     </div>

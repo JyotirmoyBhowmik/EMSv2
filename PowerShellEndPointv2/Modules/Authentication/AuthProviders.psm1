@@ -40,15 +40,15 @@ function Invoke-MultiProviderAuth {
         [object]$Config
     )
 
-	$bstr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecurePassword)
-	try {
-	    $plainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr)
-	}
-	finally {
-	    if ($bstr -ne [IntPtr]::Zero) {
-        [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
-	    }
-	}
+    $bstr = [System.Runtime.InteropServices.Marshal]::SecureStringToBSTR($SecurePassword)
+    try {
+        $plainPassword = [System.Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr)
+    }
+    finally {
+        if ($bstr -ne [IntPtr]::Zero) {
+            [System.Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
+        }
+    }
 
     $enabledProviders = $Config.Authentication.Providers |
         Where-Object { $_.Enabled -eq $true } |

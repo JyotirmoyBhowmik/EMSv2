@@ -94,11 +94,42 @@ function Dashboard() {
         cursor: 'pointer'
     };
 
-    return (
-        <div>
-            <h1 style={{ marginBottom: '30px' }}>Dashboard</h1>
+    const InfoIcon = ({ text }) => (
+        <span className="tooltip-container" style={{ marginLeft: '6px', cursor: 'help', verticalAlign: 'middle', display: 'inline-flex' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.7 }}>
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span className="tooltip-text">{text}</span>
+        </span>
+    );
 
-            <h3 style={{ marginBottom: '15px' }}>Compliance Classification</h3>
+    return (
+        <div className="dashboard-container">
+            <style>{`
+                .tooltip-container { position: relative; display: inline-block; }
+                .tooltip-text {
+                    visibility: hidden; width: 220px; background-color: #1e293b; color: #fff;
+                    text-align: center; border-radius: 6px; padding: 8px 12px; position: absolute;
+                    z-index: 10; bottom: 125%; left: 50%; margin-left: -110px; opacity: 0;
+                    transition: opacity 0.3s; font-size: 0.75rem; font-weight: 400; line-height: 1.4;
+                    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); pointer-events: none;
+                }
+                .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+                .tooltip-text::after {
+                    content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px;
+                    border-width: 5px; border-style: solid; border-color: #1e293b transparent transparent transparent;
+                }
+                .stat-card:hover { transform: translateY(-2px); transition: transform 0.2s; }
+            `}</style>
+
+            <h1 style={{ marginBottom: '30px', fontWeight: 700, color: '#0f172a' }}>Dashboard</h1>
+
+            <h3 style={{ marginBottom: '15px', fontSize: '1.1rem', color: '#64748b' }}>
+                Compliance Classification
+                <InfoIcon text="Real-time breakdown of endpoint security and collection status across the enterprise." />
+            </h3>
 
             <div className="stat-cards">
                 <button
@@ -109,11 +140,13 @@ function Dashboard() {
                         background: 'linear-gradient(135deg, #2e7d32, #66bb6a)'
                     }}
                     onClick={() => navigate('/results?view=compliant')}
-                    title="Open compliant endpoints"
                 >
-                    <div className="stat-label">COMPLIANT ENDPOINTS</div>
+                    <div className="stat-label">
+                        COMPLIANT ENDPOINTS
+                        <InfoIcon text="Endpoints meeting 100% of defined enterprise security policies." />
+                    </div>
                     <div className="stat-value">{stats.compliantEndpoints || 0}</div>
-                    <div style={{ fontSize: '0.85rem', marginTop: '8px' }}>
+                    <div style={{ fontSize: '0.85rem', marginTop: '8px', opacity: 0.9 }}>
                         All required compliance fields valid
                     </div>
                 </button>
@@ -126,11 +159,13 @@ function Dashboard() {
                         background: 'linear-gradient(135deg, #f57c00, #ffb74d)'
                     }}
                     onClick={() => navigate('/results?view=partial')}
-                    title="Open partial compliant endpoints"
                 >
-                    <div className="stat-label">PARTIAL COMPLIANT</div>
+                    <div className="stat-label">
+                        PARTIAL COMPLIANT
+                        <InfoIcon text="Missing one or more secondary security configurations or policy data." />
+                    </div>
                     <div className="stat-value">{stats.partialCompliantEndpoints || 0}</div>
-                    <div style={{ fontSize: '0.85rem', marginTop: '8px' }}>
+                    <div style={{ fontSize: '0.85rem', marginTop: '8px', opacity: 0.9 }}>
                         One or more required fields missing or unknown
                     </div>
                 </button>
@@ -143,11 +178,13 @@ function Dashboard() {
                         background: 'linear-gradient(135deg, #d32f2f, #ef5350)'
                     }}
                     onClick={() => navigate('/results?view=partial&issue=collectionFailed')}
-                    title="Open collection failed endpoints"
                 >
-                    <div className="stat-label">COLLECTION FAILED</div>
+                    <div className="stat-label">
+                        COLLECTION FAILED
+                        <InfoIcon text="Inventory collection was blocked by firewall, RPC failure, or system being offline." />
+                    </div>
                     <div className="stat-value">{stats.collectionFailedEndpoints || 0}</div>
-                    <div style={{ fontSize: '0.85rem', marginTop: '8px' }}>
+                    <div style={{ fontSize: '0.85rem', marginTop: '8px', opacity: 0.9 }}>
                         Inventory collection failed / RPC unavailable
                     </div>
                 </button>
@@ -160,12 +197,14 @@ function Dashboard() {
                         background: 'linear-gradient(135deg, #5e35b1, #7e57c2)'
                     }}
                     onClick={() => navigate('/results?view=partial&issue=biosPasswordUnknown')}
-                    title="Open BIOS password unknown endpoints"
                 >
-                    <div className="stat-label">BIOS PASSWORD UNKNOWN</div>
+                    <div className="stat-label">
+                        BIOS PASSWORD
+                        <InfoIcon text="The status of hardware-level passwords (Admin/System) cannot be verified." />
+                    </div>
                     <div className="stat-value">{stats.biosPasswordUnknownEndpoints || 0}</div>
-                    <div style={{ fontSize: '0.85rem', marginTop: '8px' }}>
-                        Power-on/Admin BIOS password status is unknown or not verified
+                    <div style={{ fontSize: '0.85rem', marginTop: '8px', opacity: 0.9 }}>
+                        Power-on/Admin password status unknown
                     </div>
                 </button>
 
@@ -177,29 +216,37 @@ function Dashboard() {
                         background: 'linear-gradient(135deg, #1976d2, #64b5f6)'
                     }}
                     onClick={() => navigate('/results?view=partial&issue=metricWarning')}
-                    title="Open metric warning endpoints"
                 >
-                    <div className="stat-label">METRIC WARNING</div>
+                    <div className="stat-label">
+                        METRIC WARNING
+                        <InfoIcon text="System identity is confirmed, but performance/health telemetry collection failed." />
+                    </div>
                     <div className="stat-value">{stats.metricWarningEndpoints || 0}</div>
-                    <div style={{ fontSize: '0.85rem', marginTop: '8px' }}>
+                    <div style={{ fontSize: '0.85rem', marginTop: '8px', opacity: 0.9 }}>
                         Inventory completed but metric collection failed
                     </div>
                 </button>
             </div>
 
             <div className="card">
-                <h3 style={{ marginBottom: '20px' }}>System Health Overview</h3>
+                <h3 style={{ marginBottom: '20px', fontSize: '1.1rem', color: '#64748b' }}>
+                    System Health Overview
+                    <InfoIcon text="Aggregated health score based on security compliance, uptime, and hardware alerts." />
+                </h3>
                 <div
                     style={{
                         display: 'grid',
                         gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                        gap: '20px'
+                        gap: '25px'
                     }}
                 >
                     <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                            <span>Excellent</span>
-                            <strong style={{ color: 'var(--success-color)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', alignItems: 'center' }}>
+                            <span style={{ fontWeight: 600, color: '#475569' }}>
+                                Excellent
+                                <InfoIcon text="Fully healthy: 100% compliant and active telemetry." />
+                            </span>
+                            <strong style={{ color: '#16a34a', fontSize: '1.1rem' }}>
                                 {stats.excellentCount || 0}
                             </strong>
                         </div>
@@ -212,9 +259,12 @@ function Dashboard() {
                     </div>
 
                     <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                            <span>Good</span>
-                            <strong style={{ color: 'var(--info-color)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', alignItems: 'center' }}>
+                            <span style={{ fontWeight: 600, color: '#475569' }}>
+                                Good
+                                <InfoIcon text="Minor gaps: Mostly compliant with 1-2 non-critical missing data points." />
+                            </span>
+                            <strong style={{ color: '#2563eb', fontSize: '1.1rem' }}>
                                 {stats.goodCount || 0}
                             </strong>
                         </div>
@@ -227,9 +277,12 @@ function Dashboard() {
                     </div>
 
                     <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                            <span>Fair</span>
-                            <strong style={{ color: 'var(--warning-color)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', alignItems: 'center' }}>
+                            <span style={{ fontWeight: 600, color: '#475569' }}>
+                                Fair
+                                <InfoIcon text="Warning: Significant policy violations or outdated inventory data." />
+                            </span>
+                            <strong style={{ color: '#ca8a04', fontSize: '1.1rem' }}>
                                 {stats.fairCount || 0}
                             </strong>
                         </div>
@@ -242,9 +295,12 @@ function Dashboard() {
                     </div>
 
                     <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                            <span>Poor</span>
-                            <strong style={{ color: 'var(--error-color)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', alignItems: 'center' }}>
+                            <span style={{ fontWeight: 600, color: '#475569' }}>
+                                Poor
+                                <InfoIcon text="Critical: Major security vulnerabilities or failed management connectivity." />
+                            </span>
+                            <strong style={{ color: '#dc2626', fontSize: '1.1rem' }}>
                                 {stats.poorCount || 0}
                             </strong>
                         </div>

@@ -82,12 +82,42 @@ const ScanEndpoint = () => {
         }
     };
 
+    const InfoIcon = ({ text }) => (
+        <span className="tooltip-container" style={{ marginLeft: '6px', cursor: 'help', verticalAlign: 'middle', display: 'inline-flex' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.6 }}>
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span className="tooltip-text">{text}</span>
+        </span>
+    );
+
     return (
         <div>
-            <h1>Scan Endpoint</h1>
+            <style>{`
+                .tooltip-container { position: relative; display: inline-block; }
+                .tooltip-text {
+                    visibility: hidden; width: 200px; background-color: #1e293b; color: #fff;
+                    text-align: center; border-radius: 6px; padding: 8px 12px; position: absolute;
+                    z-index: 10; bottom: 125%; left: 50%; margin-left: -100px; opacity: 0;
+                    transition: opacity 0.3s; font-size: 0.75rem; font-weight: 400; line-height: 1.4;
+                    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); pointer-events: none;
+                }
+                .tooltip-container:hover .tooltip-text { visibility: visible; opacity: 1; }
+                .tooltip-text::after {
+                    content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px;
+                    border-width: 5px; border-style: solid; border-color: #1e293b transparent transparent transparent;
+                }
+            `}</style>
 
-            <div className="card">
-                <h3>Single Host Scan</h3>
+            <h1 style={{ marginBottom: '24px', fontWeight: 700, color: '#0f172a' }}>Scan Endpoint</h1>
+
+            <div className="card" style={{ marginBottom: '20px' }}>
+                <h3 style={{ marginBottom: '15px', color: '#1e293b' }}>
+                    Single Host Scan
+                    <InfoIcon text="Submit a specific computer for immediate inventory and compliance verification." />
+                </h3>
                 <div className="form-group">
                     <label className="form-label">Hostname / IP Address</label>
                     <input
@@ -103,7 +133,10 @@ const ScanEndpoint = () => {
             </div>
 
             <div className="card">
-                <h3>Bulk Host Scan</h3>
+                <h3 style={{ marginBottom: '15px', color: '#1e293b' }}>
+                    Bulk Host Scan
+                    <InfoIcon text="Process multiple endpoints simultaneously. Supports file upload or manual list entry." />
+                </h3>
                 <div className="form-group">
                     <label className="form-label">Upload TXT File</label>
                     <input
@@ -112,19 +145,19 @@ const ScanEndpoint = () => {
                         accept=".txt,text/plain"
                         onChange={handleFileUpload}
                     />
-                    {fileName && <small>Selected file: {fileName}</small>}
+                    {fileName && <small style={{ display: 'block', marginTop: '4px', color: '#64748b' }}>Selected file: {fileName}</small>}
                 </div>
 
                 <div className="form-group">
                     <label className="form-label">Hosts</label>
                     <textarea
                         className="form-control"
-                        rows="10"
+                        rows="8"
                         placeholder="Paste one hostname/IP per line, or comma/space separated."
                         value={bulkText}
                         onChange={(e) => setBulkText(e.target.value)}
                     />
-                    <small>Total parsed hosts: {bulkTargets.length}</small>
+                    <small style={{ display: 'block', marginTop: '4px', color: '#64748b' }}>Total parsed hosts: {bulkTargets.length}</small>
                 </div>
 
                 <button className="btn btn-primary" onClick={handleBulkScan} disabled={loading || bulkTargets.length === 0}>

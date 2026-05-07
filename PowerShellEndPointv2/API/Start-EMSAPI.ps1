@@ -35,11 +35,25 @@ Import-Module "$ModuleRoot\BulkProcessor.psm1" -Force
 
 # Load Configuration
 if (-not (Test-Path $ConfigPath)) {
-    Write-EMSLog -Message "Configuration file not found: $ConfigPath" -Severity Error
+    Write-Host "[ERROR] Configuration file not found at $ConfigPath" -ForegroundColor Red
     exit 1
 }
-$Global:EMSConfig = Get-Content $ConfigPath -Raw | ConvertFrom-Json
-Initialize-PostgreSQLConnection -Config $Global:EMSConfig | Out-Null
+
+try {
+    $rawConfig = Get-Content $ConfigPath -Raw | ConvertFrom-Json
+    $Global:EMSConfig = $rawConfig
+} catch {
+    Write-Host "[ERROR] Failed to parse configuration file: $($_.Exception.Message)" -ForegroundColor Red
+    exit 1
+}
+
+# Ensure Database Connection
+if (Get-Command Initialize-PostgreSQLConnection -ErrorAction SilentlyContinue) {
+    Initialize-PostgreSQLConnection -Config $Global:EMSConfig
+} else {
+    Write-Host "[ERROR] Initialize-PostgreSQLConnection command not found. Database module failed to load." -ForegroundColor Red
+    exit 1
+}
 
 # Ensure Security Defaults
 if (-not $Global:EMSConfig.PSObject.Properties['Security']) { $Global:EMSConfig | Add-Member -NotePropertyName Security -NotePropertyValue ([pscustomobject]@{}) }

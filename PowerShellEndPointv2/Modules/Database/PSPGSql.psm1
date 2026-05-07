@@ -89,6 +89,26 @@ function Get-PGConnection {
 }
 
 # -------------------------
+# Connection Tester
+# -------------------------
+function Test-PostgreSQLConnection {
+    [CmdletBinding()]
+    param()
+
+    try {
+        $conn = Get-PGConnection
+        $cmd  = $conn.CreateCommand()
+        $cmd.CommandText = "SELECT 1"
+        $cmd.ExecuteScalar() | Out-Null
+        $conn.Close()
+        return $true
+    }
+    catch {
+        return $false
+    }
+}
+
+# -------------------------
 # Core Query Executor
 # -------------------------
 function Invoke-PGQuery {
@@ -149,4 +169,4 @@ function Invoke-PGQuery {
     }
 }
 
-Export-ModuleMember -Function Initialize-PostgreSQLConnection, Invoke-PGQuery
+Export-ModuleMember -Function Initialize-PostgreSQLConnection, Test-PostgreSQLConnection, Get-PGConnection, Invoke-PGQuery

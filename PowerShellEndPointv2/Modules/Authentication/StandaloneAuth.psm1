@@ -1,4 +1,4 @@
-﻿#requires -Version 5.1
+#requires -Version 5.1
 
 <#
 StandaloneAuth.psm1
@@ -24,30 +24,7 @@ if (-not (Get-Command Invoke-PGQuery -ErrorAction SilentlyContinue)) {
 if (-not (Get-Command Initialize-PostgreSQLConnection -ErrorAction SilentlyContinue)) {
     throw "Initialize-PostgreSQLConnection is not available. PSPGSql.psm1 did not import correctly."
 }
-
-try {
-    $isDbReady = $false
-
-    try {
-        $isDbReady = Test-PostgreSQLConnection
-    }
-    catch {
-        $isDbReady = $false
-    }
-
-    if (-not $isDbReady) {
-        $configPath = Join-Path $PSScriptRoot "..\..\Config\EMSConfig.json"
-        if (-not (Test-Path $configPath)) {
-            throw "EMSConfig.json not found at $configPath"
-        }
-
-        $config = Get-Content $configPath -Raw | ConvertFrom-Json
-        $null = Initialize-PostgreSQLConnection -Config $config
-    }
-}
-catch {
-    throw "Failed to initialize PostgreSQL connection for StandaloneAuth: $($_.Exception.Message)"
-}
+# Note: Connection initialization is now handled centrally by Start-EMSAPI.ps1 or caller.
 
 function Ensure-LocalCredentialTable {
     [CmdletBinding()]
