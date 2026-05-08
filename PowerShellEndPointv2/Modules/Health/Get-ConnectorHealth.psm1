@@ -150,7 +150,7 @@ function Test-WinRMConnector {
             }
         }
         catch {
-            $errors += "$addr: $($_.Exception.Message)"
+            $errors += "$($addr): $($_.Exception.Message)"
         }
     }
     $sw.Stop()

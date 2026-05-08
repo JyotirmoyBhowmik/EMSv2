@@ -61,7 +61,7 @@ DO UPDATE SET $updateStr, updated_at = NOW()
             Invoke-PGQuery -Query $query -Parameters $params -NonQuery | Out-Null
         }
         catch {
-            Write-EMSLog -Message "Failed to write metric to $TableName: $($_.Exception.Message)" -Severity 'Error' -Category 'DBWriter'
+            Write-EMSLog -Message "Failed to write metric to $($TableName): $($_.Exception.Message)" -Severity 'Error' -Category 'DBWriter'
         }
     }
     

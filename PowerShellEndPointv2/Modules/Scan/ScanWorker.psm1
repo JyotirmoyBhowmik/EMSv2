@@ -195,7 +195,7 @@ function Start-EMSScan {
                 err = $_.Exception.Message
             }
             Write-ScanTrace -ScanId $ScanId -StepName "Error" -ModuleName "ScanWorker" -Status "Error" -Message $_.Exception.Message
-            Write-EMSLog -Message "Scan failed for $Target: $($_.Exception.Message)" -Severity 'Error' -Category 'Scan' -CorrelationId $ScanId
+            Write-EMSLog -Message "Scan failed for $($Target): $($_.Exception.Message)" -Severity 'Error' -Category 'Scan' -CorrelationId $ScanId
         }
     }).AddArgument($ScanId).AddArgument($Target)
 

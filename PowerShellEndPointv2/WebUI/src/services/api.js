@@ -153,13 +153,14 @@ export const computerService = {
 export const adminService = {
     getSettings: () => get('/admin/settings'),
     updateSetting: (key, enabled) => put(`/admin/settings/${key}`, { enabled }),
+    getEndpoints: () => get('/computers'), // Alias for compatibility
     getUsers: () => get('/admin/users'),
     createUser: (data) => post('/admin/users', data),
     updateUser: (id, data) => put(`/admin/users/${id}`, data),
     deleteUser: (id) => del(`/admin/users/${id}`),
     getAuditLogs: (params) => get('/admin/audit', params),
     getRebootStatus: () => get('/admin/reboot-status'),
-    getConnectors: () => get('/admin/connectors'),
+    getConnectors: () => get('/admin/connectors').then(res => res.connectors || res),
 };
 
 // ── Performance Service ────────────────────────────

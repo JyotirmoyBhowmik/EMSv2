@@ -81,7 +81,7 @@ function Start-HOQueue {
                 $sessionOption = New-CimSessionOption -Protocol $protocol
                 $cimSession = New-CimSession -ComputerName $hostname -OperationTimeoutSec 15 -SessionOption $sessionOption -ErrorAction Stop
             } catch {
-                Write-EMSLog -Message "Failed to create forced CIM session ($protocol) for $hostname: $_" -Severity 'Warning'
+                Write-EMSLog -Message "Failed to create forced CIM session ($protocol) for $($hostname): $_" -Severity 'Warning'
             }
         }
         
