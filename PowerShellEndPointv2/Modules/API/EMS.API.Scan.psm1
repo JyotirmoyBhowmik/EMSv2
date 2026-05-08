@@ -77,8 +77,9 @@ function Invoke-ScanRoutes {
                 return $true 
             }
             $scanId = [guid]::NewGuid()
+            $protocol = if ($body.protocol) { $body.protocol } else { $null }
             Invoke-PGQuery -NonQuery -Query "INSERT INTO scans (scan_id, target, status, started_at) VALUES (@scanId, @target, 'queued', NOW());" -Parameters @{ scanId = $scanId; target = $body.target }
-            Start-EMSScan -ScanId $scanId -Target $body.target
+            Start-EMSScan -ScanId $scanId -Target $body.target -Protocol $protocol
             Write-JsonResponse $Request $Response 202 @{ success = $true; scanId = $scanId; status = 'queued' }
             return $true
         }
@@ -97,8 +98,9 @@ function Invoke-ScanRoutes {
                 return $true 
             }
             
+            $protocol = if ($body.protocol) { $body.protocol } else { $null }
             try {
-                $batch = Start-EMSBatchScan -Targets $targets
+                $batch = Start-EMSBatchScan -Targets $targets -Protocol $protocol
                 Write-JsonResponse $Request $Response 202 @{ success=$true; message='Bulk scan queued successfully'; targetCount=$batch.targetCount; queuedScanCount=$batch.scanIds.Count; targets=$batch.targets; scanIds=$batch.scanIds; status='queued' }
             } catch { 
                 Write-JsonResponse $Request $Response 400 @{ success = $false; message = $_.Exception.Message } 
@@ -125,6 +127,23 @@ function Invoke-ScanRoutes {
             }
             
             Write-JsonResponse $Request $Response 200 @{ success=$true; scanId=$row.scan_id; target=$row.target; status=$row.status; startedAt=$row.started_at; completedAt=$row.completed_at; errorMessage=$row.error_message }
+            return $true
+        }
+
+        'GET /scan/trace' {
+            if (-not (Test-ViewerAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
+            $scanIdRaw = $Request.QueryString['scanId']
+            if (-not $scanIdRaw) { 
+                Write-JsonResponse $Request $Response 400 @{ success = $false; message = 'scanId is required' }
+                return $true 
+            }
+            try { $scanId = [Guid]::Parse($scanIdRaw) } catch { 
+                Write-JsonResponse $Request $Response 400 @{ success = $false; message = 'Invalid scanId format' }
+                return $true 
+            }
+            
+            $traces = Invoke-PGQuery -Query "SELECT trace_id, step_name, module_name, status, message, timestamp FROM scan_trace WHERE scan_id = @scanId ORDER BY timestamp ASC, trace_id ASC;" -Parameters @{ scanId = $scanId }
+            Write-JsonResponse $Request $Response 200 @{ success=$true; scanId=$scanId; traces=$traces }
             return $true
         }
 

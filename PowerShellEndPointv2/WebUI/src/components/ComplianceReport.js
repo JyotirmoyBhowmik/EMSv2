@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { complianceService, resultsService } from '../services/api';
+import { Link } from 'react-router-dom';
 
 const toRows = (payload) => {
     if (Array.isArray(payload)) return payload;
@@ -353,6 +354,7 @@ const ComplianceReport = () => {
                                 {columns.map((column) => (
                                     <th key={column.key}>{column.label}</th>
                                 ))}
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -368,6 +370,9 @@ const ComplianceReport = () => {
                                         {columns.map((column) => (
                                             <td key={column.key}>{text(row[column.key])}</td>
                                         ))}
+                                        <td>
+                                            {row.scan_id ? <Link to={`/scan/trace/${row.scan_id}`} className="btn btn-sm" style={{ padding: '2px 8px', fontSize: '0.75rem' }}>View Trace</Link> : '-'}
+                                        </td>
                                     </tr>
                                 ))
                             )}

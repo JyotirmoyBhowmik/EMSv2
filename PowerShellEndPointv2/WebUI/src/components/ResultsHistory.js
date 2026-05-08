@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { complianceService, scanService, resultsService } from '../services/api';
 import ComplianceReport from './ComplianceReport';
 
@@ -636,6 +637,7 @@ const ResultsHistory = () => {
                                     <th>Last Checked</th>
                                 {/* EMS_PATCH_RESULTS_HISTORY_COMMENT_TH_V1_BEGIN */}
                                 <th>Comment</th>
+                                <th>Actions</th>
                                 {/* EMS_PATCH_RESULTS_HISTORY_COMMENT_TH_V1_END */}
                                 </tr>
                             ) : (
@@ -665,6 +667,7 @@ const ResultsHistory = () => {
                                     <th>Last Checked</th>
                                 {/* EMS_PATCH_RESULTS_HISTORY_COMMENT_TH_V1_BEGIN */}
                                 <th>Comment</th>
+                                <th>Actions</th>
                                 {/* EMS_PATCH_RESULTS_HISTORY_COMMENT_TH_V1_END */}
                                 </tr>
                             )}
@@ -698,6 +701,9 @@ const ResultsHistory = () => {
                                                 <td>{value(row.lastchecked || row.LastChecked)}</td>
                                     {/* EMS_PATCH_RESULTS_HISTORY_COMMENT_TD_V1_BEGIN */}
                                     <td title={emsGetCommentText(row)}>{emsGetCommentText(row)}</td>
+                                    <td>
+                                        {row.scan_id ? <Link to={`/scan/trace/${row.scan_id}`} className="btn btn-sm" style={{ padding: '2px 8px', fontSize: '0.75rem' }}>View Trace</Link> : '-'}
+                                    </td>
                                     {/* EMS_PATCH_RESULTS_HISTORY_COMMENT_TD_V1_END */}
                                             </tr>
                                         );

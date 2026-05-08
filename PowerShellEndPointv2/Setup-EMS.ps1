@@ -61,11 +61,13 @@ if (-not $SkipDatabaseTest) {
 
     Write-Host '[4/6] Patching database schema...' -ForegroundColor Yellow
     try {
-        $patchPath = '.\Database\fix_production_schema_v3.sql'
-        if (Test-Path $patchPath) {
-            $patchSql = Get-Content $patchPath -Raw
-            Invoke-PGQuery -NonQuery -Query $patchSql
-            Write-Host '  [OK] Database schema patched' -ForegroundColor Green
+        $patches = @('.\Database\fix_production_schema_v3.sql', '.\Database\optimize_performance.sql')
+        foreach ($p in $patches) {
+            if (Test-Path $p) {
+                $patchSql = Get-Content $p -Raw
+                Invoke-PGQuery -NonQuery -Query $patchSql
+                Write-Host "  [OK] Applied patch: $(Split-Path $p -Leaf)" -ForegroundColor Green
+            }
         }
     } catch { Write-Host '  [ERROR] Patch failed: ' + $_ -ForegroundColor Red }
 }

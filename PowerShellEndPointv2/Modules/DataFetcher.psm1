@@ -20,12 +20,10 @@ function Invoke-DataFetch {
     .RETURNS
         Array of complete diagnostic results
     #>
-    param(
-        [Parameter(Mandatory)]
-        [array]$Targets,
+        [PSCustomObject]$Config,
         
-        [Parameter(Mandatory)]
-        [PSCustomObject]$Config
+        [Parameter()]
+        [string]$Protocol = $null
     )
     
     Write-EMSLog -Message "Starting data fetch for $($Targets.Count) targets" -Severity 'Info' -Category 'DataFetch'
@@ -40,7 +38,7 @@ function Invoke-DataFetch {
         Write-EMSLog -Message "Processing HO Queue: $($queues.HOQueue.Count) targets with throttle limit $($Config.Topology.HOThrottleLimit)" `
             -Severity 'Info' -Category 'DataFetch'
         
-        $hoResults = Start-HOQueue -Targets $queues.HOQueue -Config $Config
+        $hoResults = Start-HOQueue -Targets $queues.HOQueue -Config $Config -Protocol $Protocol
         $results += $hoResults
     }
     
@@ -49,7 +47,7 @@ function Invoke-DataFetch {
         Write-EMSLog -Message "Processing Remote Queue: $($queues.RemoteQueue.Count) targets with throttle limit $($Config.Topology.RemoteThrottleLimit)" `
             -Severity 'Info' -Category 'DataFetch'
         
-        $remoteResults = Start-MPLSQueue -Targets $queues.RemoteQueue -Config $Config
+        $remoteResults = Start-MPLSQueue -Targets $queues.RemoteQueue -Config $Config -Protocol $Protocol
         $results += $remoteResults
     }
     
@@ -65,16 +63,27 @@ function Start-HOQueue {
     #>
     param(
         [array]$Targets,
-        [PSCustomObject]$Config
+        [PSCustomObject]$Config,
+        [string]$Protocol = $null
     )
     
     $scriptBlock = {
-        param($hostname, $criticalServices)
+        param($hostname, $criticalServices, $protocol)
         
         # Import diagnostic modules
         $modulePath = "$using:PSScriptRoot"
         Import-Module "$modulePath\Diagnostics\SystemHealth.psm1" -Force
         Import-Module "$modulePath\Diagnostics\SecurityPosture.psm1" -Force
+        
+        $cimSession = $null
+        if ($protocol) {
+            try {
+                $sessionOption = New-CimSessionOption -Protocol $protocol
+                $cimSession = New-CimSession -ComputerName $hostname -OperationTimeoutSec 15 -SessionOption $sessionOption -ErrorAction Stop
+            } catch {
+                Write-EMSLog -Message "Failed to create forced CIM session ($protocol) for $hostname: $_" -Severity 'Warning'
+            }
+        }
         
         try {
             $results = @{
@@ -88,8 +97,11 @@ function Start-HOQueue {
             }
             
             # Run diagnostics
-            $results.SystemHealth = Invoke-SystemHealthChecks -ComputerName $hostname -CriticalServices $criticalServices
-            $results.Security = Invoke-SecurityChecks -ComputerName $hostname
+            $results.SystemHealth = Invoke-SystemHealthChecks -ComputerName $hostname -CimSession $cimSession -CriticalServices $criticalServices
+            $results.Security = Invoke-SecurityChecks -ComputerName $hostname -CimSession $cimSession
+            
+            # Cleanup
+            if ($cimSession) { Remove-CimSession -CimSession $cimSession }
             
             # Calculate health score
             $criticalCount = ($results.SystemHealth + $results.Security | Where-Object { $_.Status -eq 'Critical' -or $_.Compliance -eq 'Critical' }).Count
@@ -120,7 +132,7 @@ function Start-HOQueue {
     # Execute in parallel
     $jobs = @()
     foreach ($target in $Targets) {
-        $jobs += Start-Job -ScriptBlock $scriptBlock -ArgumentList $target.Hostname, $Config.Remediation.CriticalServices
+        $jobs += Start-Job -ScriptBlock $scriptBlock -ArgumentList $target.Hostname, $Config.Remediation.CriticalServices, $Protocol
     }
     
     # Wait for completion with progress
@@ -251,7 +263,8 @@ function Start-MPLSQueue {
     #>
     param(
         [array]$Targets,
-        [PSCustomObject]$Config
+        [PSCustomObject]$Config,
+        [string]$Protocol = $null
     )
     
     $results = @()
@@ -266,7 +279,7 @@ function Start-MPLSQueue {
             -Severity 'Info' -Category 'DataFetch'
         
         $scriptBlock = {
-            param($hostname, $criticalServices)
+            param($hostname, $criticalServices, $protocol)
             
             # Import diagnostic modules
             $modulePath = "$using:PSScriptRoot"
@@ -275,7 +288,8 @@ function Start-MPLSQueue {
             
             try {
                 # Create optimized CIM session
-                $sessionOption = New-CimSessionOption -Protocol Wsman
+                $actualProtocol = if ($protocol) { $protocol } else { 'Wsman' }
+                $sessionOption = New-CimSessionOption -Protocol $actualProtocol
                 $cimSession = New-CimSession -ComputerName $hostname -OperationTimeoutSec 15 -SessionOption $sessionOption -ErrorAction Stop
                 
                 $results = @{
@@ -323,8 +337,8 @@ function Start-MPLSQueue {
         
         # Execute batch
         $batchJobs = @()
-        foreach ($target in $batchTargets) {
-            $batchJobs += Start-Job -ScriptBlock $scriptBlock -ArgumentList $target.Hostname, $Config.Remediation.CriticalServices
+        foreach ($batchTargets as $target) {
+            $batchJobs += Start-Job -ScriptBlock $scriptBlock -ArgumentList $target.Hostname, $Config.Remediation.CriticalServices, $Protocol
         }
         
         # Wait for batch completion

@@ -29,17 +29,18 @@ function Dashboard() {
         metricWarningEndpoints: 0
     });
 
+    const [range, setRange] = useState('all');
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         loadStats();
         const interval = setInterval(loadStats, 30000);
         return () => clearInterval(interval);
-    }, []);
+    }, [range]);
 
     const loadStats = async () => {
         try {
-            const raw = await dashboardService.getStats();
+            const raw = await dashboardService.getStats(range);
             const data = raw?.stats ? raw.stats : raw || {};
 
             setStats({
@@ -124,7 +125,24 @@ function Dashboard() {
                 .stat-card:hover { transform: translateY(-2px); transition: transform 0.2s; }
             `}</style>
 
-            <h1 style={{ marginBottom: '30px', fontWeight: 700, color: '#0f172a' }}>Dashboard</h1>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+                <h1 style={{ margin: 0, fontWeight: 700, color: '#0f172a' }}>Dashboard</h1>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#64748b' }}>Observation Window:</span>
+                    <select 
+                        className="form-control" 
+                        value={range} 
+                        onChange={(e) => setRange(e.target.value)}
+                        style={{ width: '160px', marginBottom: 0 }}
+                    >
+                        <option value="all">All Time</option>
+                        <option value="today">Today (So far)</option>
+                        <option value="24h">Last 24 Hours</option>
+                        <option value="7d">Last 7 Days</option>
+                        <option value="30d">Last 30 Days</option>
+                    </select>
+                </div>
+            </div>
 
             <h3 style={{ marginBottom: '15px', fontSize: '1.1rem', color: '#64748b' }}>
                 Compliance Classification

@@ -15,6 +15,7 @@ const ScanEndpoint = () => {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
+    const [protocol, setProtocol] = useState(''); // Default to 'Auto'
     const [lastResponse, setLastResponse] = useState(null);
 
     const bulkTargets = useMemo(() => splitTargets(bulkText), [bulkText]);
@@ -32,7 +33,7 @@ const ScanEndpoint = () => {
         setLastResponse(null);
 
         try {
-            const result = await scanService.scanSingle(target);
+            const result = await scanService.scanSingle(target, protocol || null);
             setLastResponse(result);
             setMessage(`Scan submitted for ${target}.`);
         } catch (err) {
@@ -54,7 +55,7 @@ const ScanEndpoint = () => {
         setLastResponse(null);
 
         try {
-            const result = await scanService.scanBulk(bulkTargets);
+            const result = await scanService.scanBulk(bulkTargets, protocol || null);
             setLastResponse(result);
             setMessage(`Bulk scan submitted for ${bulkTargets.length} host(s).`);
         } catch (err) {
@@ -112,6 +113,29 @@ const ScanEndpoint = () => {
             `}</style>
 
             <h1 style={{ marginBottom: '24px', fontWeight: 700, color: '#0f172a' }}>Scan Endpoint</h1>
+
+            <div className="card" style={{ marginBottom: '20px', borderLeft: '4px solid #3b82f6' }}>
+                <h3 style={{ marginBottom: '15px', color: '#1e293b' }}>
+                    Protocol Selection (Force Option)
+                    <InfoIcon text="Force a specific communication protocol. Use 'Auto' for default discovery logic." />
+                </h3>
+                <div className="form-group">
+                    <label className="form-label">Connection Protocol</label>
+                    <select 
+                        className="form-control" 
+                        value={protocol} 
+                        onChange={(e) => setProtocol(e.target.value)}
+                        style={{ maxWidth: '300px' }}
+                    >
+                        <option value="">Auto-detect (Default)</option>
+                        <option value="DCOM">Force DCOM</option>
+                        <option value="Wsman">Force WinRM / Wsman</option>
+                    </select>
+                    <small style={{ display: 'block', marginTop: '8px', color: '#64748b' }}>
+                        <strong>Note:</strong> Forcing a protocol that is disabled on the target will cause the scan to fail.
+                    </small>
+                </div>
+            </div>
 
             <div className="card" style={{ marginBottom: '20px' }}>
                 <h3 style={{ marginBottom: '15px', color: '#1e293b' }}>

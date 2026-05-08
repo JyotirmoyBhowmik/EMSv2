@@ -248,9 +248,57 @@ VALUES (@userid, @hash, @salt, true, NOW())
     return $newUser
 }
 
+# ---------------------------------------------------------
+# Update standalone local EMS user password
+# ---------------------------------------------------------
+function Set-StandalonePassword {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string]$Username,
+
+        [Parameter(Mandatory)]
+        [SecureString]$NewSecurePassword
+    )
+
+    $user = Get-EMSLocalCredential -Username $Username
+    if (-not $user) {
+        throw "User '$Username' not found."
+    }
+
+    $bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($NewSecurePassword)
+    try {
+        $plainPassword = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr)
+    }
+    finally {
+        if ($bstr -ne [IntPtr]::Zero) {
+            [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr)
+        }
+    }
+
+    $hashData = New-PasswordHash -Password $plainPassword
+    
+    Invoke-PGQuery -NonQuery -Query @"
+UPDATE user_credentials 
+SET password_hash = @hash, 
+    password_salt = @salt, 
+    updated_at = NOW() 
+WHERE user_id = @userid
+"@ -Parameters @{
+        userid = $user.user_id
+        hash   = $hashData.Hash
+        salt   = $hashData.Salt
+    } | Out-Null
+
+    if (Get-Command Write-EMSLog -ErrorAction SilentlyContinue) {
+        Write-EMSLog -Message "Password updated for LOCAL user: $Username" -Severity 'Info'
+    }
+}
+
 Export-ModuleMember -Function @(
     'Test-StandaloneAuth',
     'New-StandaloneUser',
+    'Set-StandalonePassword',
     'Get-EMSLocalCredential',
     'New-PasswordHash',
     'Test-PasswordHash'

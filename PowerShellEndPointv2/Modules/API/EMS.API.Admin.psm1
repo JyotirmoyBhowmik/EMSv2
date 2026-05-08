@@ -149,6 +149,35 @@ ORDER BY computer_name, timestamp DESC;
             } catch { Write-JsonResponse $Request $Response 500 @{ success=$false; error=$_.Exception.Message } }
             return $true
         }
+        
+        'POST /auth/change-password' {
+            try {
+                $ctx = Get-RequestUserContext -Request $Request
+                if (-not $ctx.Username) { Write-JsonResponse $Request $Response 401 @{ success=$false; message='Unauthorized' }; return $true }
+                
+                $body = Read-JsonBody $Request
+                if (-not $body.oldPassword -or -not $body.newPassword) {
+                    Write-JsonResponse $Request $Response 400 @{ success=$false; message='Old and new passwords required' }
+                    return $true
+                }
+                
+                # Verify old password
+                $authResult = Test-StandaloneAuth -Username $ctx.Username -Password $body.oldPassword -Config $Config
+                if (-not $authResult.Success) {
+                    Write-JsonResponse $Request $Response 403 @{ success=$false; message='Invalid old password' }
+                    return $true
+                }
+                
+                # Set new password
+                $secureNew = ConvertTo-SecureString $body.newPassword -AsPlainText -Force
+                Set-StandalonePassword -Username $ctx.Username -NewSecurePassword $secureNew
+                
+                Write-JsonResponse $Request $Response 200 @{ success=$true; message='Password updated successfully' }
+            } catch {
+                Write-JsonResponse $Request $Response 500 @{ success=$false; error=$_.Exception.Message }
+            }
+            return $true
+        }
     }
 
     # PUT /admin/settings/:key

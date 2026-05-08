@@ -80,6 +80,10 @@ export const authService = {
     getProviders: async () => {
         const response = await apiClient.get('/auth/providers');
         return response.data;
+    },
+    changePassword: async (oldPassword, newPassword) => {
+        const response = await apiClient.post('/auth/change-password', { oldPassword, newPassword });
+        return response.data;
     }
 };
 
@@ -87,8 +91,8 @@ export const authService = {
 // Dashboard Service
 // ─────────────────────────────────────────────────
 export const dashboardService = {
-    getStats: async () => {
-        const response = await apiClient.get('/api/dashboard/stats');
+    getStats: async (range = 'all') => {
+        const response = await apiClient.get('/api/dashboard/stats', { params: { range } });
         const raw = response.data || {};
         const stats = raw.stats || raw || {};
         const collectionFailed = Number(stats.collectionFailedEndpoints ?? raw.collectionFailedEndpoints ?? 0);
@@ -107,10 +111,11 @@ export const dashboardService = {
 // Scan Service
 // ─────────────────────────────────────────────────
 export const scanService = {
-    scanSingle: async (target) => (await apiClient.post('/scan/single', { target })).data,
-    scanBulk: async (targets) => (await apiClient.post('/scan/bulk', { targets })).data,
+    scanSingle: async (target, protocol = null) => (await apiClient.post('/scan/single', { target, protocol })).data,
+    scanBulk: async (targets, protocol = null) => (await apiClient.post('/scan/bulk', { targets, protocol })).data,
     getScanStatus: async (scanId) => (await apiClient.get('/scan/status', { params: { scanId } })).data,
-    getScanResult: async (scanId) => (await apiClient.get('/scan/result', { params: { scanId } })).data
+    getScanResult: async (scanId) => (await apiClient.get('/scan/result', { params: { scanId } })).data,
+    getScanTrace:  async (scanId) => (await apiClient.get('/scan/trace',  { params: { scanId } })).data
 };
 
 // ─────────────────────────────────────────────────
