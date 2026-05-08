@@ -162,5 +162,41 @@ export const adminService = {
     getConnectors: () => get('/admin/connectors'),
 };
 
+// ── Performance Service ────────────────────────────
+export const performanceService = {
+    getPerformanceReport: (hostname, period = '7d') => get('/performance/report', { hostname, period }),
+    getResourceUtilization: (hostname, metric, period = '24h') => get('/performance/utilization', { hostname, metric, period }),
+    getPerformanceAlerts: (params) => get('/performance/alerts', params),
+};
+
+// ── Historical Reports Service ──────────────────────
+export const historicalService = {
+    getHeatmap:     (params) => get('/historical/heatmap', params),
+    getTimeline:    (computer) => get(`/historical/timeline/${computer}`),
+    getComparison:  (computers, period) => post('/historical/compare', { computers, period }),
+    getDriftAnalysis: () => get('/historical/drift'),
+    getCutoverReport: (params) => get('/historical/cutover', params),
+};
+
+// ── Inventory Service ───────────────────────────────
+export const inventoryService = {
+    getAll:         (params) => get('/inventory', params),
+    getByHostname:  (hostname) => get(`/inventory/${hostname}`),
+    getLifecycle:   () => get('/inventory/lifecycle'),
+    exportCSV:      (params) => get('/inventory/export', params),
+};
+
+// ── Error Logging Service ───────────────────────────
+export const errorLogService = {
+    logFrontendError: async (message, stack, url) => {
+        try {
+            await post('/audit/frontend-error', {
+                message, stack, url,
+                userAgent: navigator.userAgent
+            });
+        } catch { /* silent */ }
+    }
+};
+
 export { apiClient };
 export default apiClient;
