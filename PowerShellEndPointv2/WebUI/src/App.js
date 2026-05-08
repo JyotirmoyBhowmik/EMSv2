@@ -65,11 +65,32 @@ function ProtectedRoute({ children, requireScan = false, requireAdmin = false })
 }
 
 function NavItem({ to, icon: Icon, label, end = false }) {
+    const location = useLocation();
+    
+    // Parse the path and search from the 'to' prop
+    const toPath = to.split('?')[0];
+    const toSearch = to.split('?')[1] || '';
+    
+    // Check if the path matches
+    const pathMatches = end ? location.pathname === toPath : location.pathname.startsWith(toPath);
+    
+    // If it's the results path, we must match the view query parameter exactly
+    let isQueryMatch = true;
+    if (toPath === '/results') {
+        const currentParams = new URLSearchParams(location.search);
+        const toParams = new URLSearchParams(toSearch);
+        const currentView = currentParams.get('view') || '';
+        const toView = toParams.get('view') || '';
+        isQueryMatch = currentView === toView;
+    }
+
+    const isActive = pathMatches && isQueryMatch;
+
     return (
         <NavLink
             to={to}
             end={end}
-            style={({ isActive }) => ({
+            style={() => ({
                 display: 'flex', alignItems: 'center', gap: '10px',
                 padding: '10px 14px', color: isActive ? '#ffffff' : 'rgba(255,255,255,0.75)',
                 textDecoration: 'none', borderRadius: '8px', fontSize: '0.875rem',

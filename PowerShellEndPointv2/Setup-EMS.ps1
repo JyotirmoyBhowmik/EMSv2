@@ -28,6 +28,13 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+# Ensure Administrator Privileges
+if (-not ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    Write-Host "[ERROR] This setup script requires Administrator privileges." -ForegroundColor Red
+    Write-Host "Please restart PowerShell as Administrator and run the script again." -ForegroundColor Yellow
+    exit 1
+}
+
 Write-Host "`n========================================" -ForegroundColor Cyan
 Write-Host " EMS Web Architecture - Quick Setup" -ForegroundColor Cyan
 Write-Host "========================================`n" -ForegroundColor Cyan

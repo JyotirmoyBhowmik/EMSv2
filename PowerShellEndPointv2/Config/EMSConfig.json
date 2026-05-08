@@ -90,7 +90,7 @@
   },
   "API": {
     "Enabled": true,
-    "ListenAddress": "http://localhost:5000",
+    "ListenAddress": "http://*:5000",
     "EnableSwagger": true,
     "JWTSecretKey": "ChangeMeToRandom32PlusCharSecret_2026!",
     "TokenExpirationMinutes": 60,

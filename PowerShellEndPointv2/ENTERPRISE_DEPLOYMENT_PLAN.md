@@ -73,11 +73,24 @@ Located in `PowerShellEndPointv2\Config\EMSConfig.json`. Update the following:
 }
 ```
 
-### 3.2 URL Reservation
-Run as **Administrator** to allow the API to listen on all interfaces:
+### 3.2 URL Reservation & Firewall (Requires Administrator)
+Run PowerShell as **Administrator** to allow the API to listen on all interfaces and allow inbound traffic on port 5000. Failure to perform this step will result in **30000ms Axios Timeouts** in the Web UI:
 
 ```powershell
-netsh http add urlacl url=http://+:5000/ user=Everyone
+# 1. Allow the API to bind to all IPs
+netsh http add urlacl url=http://*:5000/ user=Everyone
+
+# 2. Allow inbound traffic through Windows Firewall
+New-NetFirewallRule -DisplayName "EMS API" -Direction Inbound -LocalPort 5000 -Protocol TCP -Action Allow -Profile Any -Force
+```
+
+### 3.3 Frontend API Connection Configuration
+If you intend to access the dashboard from other machines on your network, you must ensure the React application points to the correct backend IP.
+
+Edit `PowerShellEndPointv2\WebUI\.env`:
+```env
+# Replace with your server's actual network IP address
+REACT_APP_API_URL=http://10.192.6.109:5000
 ```
 
 ---
