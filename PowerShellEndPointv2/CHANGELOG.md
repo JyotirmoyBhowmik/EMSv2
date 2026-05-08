@@ -1,5 +1,23 @@
 # EMS Changelog
 
+## [3.0.1] - 2026-05-08
+
+### Added
+- **Production Hardening Patch**: Created `fix_production_schema_v3.sql` to resolve missing relations and columns in production.
+- **Automated Setup Step**: Integrated schema patching directly into `Setup-EMS.ps1`.
+- **v3 API Telemetry**: Added `/admin/health` endpoint for real-time connector monitoring.
+- **In-Memory Rate Limiting**: Implemented protection against rapid API requests (100 req/min/IP).
+
+### Fixed
+- **Dashboard 500 Errors**: Resolved aggregate query failures by creating missing compliance views.
+- **Axios Timeouts**: Updated documentation with mandatory `netsh` URL reservation and firewall rules.
+- **Monitoring Navigation**: Fixed tab highlighting logic in `App.js` for independent selection.
+- **Setup Script Errors**: Resolved PowerShell parser and encoding issues in `Setup-EMS.ps1`.
+
+### Changed
+- **Documentation Overhaul**: Updated `README.md`, `INSTALLATION.md`, and `QUICK_START.md` for modern v3 architecture.
+- **API Connectivity**: Updated listener to bind to `http://*:5000` for network-wide access.
+
 ## [3.0.0] - 2026-05-07
 
 ### Added
