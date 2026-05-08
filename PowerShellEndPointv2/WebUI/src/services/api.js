@@ -12,8 +12,9 @@ const getBaseUrl = () => {
         return `${protocol}//${hostname}:5000`;
     }
     
-    // If running on standard port (e.g. IIS), assume API is at /api
-    return `${origin}/api`;
+    // If running on standard port (e.g. IIS), return origin.
+    // The service calls already start with /api (e.g. /api/dashboard/stats)
+    return origin;
 };
 
 const API_BASE_URL = getBaseUrl();
@@ -84,17 +85,27 @@ export const scanService = {
     scanSingle:     (target, protocol) => post('/api/scan/single', { target, protocol }),
     scanBulk:       (targets, protocol) => post('/api/scan/bulk', { targets, protocol }),
     getScanStatus:  (scanId) => get('/api/scan/status', { scanId }),
+    getScanResult:  (scanId) => get('/api/scan/result', { scanId }),
     getScanTrace:   (scanId) => get('/api/scan/trace',  { scanId }),
     archiveScan:    (scanId, reason) => post(`/api/results/${scanId}/archive`, { reason }),
+    restoreScan:    (scanId) => post(`/api/results/${scanId}/restore`, {}),
 };
 
 export const dashboardService = {
     getStats: (range) => get('/api/dashboard/stats', { range }).then(res => res?.stats || res || {}),
+    getSummary: () => get('/api/dashboard/summary'),
+    getTopIssues: () => get('/api/dashboard/top-issues'),
 };
 
 export const resultsService = {
     getAll: (params) => get('/api/results', params).then(res => res?.results || res || []),
     getById: (id) => get(`/api/results/${id}`),
+    getLatest: () => get('/api/results/latest'),
+};
+
+export const complianceService = {
+    getReport: (params) => get('/api/compliance/report', params).then(res => res?.report || res || []),
+    getHistory: (params) => get('/api/compliance/history', params).then(res => res?.history || res || []),
 };
 
 export const adminService = {
@@ -102,6 +113,9 @@ export const adminService = {
     updateSetting: (key, enabled) => put(`/api/admin/settings/${key}`, { enabled }),
     getEndpoints: () => get('/api/computers').then(res => res?.computers || []),
     getUsers: () => get('/api/admin/users').then(res => res?.users || []),
+    createUser: (data) => post('/api/admin/users', data),
+    updateUser: (id, data) => put(`/api/admin/users/${id}`, data),
+    deleteUser: (id) => del(`/api/admin/users/${id}`),
     getAuditLogs: (params) => get('/api/admin/audit', params).then(res => res?.logs || []),
     getRebootStatus: () => get('/api/admin/reboot-status').then(res => res?.endpoints || []),
     getConnectors: () => get('/api/admin/connectors').then(res => {
@@ -110,19 +124,30 @@ export const adminService = {
     }),
 };
 
+export const performanceService = {
+    getPerformanceReport: (hostname, period = '7d') => get('/api/performance/report', { hostname, period }),
+    getResourceUtilization: (hostname, metric, period = '24h') => get('/api/performance/utilization', { hostname, metric, period }),
+    getPerformanceAlerts: (params) => get('/api/performance/alerts', params),
+};
+
 export const computerService = {
     getAll: (params) => get('/api/computers', params).then(res => res?.computers || res || []),
     getByName: (name) => get(`/api/computers/${encodeURIComponent(name)}`),
 };
 
 export const inventoryService = {
-    getLifecycle: () => get('/api/inventory/lifecycle'),
+    getAll:         (params) => get('/api/inventory', params).then(res => res?.inventory || res || []),
+    getByHostname:  (hostname) => get(`/api/inventory/${hostname}`),
+    getLifecycle:   () => get('/api/inventory/lifecycle'),
+    exportCSV:      (params) => get('/api/inventory/export', params),
 };
 
 export const historicalService = {
     getHeatmap:     (params) => get('/api/historical/heatmap', params),
     getTimeline:    (computer) => get(`/api/historical/timeline/${computer}`),
+    getComparison:  (computers, period) => post('/api/historical/compare', { computers, period }),
     getDriftAnalysis: () => get('/api/historical/drift'),
+    getCutoverReport: (params) => get('/api/historical/cutover', params),
 };
 
 export const errorLogService = {
