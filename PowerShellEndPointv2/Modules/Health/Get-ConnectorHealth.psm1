@@ -136,26 +136,30 @@ function Test-SMTPConnector {
 
 function Test-WinRMConnector {
     $sw = [System.Diagnostics.Stopwatch]::StartNew()
-    try {
-        $result = Test-WSMan -ComputerName localhost -ErrorAction Stop
-        $sw.Stop()
-        return [pscustomobject]@{
-            Connector = 'WinRM'
-            Status    = 'Healthy'
-            Latency   = "$($sw.ElapsedMilliseconds)ms"
-            Message   = "WS-Management operational on localhost"
-            LastCheck = (Get-Date).ToString('yyyy-MM-dd HH:mm:ss')
+    $errors = @()
+    foreach ($addr in @('localhost', '127.0.0.1')) {
+        try {
+            $result = Test-WSMan -ComputerName $addr -ErrorAction Stop
+            $sw.Stop()
+            return [pscustomobject]@{
+                Connector = 'WinRM'
+                Status    = 'Healthy'
+                Latency   = "$($sw.ElapsedMilliseconds)ms"
+                Message   = "WS-Management operational on $addr"
+                LastCheck = (Get-Date).ToString('yyyy-MM-dd HH:mm:ss')
+            }
+        }
+        catch {
+            $errors += "$addr: $($_.Exception.Message)"
         }
     }
-    catch {
-        $sw.Stop()
-        return [pscustomobject]@{
-            Connector = 'WinRM'
-            Status    = 'Down'
-            Latency   = "$($sw.ElapsedMilliseconds)ms"
-            Message   = $_.Exception.Message
-            LastCheck = (Get-Date).ToString('yyyy-MM-dd HH:mm:ss')
-        }
+    $sw.Stop()
+    return [pscustomobject]@{
+        Connector = 'WinRM'
+        Status    = 'Down'
+        Latency   = "$($sw.ElapsedMilliseconds)ms"
+        Message   = $errors -join " | "
+        LastCheck = (Get-Date).ToString('yyyy-MM-dd HH:mm:ss')
     }
 }
 

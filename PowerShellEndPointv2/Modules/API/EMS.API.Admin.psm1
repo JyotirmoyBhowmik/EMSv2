@@ -193,7 +193,7 @@ ORDER BY computer_name, timestamp DESC;
             if (-not $existing) { Write-JsonResponse $Request $Response 404 @{ success=$false; message="Feature '$featureKey' not found" }; return $true }
 
             Invoke-PGQuery -NonQuery -Query "UPDATE feature_toggles SET enabled=@en WHERE feature_key=@k;" -Parameters @{ en=$enabled; k=$featureKey }
-            try { Invoke-PGQuery -NonQuery -Query "INSERT INTO audit_feature_toggles (feature_key,old_value,new_value,changed_by,timestamp) VALUES (@k,@ov,@nv,@by,NOW());" -Parameters @{ k=$featureKey; ov=[string]$existing.enabled; nv=[string]$enabled; by=$changedBy } } catch {}
+            try { Invoke-PGQuery -NonQuery -Query "INSERT INTO audit_feature_toggles (feature_key,old_value,new_value,changed_by,timestamp) VALUES (@k,@ov,@nv,@by,NOW());" -Parameters @{ k=$featureKey; ov=$existing.enabled; nv=$enabled; by=$changedBy } } catch {}
             Write-JsonResponse $Request $Response 200 @{ success=$true; featureKey=$featureKey; enabled=$enabled }
         } catch { Write-JsonResponse $Request $Response 500 @{ success=$false; error=$_.Exception.Message } }
         return $true
