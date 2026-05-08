@@ -11,7 +11,7 @@ import {
 import Dashboard from './components/Dashboard';
 import ScanEndpoint from './components/ScanEndpoint';
 import ScanTrace from './components/ScanTrace';
-import ComplianceResults from './components/ComplianceResults';
+import ComplianceReport from './components/ComplianceReport';
 import ResultsHistory from './components/ResultsHistory';
 import Login from './components/Login';
 import AdminSettings from './components/AdminSettings';
@@ -297,7 +297,7 @@ function AppRoutes() {
                 <Route index element={<Navigate to="/dashboard" replace />} />
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="results"   element={<ResultsHistory />} />
-                <Route path="compliance" element={<ComplianceResults />} />
+                <Route path="compliance" element={<ComplianceReport />} />
                 <Route path="scan/trace/:scanId" element={<ScanTrace />} />
 
                 <Route path="scan" element={
