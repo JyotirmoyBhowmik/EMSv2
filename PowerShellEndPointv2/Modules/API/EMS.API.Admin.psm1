@@ -15,6 +15,38 @@ function Invoke-AdminRoutes {
 
     switch ("$Method $Path") {
 
+        'GET /admin/health' {
+            try {
+                $process = Get-Process -Id $PID
+                $uptime = [DateTime]::Now - $process.StartTime
+                $memoryMB = [math]::Round($process.WorkingSet64 / 1MB, 2)
+                
+                $dbStart = [DateTime]::Now
+                $dbStatus = 'Healthy'
+                $dbMs = 0
+                try { Invoke-PGQuery -Query "SELECT 1;" | Out-Null; $dbMs = [math]::Round(([DateTime]::Now - $dbStart).TotalMilliseconds, 2) }
+                catch { $dbStatus = 'Down' }
+
+                $metrics = @{
+                    success = $true
+                    timestamp = [DateTime]::UtcNow.ToString("o")
+                    api = @{
+                        uptime = $uptime.ToString("d\.hh\:mm\:ss")
+                        memoryUsageMB = $memoryMB
+                        processId = $PID
+                    }
+                    database = @{
+                        status = $dbStatus
+                        latencyMs = $dbMs
+                    }
+                }
+                Write-JsonResponse $Request $Response 200 $metrics
+            } catch {
+                Write-JsonResponse $Request $Response 500 @{ success = $false; error = $_.Exception.Message }
+            }
+            return $true
+        }
+
         'GET /admin/settings' {
             if (-not (Require-AdminAccess -Request $Request -Response $Response -Config $Config)) { return $true }
             try {

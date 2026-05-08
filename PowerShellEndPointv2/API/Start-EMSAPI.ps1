@@ -66,18 +66,71 @@ if (-not $Global:EMSConfig.PSObject.Properties['Security']) { $Global:EMSConfig 
 if (-not $Global:EMSConfig.Security.PSObject.Properties['AdminGroup']) { $Global:EMSConfig.Security | Add-Member -NotePropertyName AdminGroup -NotePropertyValue 'EMS_Admins' }
 if (-not $Global:EMSConfig.Security.PSObject.Properties['MonitorGroup']) { $Global:EMSConfig.Security | Add-Member -NotePropertyName MonitorGroup -NotePropertyValue 'EMS_Monitor' }
 
-Write-Host '[INFO] EMS REST API (Modular) initializing on port 5000...' -ForegroundColor Cyan
+# Parse Listen Port from Config
+$listenUrl = "http://localhost:5000"
+if ($Global:EMSConfig.API -and $Global:EMSConfig.API.ListenAddress) {
+    $listenUrl = $Global:EMSConfig.API.ListenAddress
+}
+
+$port = 5000
+if ($listenUrl -match ':(\d+)') {
+    $port = $matches[1]
+}
+
+# Ensure trailing slash for HttpListener
+$prefix = $listenUrl
+if (-not $prefix.EndsWith('/')) {
+    $prefix += '/'
+}
+
+Write-Host "[INFO] EMS REST API (Modular) initializing on $prefix ..." -ForegroundColor Cyan
 
 # -------------------------
 # 2. Main Service Loop
 # -------------------------
 $listener = [System.Net.HttpListener]::new()
-$listener.Prefixes.Add('http://*:5000/')
+$listener.Prefixes.Add($prefix)
 
 try {
-    $listener.Start()
-    Write-EMSLog -Message "API Service started on http://*:5000/" -Severity Success
+    try {
+        $listener.Start()
+        Write-EMSLog -Message "API Service started on $prefix" -Severity Success
+    } catch {
+        $exMsg = $_.Exception.Message
+        if ($exMsg -match "conflicts with an existing registration") {
+            Write-Host "[ERROR] Port $port is already in use." -ForegroundColor Red
+            # Try to find the blocking process
+            $netstat = netstat -ano | Select-String ":$port\s" | Select-Object -First 1
+            if ($netstat) {
+                $parts = -split $netstat.ToString().Trim()
+                $pidValue = $parts[-1]
+                Write-Host "[ACTION REQUIRED] Port $port is held by Process ID (PID): $pidValue" -ForegroundColor Yellow
+                Write-Host "                To kill it, run: Stop-Process -Id $pidValue -Force" -ForegroundColor Yellow
+                
+                try {
+                    $proc = Get-Process -Id $pidValue -ErrorAction SilentlyContinue
+                    if ($proc) {
+                        Write-Host "                Process Name: $($proc.ProcessName)" -ForegroundColor Yellow
+                    }
+                } catch { }
+            }
+            Write-EMSLog -Message "Failed to start API listener: Port $port in use." -Severity Error
+            exit 1
+        } elseif ($exMsg -match "Access is denied") {
+            Write-Host "[ERROR] Access is denied when binding to port $port." -ForegroundColor Red
+            Write-Host "[ACTION REQUIRED] You must run PowerShell as Administrator to start the API Service." -ForegroundColor Yellow
+            Write-EMSLog -Message "Failed to start API listener: Access Denied. Requires Administrator privileges." -Severity Error
+            exit 1
+        } else {
+            throw $_
+        }
+    }
     
+    # 3. Rate Limiting Setup
+    $Global:RateLimitCache = @{} # IP -> @{ Count, ResetTime }
+    $RateLimitMaxRequests = 100
+    $RateLimitWindowSeconds = 60
+
     while ($listener.IsListening) {
         $context = $null
         try {
@@ -95,6 +148,27 @@ try {
                 $response.StatusCode = 204
                 $response.Close()
                 continue
+            }
+
+            # 1.5 Rate Limiting
+            $clientIp = $request.RemoteEndPoint.Address.ToString()
+            $now = [DateTime]::Now
+            if (-not $Global:RateLimitCache.ContainsKey($clientIp)) {
+                $Global:RateLimitCache[$clientIp] = @{ Count = 1; ResetTime = $now.AddSeconds($RateLimitWindowSeconds) }
+            } else {
+                $limitInfo = $Global:RateLimitCache[$clientIp]
+                if ($now -gt $limitInfo.ResetTime) {
+                    $limitInfo.Count = 1
+                    $limitInfo.ResetTime = $now.AddSeconds($RateLimitWindowSeconds)
+                } else {
+                    $limitInfo.Count++
+                    if ($limitInfo.Count -gt $RateLimitMaxRequests) {
+                        Write-EMSLog -Message "Rate limit exceeded for IP: $clientIp" -Severity Warning -Category "Security"
+                        Add-CorsHeaders -Request $request -Response $response
+                        Write-JsonResponse $request $response 429 @{ success = $false; error = "Too Many Requests. Please try again later." }
+                        continue
+                    }
+                }
             }
 
             # 2. Authentication Logic (Legacy compatibility for /auth routes)
