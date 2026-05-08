@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { adminService } from '../services/api';
 
 function AuditLog() {
@@ -14,9 +14,7 @@ function AuditLog() {
         { key: 'feature', label: 'Feature Toggles'  }
     ];
 
-    useEffect(() => { loadLogs(); }, [logType]);
-
-    const loadLogs = async () => {
+    const loadLogs = useCallback(async () => {
         setLoading(true);
         try {
             const data = await adminService.getAuditLogs(logType, 200);
@@ -27,7 +25,9 @@ function AuditLog() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [logType]);
+
+    useEffect(() => { loadLogs(); }, [loadLogs]);
 
     const filteredLogs = logs.filter(log => {
         if (filters.user && !(log.username || '').toLowerCase().includes(filters.user.toLowerCase())) return false;

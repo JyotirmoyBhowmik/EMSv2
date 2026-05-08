@@ -1,7 +1,6 @@
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import api from '../services/api';
-import toast from 'react-hot-toast';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {

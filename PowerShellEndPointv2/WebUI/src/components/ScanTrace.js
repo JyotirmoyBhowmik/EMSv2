@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { scanService } from '../services/api';
 
@@ -7,10 +7,9 @@ const ScanTrace = () => {
     const [scanInfo, setScanInfo] = useState(null);
     const [traces, setTraces] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState('');
     const [autoRefresh, setAutoRefresh] = useState(true);
 
-    const loadData = async () => {
+    const loadData = useCallback(async () => {
         try {
             const [statusRes, traceRes] = await Promise.all([
                 scanService.getScanStatus(scanId),
@@ -24,11 +23,11 @@ const ScanTrace = () => {
                 setAutoRefresh(false);
             }
         } catch (err) {
-            setError(err.message || 'Failed to load trace data');
+            console.error('Failed to load trace data:', err);
         } finally {
             setLoading(false);
         }
-    };
+    }, [scanId]);
 
     useEffect(() => {
         loadData();
@@ -37,7 +36,7 @@ const ScanTrace = () => {
             interval = setInterval(loadData, 3000);
         }
         return () => clearInterval(interval);
-    }, [scanId, autoRefresh]);
+    }, [loadData, autoRefresh]);
 
     if (loading && !scanInfo) {
         return <div className="card">Loading trace data...</div>;

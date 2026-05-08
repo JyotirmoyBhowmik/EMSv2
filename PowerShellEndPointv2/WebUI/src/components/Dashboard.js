@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { dashboardService } from '../services/api';
 
@@ -32,13 +32,7 @@ function Dashboard() {
     const [range, setRange] = useState('all');
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        loadStats();
-        const interval = setInterval(loadStats, 30000);
-        return () => clearInterval(interval);
-    }, [range]);
-
-    const loadStats = async () => {
+    const loadStats = useCallback(async () => {
         try {
             const raw = await dashboardService.getStats(range);
             const data = raw?.stats ? raw.stats : raw || {};
@@ -71,7 +65,13 @@ function Dashboard() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [range]);
+
+    useEffect(() => {
+        loadStats();
+        const interval = setInterval(loadStats, 30000);
+        return () => clearInterval(interval);
+    }, [loadStats]);
 
     if (loading) {
         return <div className="spinner"></div>;
