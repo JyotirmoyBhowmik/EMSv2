@@ -62,40 +62,37 @@ The Enterprise Endpoint Monitoring System (EMS) has been migrated from a WPF des
 - PowerShell 5.1+
 - IIS 10+ (for production)
 
-### Development Setup
+### Development & Quick Setup
 
-**1. Database**:
+The easiest way to set up the environment is using the automated setup script.
+
+**1. Run Setup Script (As Administrator)**:
 ```powershell
-# Install PostgreSQL
-# Create database: ems_production
-# Run schema:
-psql -U postgres -d ems_production -f Database\schema.sql
-
-# Install Npgsql driver
-nuget install Npgsql -OutputDirectory .\Lib -Version 7.0.6
+# Open PowerShell as Administrator and run:
+.\Setup-EMS.ps1 -DBPassword "YourSecurePassword"
 ```
+This script will:
+- Verify prerequisites (Node.js, PostgreSQL, Npgsql)
+- Update `EMSConfig.json` with your database credentials
+- **[CRITICAL]** Initialize and patch the database schema (v3 Alignment)
+- Create an initial admin user
+- Install Web UI dependencies
 
-**2. Configure**:
-Update `Config\EMSConfig.json`:
-- Database connection settings
-- API configuration
-- Security settings
-
-**3. Start API**:
+**2. Start API**:
 ```powershell
 .\API\Start-EMSAPI.ps1
 ```
 
-**4. Start Web UI**:
+**3. Start Web UI (Development)**:
 ```powershell
 cd WebUI
-npm install
 npm start
 ```
 
-**5. Access Application**:
+**4. Access Application**:
 - Development: http://localhost:3000
-- Login with AD credentials (user must be in `EMS_Admins` group)
+- Production: http://[Server-IP]:5000 (via IIS or Node build)
+- Login: Use AD credentials (user must be in `EMS_Admins` group)
 
 ---
 

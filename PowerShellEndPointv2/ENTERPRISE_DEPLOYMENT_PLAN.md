@@ -49,6 +49,7 @@ $env:PGPASSWORD = 'YOUR_PASSWORD'
 psql -U ems_service -d ems_production -f ".\Database\schema.sql"
 psql -U ems_service -d ems_production -f ".\Database\schema_granular_metrics_part1.sql"
 psql -U ems_service -d ems_production -f ".\Database\schema_granular_metrics_part2.sql"
+psql -U ems_service -d ems_production -f ".\Database\fix_production_schema_v3.sql"
 ```
 
 ---
