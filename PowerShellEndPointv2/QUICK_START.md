@@ -1,280 +1,100 @@
-# EMS Quick Start Guide
+# EMS Quick Start Guide (v3.0)
 
-Get the Enterprise Monitoring System up and running in minutes!
+Get the Enterprise Monitoring System up and running in minutes using the automated setup tools.
 
 ---
 
-## 🚀 Fast Track (Prerequisites Already Installed)
+## 🚀 Fast Track (Recommended)
 
-If you already have PostgreSQL, Node.js, and all modules installed:
+If you have PostgreSQL and Node.js installed, follow these three steps:
 
 ```powershell
-# 1. Configure and test
-.\Setup-EMS.ps1 -DBPassword "YourPassword123!" -CreateSampleData
+# 1. Automated Environment Setup (As Administrator)
+.\Setup-EMS.ps1 -DBPassword "ThinkPad@2026" -CreateSampleData
 
-# 2. Start both services
+# 2. Start the EMS Services
 .\Start-EMS-Dev.ps1
 
-# 3. Open browser to http://localhost:3000
-# 4. Login with AD credentials
+# 3. Access the Dashboard
+# Open http://localhost:3000
+# Login with AD or Local Admin credentials
 ```
-
-That's it! You're running EMS.
 
 ---
 
-## 📋 Step-by-Step Setup
+## 📋 Standard Setup Workflow
 
-### Step 1: Install Prerequisites (One Time)
+### Step 1: Install Core Prerequisites
 
-**PostgreSQL**:
-```powershell
-# Download from https://www.postgresql.org/download/windows/
-# Or use Chocolatey:
-choco install postgresql15 -y
-```
+1.  **PostgreSQL (v16+)**: [Download Here](https://www.postgresql.org/download/windows/)
+2.  **Node.js (v18+ LTS)**: [Download Here](https://nodejs.org/)
+3.  **PowerShell (7.3+)**: Required for API performance.
 
-**Node.js**:
-```powershell
-# Download from https://nodejs.org/
-# Or use Chocolatey:
-choco install nodejs-lts -y
-```
+### Step 2: Automated Configuration
 
-**Npgsql Driver**:
-```powershell
-cd C:\Users\ZORO\PowerShellEndPointv2
-nuget install Npgsql -OutputDirectory .\Lib -Version 7.0.6
-```
-
-**PowerShell Module**:
-```powershell
-Install-Module UniversalDashboard -Force
-```
-
-### Step 2: Create Database
+The `Setup-EMS.ps1` script handles database initialization, schema patching (v3), and configuration:
 
 ```powershell
-# Connect to PostgreSQL
-psql -U postgres
-
-# In psql prompt:
-CREATE DATABASE ems_production;
-CREATE USER ems_service WITH PASSWORD 'YourPassword123!';
-\q
-
-# Deploy schema
-cd C:\Users\ZORO\PowerShellEndPointv2\Database
-psql -U postgres -d ems_production -f schema.sql
-
-# Grant permissions
-psql -U postgres -d ems_production
-GRANT ALL ON ALL TABLES IN SCHEMA public TO ems_service;
-GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO ems_service;
-\q
+# Open PowerShell as Administrator
+.\Setup-EMS.ps1 -DBPassword "YourPassword"
 ```
 
-### Step 3: Configure EMS
+**This script performs:**
+- [OK] Prerequisite validation
+- [OK] **[v3 Patch]** Database schema alignment
+- [OK] `EMSConfig.json` synchronization
+- [OK] Initial Admin user creation
+- [OK] Web UI dependency installation (`npm install`)
 
-Run the automated setup:
-```powershell
-cd C:\Users\ZORO\PowerShellEndPointv2
-.\Setup-EMS.ps1 -DBPassword "YourPassword123!" -CreateSampleData
-```
+### Step 3: Security Configuration
 
-This script will:
-- ✓ Check all prerequisites
-- ✓ Update configuration file
-- ✓ Test database connection
-- ✓ Create admin user
-- ✓ Install npm packages
-- ✓ Generate sample test data
-
-### Step 4: Create AD Security Group
+Ensure the API can bind to network interfaces and pass through the firewall:
 
 ```powershell
-# As Domain Admin
-Import-Module ActiveDirectory
-New-ADGroup -Name "EMS_Admins" -GroupCategory Security -GroupScope Global
-Add-ADGroupMember -Identity "EMS_Admins" -Members "yourusername"
+# As Administrator
+netsh http add urlacl url=http://*:5000/ user=Everyone
+New-NetFirewallRule -DisplayName "EMS API" -Direction Inbound -LocalPort 5000 -Protocol TCP -Action Allow -Profile Any -Force
 ```
 
-### Step 5: Start Development Environment
+### Step 4: Launching EMS
+
+You can start the environment using the unified launcher:
 
 ```powershell
 .\Start-EMS-Dev.ps1
 ```
 
-This opens two windows:
-- **Window 1**: API Backend (port 5000)
-- **Window 2**: React Frontend (port 3000)
-
-Browser will auto-open to http://localhost:3000
-
-### Step 6: Login and Test
-
-1. Login with your AD credentials (format: `DOMAIN\username`)
-2. Explore the dashboard
-3. Try a scan (use sample data hostnames)
-4. View results history
+**Services Started:**
+- **API Backend**: Listening on `http://*:5000`
+- **Web Frontend**: Listening on `http://localhost:3000` (Dev Mode)
 
 ---
 
-## 🔧 Manual Start (Alternative)
+## 📊 Verification
 
-If you prefer to start services manually:
-
-**Terminal 1 - Start API**:
+### Check API Health
 ```powershell
-cd C:\Users\ZORO\PowerShellEndPointv2\API
-.\Start-EMSAPI.ps1
+Invoke-RestMethod -Uri "http://localhost:5000/admin/health"
 ```
 
-**Terminal 2 - Start React**:
+### Check Database Tables
 ```powershell
-cd C:\Users\ZORO\PowerShellEndPointv2\WebUI
-npm start
+psql -U ems_service -d ems_production -c "\dt"
 ```
+*Expected: 130+ tables, including `scans` and `scan_inventory_results`.*
 
 ---
 
-## 📊 Test with Sample Data
+## 🐛 Troubleshooting
 
-Create realistic test data:
-```powershell
-cd Database
-.\Create-SampleData.ps1 -Count 50 -IncludeDiagnostics
-```
-
-This generates:
-- 50 scan results
-- Multiple users
-- Various health scores
-- Different topologies
-- Sample diagnostics
+| Issue | Solution |
+| :--- | :--- |
+| **500 Internal Error** | Run `.\Setup-EMS.ps1` again to apply v3 schema patches. |
+| **30000ms Timeout** | Run the `netsh` and `New-NetFirewallRule` commands in Step 3. |
+| **Login Failed** | Verify `EMSConfig.json` has the correct AD domain and AdminGroup. |
+| **Port 5000 Busy** | Check `Get-NetTCPConnection -LocalPort 5000` and stop the blocking process. |
 
 ---
 
-## ✅ Verify Everything Works
-
-### Check API
-```powershell
-# Test authentication
-$body = @{
-    username = "DOMAIN\yourusername"
-    password = "yourpassword"
-} | ConvertTo-Json
-
-Invoke-RestMethod -Uri "http://localhost:5000/api/auth/login" `
-                  -Method POST `
-                  -Body $body `
-                  -ContentType "application/json"
-```
-
-Should return:
-```json
-{
-  "success": true,
-  "token": "eyJ...",
-  "user": { ... }
-}
-```
-
-### Check Database
-```powershell
-# Count scans
-psql -U postgres -d ems_production -c "SELECT COUNT(*) FROM scan_results;"
-
-# View recent scans
-psql -U postgres -d ems_production -c "SELECT hostname, health_score FROM scan_results ORDER BY scan_timestamp DESC LIMIT 5;"
-```
-
----
-
-## 🐛 Common Issues
-
-### Database Connection Failed
-```powershell
-# Check PostgreSQL service
-Get-Service postgresql*
-
-# If stopped, start it:
-Start-Service postgresql-x64-15
-```
-
-### API Won't Start - Port in Use
-```powershell
-# Find what's using port 5000
-Get-NetTCPConnection -LocalPort 5000
-
-# Change port in Config\EMSConfig.json if needed
-```
-
-### React Won't Build
-```powershell
-# Clear cache and reinstall
-cd WebUI
-Remove-Item -Recurse node_modules
-npm cache clean --force
-npm install
-```
-
-### Login Failed - Unauthorized
-```powershell
-# Verify you're in EMS_Admins group
-Get-ADGroupMember -Identity "EMS_Admins"
-
-# Add yourself if missing
-Add-ADGroupMember -Identity "EMS_Admins" -Members "yourusername"
-
-# Force group policy update
-gpupdate /force
-```
-
----
-
-## 📖 Next Steps
-
-- **Production Deployment**: See [Deployment/IIS_Setup.md](Deployment/IIS_Setup.md)
-- **Full Documentation**: See [INSTALLATION.md](INSTALLATION.md)
-- **API Reference**: See [API/Start-EMSAPI.ps1](API/Start-EMSAPI.ps1) comments
-- **UI/UX Guide**: See [WebUI/UI_UX_DESIGN.md](WebUI/UI_UX_DESIGN.md)
-
----
-
-## 🎯 Development Workflow
-
-**Daily Development**:
-```powershell
-# Start services
-.\Start-EMS-Dev.ps1
-
-# Make changes to code
-# React: Edit files in WebUI\src\
-# API: Edit API\Start-EMSAPI.ps1
-# Database: Edit Modules\Database\PSPGSql.psm1
-
-# React auto-reloads, API needs restart
-# Stop API window (Ctrl+C) and restart
-```
-
-**Testing Changes**:
-```powershell
-# Generate fresh test data
-.\Database\Create-SampleData.ps1 -Count 10
-
-# Clear database and start fresh
-psql -U postgres -d ems_production -c "TRUNCATE scan_results CASCADE;"
-```
-
-**Build for Production**:
-```powershell
-cd WebUI
-npm run build
-# Output in ./build/ ready for IIS
-```
-
----
-
-**Quick Start Version**: 1.0  
-**Last Updated**: 2025-12-24
+**Version**: 3.0.1 (May 2026)  
+**Quick Start Guide**
