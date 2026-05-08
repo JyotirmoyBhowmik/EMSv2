@@ -28,6 +28,7 @@ Import-Module "$ModuleRoot\Core\EMS.Auth.psm1" -Force
 Import-Module "$ModuleRoot\API\EMS.API.Admin.psm1" -Force
 Import-Module "$ModuleRoot\API\EMS.API.Inventory.psm1" -Force
 Import-Module "$ModuleRoot\API\EMS.API.Scan.psm1" -Force
+Import-Module "$ModuleRoot\API\EMS.API.Reports.psm1" -Force
 
 # Load Worker Modules (Existing)
 Import-Module "$ModuleRoot\Scan\ScanWorker.psm1" -Force
@@ -224,6 +225,9 @@ try {
             
             # Scans & Errors
             if (-not $handled) { $handled = Invoke-ScanRoutes -Request $request -Response $response -Method $method -Path $path -Config $Global:EMSConfig }
+
+            # Advanced Reports
+            if (-not $handled) { $handled = Invoke-ReportRoutes -Request $request -Response $response -Method $method -Path $path -Config $Global:EMSConfig }
 
             # 4. Final Fallback
             if (-not $handled) {

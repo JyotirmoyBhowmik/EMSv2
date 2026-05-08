@@ -95,8 +95,13 @@ FROM scans WHERE scan_id = @scanId LIMIT 1;
 
             $totalComputers=0; $activeComputers=0; $totalScans=0; $healthyEndpoints=0; $criticalAlerts=0; $uniqueEndpoints=0; $completedScans=0; $failedScans=0; $inProgressScans=0; $averageScanTime=$null; $lastScan=$null; $excellentCount=0; $goodCount=0; $fairCount=0; $poorCount=0; $compliantEndpoints=0; $partialCompliantEndpoints=0; $collectionFailedEndpoints=0; $dellBiosUnknownEndpoints=0; $biosPasswordUnknownEndpoints=0; $metricWarningEndpoints=0
             
-            try { $row = Invoke-PGQuery -Query 'SELECT COUNT(*)::int AS total FROM computers;' | Select-Object -First 1; if ($row) { $totalComputers = [int]$row.total } } catch {}
-            try { $row = Invoke-PGQuery -Query 'SELECT COUNT(*)::int AS total FROM computers WHERE is_active = true;' | Select-Object -First 1; if ($row) { $activeComputers = [int]$row.total } } catch {}
+            try { 
+                $row = Invoke-PGQuery -Query 'SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE is_active = true)::int AS active FROM computers;' | Select-Object -First 1
+                if ($row) { 
+                    $totalComputers = [int]$row.total 
+                    $activeComputers = [int]$row.active
+                } 
+            } catch {}
             
             try {
                 $scanQuery = @"
@@ -125,37 +130,30 @@ WHERE COALESCE(is_deleted, false) = false $timeFilter;
             
             try {
                 $compWhere = if ($complianceTimeFilter) { "$complianceTimeFilter" } else { "" }
-                $complianceRows = Invoke-PGQuery -Query @"
+                $complianceQuery = @"
 SELECT
-    compliance_bucket,
-    COUNT(*)::int AS endpoint_count
+    COUNT(*) FILTER (WHERE compliance_bucket = 'Compliant')::int AS compliant_count,
+    COUNT(*) FILTER (WHERE compliance_bucket = 'Partial Compliant')::int AS partial_count,
+    COUNT(*) FILTER (WHERE compliance_issues ILIKE '%Inventory collection failed%')::int AS collection_failed_count,
+    COUNT(*) FILTER (WHERE COALESCE(compliance_warnings,'') <> '')::int AS metric_warning_count,
+    COUNT(*) FILTER (
+        WHERE COALESCE(manufacturer,'') NOT IN ('', 'Unknown')
+          AND COALESCE(model,'') NOT IN ('', 'Unknown')
+          AND COALESCE(compliance_issues,'') NOT ILIKE '%Inventory collection failed%'
+          AND (COALESCE(poweron_password,'') <> 'Configured' OR COALESCE(admin_password,'') <> 'Configured')
+    )::int AS bios_password_unknown_count
 FROM v_ems_latest_compliance_classified
-$compWhere
-GROUP BY compliance_bucket;
+$compWhere;
 "@
-                foreach ($r in @($complianceRows)) {
-                    if ($r.compliance_bucket -eq 'Compliant') { $compliantEndpoints = [int]$r.endpoint_count }
-                    elseif ($r.compliance_bucket -eq 'Partial Compliant') { $partialCompliantEndpoints = [int]$r.endpoint_count }
+                $compRow = Invoke-PGQuery -Query $complianceQuery | Select-Object -First 1
+                if ($compRow) {
+                    $compliantEndpoints = [int]$compRow.compliant_count
+                    $partialCompliantEndpoints = [int]$compRow.partial_count
+                    $collectionFailedEndpoints = [int]$compRow.collection_failed_count
+                    $metricWarningEndpoints = [int]$compRow.metric_warning_count
+                    $biosPasswordUnknownEndpoints = [int]$compRow.bios_password_unknown_count
+                    $dellBiosUnknownEndpoints = $biosPasswordUnknownEndpoints
                 }
-                
-                $issueJoin = if ($compWhere) { "AND" } else { "WHERE" }
-                
-                $collectionFailedRow = Invoke-PGQuery -Query "SELECT COUNT(*)::int AS count FROM v_ems_latest_compliance_classified $compWhere $issueJoin compliance_issues ILIKE '%Inventory collection failed%';" | Select-Object -First 1
-                if ($collectionFailedRow) { $collectionFailedEndpoints = [int]$collectionFailedRow.count }
-                
-                $biosPasswordUnknownRow = Invoke-PGQuery -Query @"
-SELECT COUNT(*)::int AS count
-FROM v_ems_latest_compliance_classified
-$compWhere
-$issueJoin COALESCE(manufacturer,'') NOT IN ('', 'Unknown')
-  AND COALESCE(model,'') NOT IN ('', 'Unknown')
-  AND COALESCE(compliance_issues,'') NOT ILIKE '%Inventory collection failed%'
-  AND (COALESCE(poweron_password,'') <> 'Configured' OR COALESCE(admin_password,'') <> 'Configured');
-"@ | Select-Object -First 1
-                if ($biosPasswordUnknownRow) { $biosPasswordUnknownEndpoints = [int]$biosPasswordUnknownRow.count; $dellBiosUnknownEndpoints = $biosPasswordUnknownEndpoints }
-                
-                $metricWarningRow = Invoke-PGQuery -Query "SELECT COUNT(*)::int AS count FROM v_ems_latest_compliance_classified $compWhere $issueJoin COALESCE(compliance_warnings,'') <> '';" | Select-Object -First 1
-                if ($metricWarningRow) { $metricWarningEndpoints = [int]$metricWarningRow.count }
             } catch {
                 # Silent catch for missing view/data
             }

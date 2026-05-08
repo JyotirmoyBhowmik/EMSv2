@@ -9,17 +9,9 @@ function Add-CorsHeaders {
         [System.Net.HttpListenerResponse]$Response
     )
 
-    $origin = $Request.Headers['Origin']
-
-    if (
-        $origin -and
-        $origin -match '^https?://(localhost|10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2[0-9]|3[0-1])\.\d{1,3}\.\d{1,3})(:\d+)?$'
-    ) {
-        $Response.Headers['Access-Control-Allow-Origin']  = $origin
-        $Response.Headers['Vary']                         = 'Origin'
-        $Response.Headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-EMS-Username, X-EMS-Groups, X-EMS-Role'
-        $Response.Headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, PATCH, OPTIONS'
-    }
+    $Response.Headers['Access-Control-Allow-Origin']  = '*'
+    $Response.Headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+    $Response.Headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-EMS-Username, X-EMS-Groups, X-EMS-Role'
 }
 
 function Write-JsonResponse {
@@ -32,7 +24,7 @@ function Write-JsonResponse {
 
     Add-CorsHeaders -Request $Request -Response $Response
 
-    $json   = $Body | ConvertTo-Json -Depth 12
+    $json = $Body | ConvertTo-Json -Depth 10 -Compress
     $buffer = [System.Text.Encoding]::UTF8.GetBytes($json)
 
     $Response.StatusCode      = $StatusCode

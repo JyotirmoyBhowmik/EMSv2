@@ -22,6 +22,7 @@ import UserManagement from './components/UserManagement';
 import EndpointLifecycle from './components/EndpointLifecycle';
 import SystemErrors from './components/SystemErrors';
 import ChangePasswordModal from './components/ChangePasswordModal';
+import HistoricalReports from './components/HistoricalReports';
 
 // ─── Nav icons (inline SVG, no extra dep) ───────────
 const Icons = {
@@ -166,6 +167,7 @@ function Layout() {
                     <NavItem to="/dashboard"               icon={Icons.Dashboard} label="Dashboard"         end />
                     <NavItem to="/results?view=daily"      icon={Icons.Monitor}   label="Daily Monitoring" />
                     <NavItem to="/results?view=compliance" icon={Icons.Results}   label="Compliance Report" />
+                    <NavItem to="/reports"                 icon={Icons.Audit}     label="Advanced Reports" />
                     <NavItem to="/results"                 icon={Icons.Results}   label="Results History"  />
 
                     {perms.canScan && (
@@ -298,6 +300,7 @@ function AppRoutes() {
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="results"   element={<ResultsHistory />} />
                 <Route path="compliance" element={<ComplianceReport />} />
+                <Route path="reports"    element={<HistoricalReports />} />
                 <Route path="scan/trace/:scanId" element={<ScanTrace />} />
 
                 <Route path="scan" element={
