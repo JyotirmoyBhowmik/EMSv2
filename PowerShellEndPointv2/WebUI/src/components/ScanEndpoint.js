@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { scanService } from '../services/api';
 
 const splitTargets = (text) => {
@@ -17,6 +18,7 @@ const ScanEndpoint = () => {
     const [error, setError] = useState('');
     const [protocol, setProtocol] = useState(''); // Default to 'Auto'
     const [lastResponse, setLastResponse] = useState(null);
+    const navigate = useNavigate();
 
     const bulkTargets = useMemo(() => splitTargets(bulkText), [bulkText]);
 
@@ -36,6 +38,9 @@ const ScanEndpoint = () => {
             const result = await scanService.scanSingle(target, protocol || null);
             setLastResponse(result);
             setMessage(`Scan submitted for ${target}.`);
+            if (result.scanId) {
+                setTimeout(() => navigate(`/scan/status/${result.scanId}`), 1500);
+            }
         } catch (err) {
             setError(err?.response?.data?.message || err?.message || 'Failed to submit scan.');
         } finally {
@@ -58,6 +63,9 @@ const ScanEndpoint = () => {
             const result = await scanService.scanBulk(bulkTargets, protocol || null);
             setLastResponse(result);
             setMessage(`Bulk scan submitted for ${bulkTargets.length} host(s).`);
+            // For bulk scans, we don't redirect to a single scanId as there are many
+            // But we could show a list or just stay here.
+            // For now, let's keep it here but show the result JSON.
         } catch (err) {
             setError(err?.response?.data?.message || err?.message || 'Failed to submit bulk scan.');
         } finally {

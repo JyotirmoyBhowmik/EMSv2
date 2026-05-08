@@ -23,6 +23,7 @@ import EndpointLifecycle from './components/EndpointLifecycle';
 import SystemErrors from './components/SystemErrors';
 import ChangePasswordModal from './components/ChangePasswordModal';
 import HistoricalReports from './components/HistoricalReports';
+import ScanStatus from './components/ScanStatus';
 
 // ─── Nav icons (inline SVG, no extra dep) ───────────
 const Icons = {
@@ -302,6 +303,7 @@ function AppRoutes() {
                 <Route path="compliance" element={<ComplianceReport />} />
                 <Route path="reports"    element={<HistoricalReports />} />
                 <Route path="scan/trace/:scanId" element={<ScanTrace />} />
+                <Route path="scan/status/:scanId" element={<ScanStatus />} />
 
                 <Route path="scan" element={
                     <ProtectedRoute requireScan>
