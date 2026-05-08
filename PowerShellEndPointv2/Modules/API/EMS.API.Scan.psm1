@@ -14,7 +14,7 @@ function Invoke-ScanRoutes {
 
     # Regex matches for Scan Results
     if ($Method -eq 'POST' -and $Path -match '^/results/([0-9a-fA-F-]+)/archive$') {
-        if (-not (Require-AdminAccess -Request $Request -Response $Response -Config $Config)) { return $true }
+        if (-not (Test-AdminAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
         try { $scanId = [Guid]::Parse($Matches[1]) } catch { 
             Write-JsonResponse $Request $Response 400 @{ success = $false; message = 'Invalid scan ID format' }
             return $true 
@@ -45,7 +45,7 @@ function Invoke-ScanRoutes {
     }
 
     if ($Method -eq 'POST' -and $Path -match '^/results/([0-9a-fA-F-]+)/restore$') {
-        if (-not (Require-AdminAccess -Request $Request -Response $Response -Config $Config)) { return $true }
+        if (-not (Test-AdminAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
         try { $scanId = [Guid]::Parse($Matches[1]) } catch { 
             Write-JsonResponse $Request $Response 400 @{ success = $false; message = 'Invalid scan ID format' }
             return $true 
@@ -70,7 +70,7 @@ function Invoke-ScanRoutes {
     # Static Routes
     switch ("$Method $Path") {
         'POST /scan/single' {
-            if (-not (Require-AdminAccess -Request $Request -Response $Response -Config $Config)) { return $true }
+            if (-not (Test-AdminAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
             $body = Read-JsonBody $Request
             if (-not $body.target) { 
                 Write-JsonResponse $Request $Response 400 @{ success = $false; message = 'Target is required' }
@@ -84,7 +84,7 @@ function Invoke-ScanRoutes {
         }
 
         'POST /scan/bulk' {
-            if (-not (Require-AdminAccess -Request $Request -Response $Response -Config $Config)) { return $true }
+            if (-not (Test-AdminAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
             $body = Read-JsonBody $Request
             $targets = @()
             if ($body.targets) {
@@ -107,7 +107,7 @@ function Invoke-ScanRoutes {
         }
 
         'GET /scan/status' {
-            if (-not (Require-ViewerAccess -Request $Request -Response $Response -Config $Config)) { return $true }
+            if (-not (Test-ViewerAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
             $scanIdRaw = $Request.QueryString['scanId']
             if (-not $scanIdRaw) { 
                 Write-JsonResponse $Request $Response 400 @{ success = $false; message = 'scanId is required' }

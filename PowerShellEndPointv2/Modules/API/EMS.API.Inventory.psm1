@@ -14,7 +14,7 @@ function Invoke-InventoryRoutes {
 
     # Regex matches
     if ($Method -eq 'GET' -and $Path -match '^/computers/(.+)$') {
-        if (-not (Require-ViewerAccess -Request $Request -Response $Response -Config $Config)) { return $true }
+        if (-not (Test-ViewerAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
         $computerName = [System.Uri]::UnescapeDataString($Matches[1])
         $computer = Invoke-PGQuery -Query @"
 SELECT computer_name, ip_address::text AS ip_address, mac_address, operating_system, os_version, os_build, domain, is_domain_joined, computer_type, manufacturer, model, serial_number, location, department, asset_tag, first_seen, last_seen, is_active, notes
@@ -39,7 +39,7 @@ FROM computer_ad_users WHERE computer_name = @computerName ORDER BY ad_username;
     }
 
     if ($Method -eq 'GET' -and $Path -match '^/results/(.+)$') {
-        if (-not (Require-ViewerAccess -Request $Request -Response $Response -Config $Config)) { return $true }
+        if (-not (Test-ViewerAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
         $resultIdRaw = [System.Uri]::UnescapeDataString($Matches[1])
         try { $resultId = [Guid]::Parse($resultIdRaw) } catch { 
             Write-JsonResponse $Request $Response 400 @{ success = $false; message = 'Invalid result ID format' }
@@ -65,7 +65,7 @@ FROM scans WHERE scan_id = @scanId LIMIT 1;
     # Static Routes
     switch ("$Method $Path") {
         'GET /api/dashboard/stats' {
-            if (-not (Require-ViewerAccess -Request $Request -Response $Response -Config $Config)) { return $true }
+            if (-not (Test-ViewerAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
             $totalComputers=0; $activeComputers=0; $totalScans=0; $healthyEndpoints=0; $criticalAlerts=0; $uniqueEndpoints=0; $completedScans=0; $failedScans=0; $inProgressScans=0; $averageScanTime=$null; $lastScan=$null; $excellentCount=0; $goodCount=0; $fairCount=0; $poorCount=0; $compliantEndpoints=0; $partialCompliantEndpoints=0; $collectionFailedEndpoints=0; $dellBiosUnknownEndpoints=0; $biosPasswordUnknownEndpoints=0; $metricWarningEndpoints=0
             try { $row = Invoke-PGQuery -Query 'SELECT COUNT(*)::int AS total FROM computers;' | Select-Object -First 1; if ($row) { $totalComputers = [int]$row.total } } catch {}
             try { $row = Invoke-PGQuery -Query 'SELECT COUNT(*)::int AS total FROM computers WHERE is_active = true;' | Select-Object -First 1; if ($row) { $activeComputers = [int]$row.total } } catch {}
@@ -125,21 +125,21 @@ WHERE COALESCE(manufacturer,'') NOT IN ('', 'Unknown')
         }
 
         'GET /api/compliance/compliant' {
-            if (-not (Require-ViewerAccess -Request $Request -Response $Response -Config $Config)) { return $true }
+            if (-not (Test-ViewerAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
             $rows = Invoke-PGQuery -Query "SELECT * FROM v_ems_latest_compliance_classified WHERE compliance_bucket = 'Compliant' ORDER BY target;"
             Write-JsonResponse $Request $Response 200 @{ success=$true; count=@($rows).Count; results=@($rows) }
             return $true
         }
 
         'GET /api/compliance/partial' {
-            if (-not (Require-ViewerAccess -Request $Request -Response $Response -Config $Config)) { return $true }
+            if (-not (Test-ViewerAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
             $rows = Invoke-PGQuery -Query "SELECT * FROM v_ems_latest_compliance_classified WHERE compliance_bucket = 'Partial Compliant' ORDER BY target;"
             Write-JsonResponse $Request $Response 200 @{ success=$true; count=@($rows).Count; results=@($rows) }
             return $true
         }
 
         'GET /results' {
-            if (-not (Require-ViewerAccess -Request $Request -Response $Response -Config $Config)) { return $true }
+            if (-not (Test-ViewerAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
             $includeDeleted = $false
             $includeDeletedRaw = $Request.QueryString['includeDeleted']
             if ($includeDeletedRaw -and $includeDeletedRaw.ToString().ToLower() -eq 'true') {
@@ -182,14 +182,14 @@ LIMIT 500;
         }
 
         'GET /computers' {
-            if (-not (Require-ViewerAccess -Request $Request -Response $Response -Config $Config)) { return $true }
+            if (-not (Test-ViewerAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
             $rows = Invoke-PGQuery -Query "SELECT computer_name, ip_address::text AS ip_address, operating_system, domain, computer_type, last_seen, is_active FROM computers ORDER BY computer_name;"
             Write-JsonResponse $Request $Response 200 @{ success = $true; computers = $rows }
             return $true
         }
 
         'POST /computers' {
-            if (-not (Require-AdminAccess -Request $Request -Response $Response -Config $Config)) { return $true }
+            if (-not (Test-AdminAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
             $body = Read-JsonBody $Request
             $computerName = if ($body.computerName) { $body.computerName } elseif ($body.name) { $body.name } else { $null }
             $ipAddress    = if ($body.ipAddress) { $body.ipAddress } elseif ($body.ip) { $body.ip } else { $null }

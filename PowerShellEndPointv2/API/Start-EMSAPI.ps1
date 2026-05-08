@@ -181,7 +181,7 @@ try {
             }
 
             if ($Method -eq 'GET' -and $Path -eq '/auth/validate') {
-                if (-not (Require-ViewerAccess -Request $request -Response $response -Config $Global:EMSConfig)) { continue }
+                if (-not (Test-ViewerAccessRequirement -Request $request -Response $response -Config $Global:EMSConfig)) { continue }
                 $ctx  = Get-RequestUserContext -Request $request
                 $role = Resolve-UserRole -Groups $ctx.Groups -Config $Global:EMSConfig
                 Write-JsonResponse $request $response 200 @{ valid = $true; role = $role; permissions = (Get-UserPermissionsObject -Role $role) }

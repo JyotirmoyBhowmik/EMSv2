@@ -48,7 +48,7 @@ function Invoke-AdminRoutes {
         }
 
         'GET /admin/settings' {
-            if (-not (Require-AdminAccess -Request $Request -Response $Response -Config $Config)) { return $true }
+            if (-not (Test-AdminAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
             try {
                 $rows = Invoke-PGQuery -Query "SELECT feature_key, feature_name, description, enabled, category FROM feature_toggles ORDER BY category, feature_name;"
                 Write-JsonResponse $Request $Response 200 @{ success = $true; features = @($rows) }
@@ -59,7 +59,7 @@ function Invoke-AdminRoutes {
         }
 
         'GET /admin/users' {
-            if (-not (Require-AdminAccess -Request $Request -Response $Response -Config $Config)) { return $true }
+            if (-not (Test-AdminAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
             try {
                 $rows = Invoke-PGQuery -Query "SELECT user_id, username, display_name, email, role, is_active, last_login FROM users ORDER BY username;"
                 Write-JsonResponse $Request $Response 200 @{ success = $true; users = @($rows) }
@@ -70,7 +70,7 @@ function Invoke-AdminRoutes {
         }
 
         'GET /admin/reboot-status' {
-            if (-not (Require-AdminAccess -Request $Request -Response $Response -Config $Config)) { return $true }
+            if (-not (Test-AdminAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
             try {
                 $rows = Invoke-PGQuery -Query @"
 SELECT DISTINCT ON (computer_name) computer_name, last_boot_time, uptime_days, uptime_status, notified
@@ -85,7 +85,7 @@ ORDER BY computer_name, timestamp DESC;
         }
 
         'GET /admin/connectors' {
-            if (-not (Require-AdminAccess -Request $Request -Response $Response -Config $Config)) { return $true }
+            if (-not (Test-AdminAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
             try {
                 # Load real health module if available
                 $healthModule = Join-Path $PSScriptRoot "..\..\Modules\Health\Get-ConnectorHealth.psm1"
@@ -116,7 +116,7 @@ ORDER BY computer_name, timestamp DESC;
         }
 
         'GET /admin/audit' {
-            if (-not (Require-AdminAccess -Request $Request -Response $Response -Config $Config)) { return $true }
+            if (-not (Test-AdminAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
             try {
                 $type  = $Request.QueryString['type']
                 $limit = if ($Request.QueryString['limit']) { [int]$Request.QueryString['limit'] } else { 100 }
@@ -138,7 +138,7 @@ ORDER BY computer_name, timestamp DESC;
         }
 
         'POST /admin/users' {
-            if (-not (Require-AdminAccess -Request $Request -Response $Response -Config $Config)) { return $true }
+            if (-not (Test-AdminAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
             try {
                 $body = Read-JsonBody $Request
                 if (-not $body.username) { Write-JsonResponse $Request $Response 400 @{ success=$false; message='username required' }; return $true }
@@ -153,7 +153,7 @@ ORDER BY computer_name, timestamp DESC;
 
     # PUT /admin/settings/:key
     if ($Method -eq 'PUT' -and $Path -match '^/admin/settings/(.+)$') {
-        if (-not (Require-AdminAccess -Request $Request -Response $Response -Config $Config)) { return $true }
+        if (-not (Test-AdminAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
         $featureKey = [System.Uri]::UnescapeDataString($Matches[1])
         try {
             $body    = Read-JsonBody $Request
@@ -172,7 +172,7 @@ ORDER BY computer_name, timestamp DESC;
 
     # PUT /admin/users/:id
     if ($Method -eq 'PUT' -and $Path -match '^/admin/users/(.+)$') {
-        if (-not (Require-AdminAccess -Request $Request -Response $Response -Config $Config)) { return $true }
+        if (-not (Test-AdminAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
         $userId = [System.Uri]::UnescapeDataString($Matches[1])
         try {
             $body = Read-JsonBody $Request
@@ -187,7 +187,7 @@ ORDER BY computer_name, timestamp DESC;
 
     # DELETE /admin/users/:id
     if ($Method -eq 'DELETE' -and $Path -match '^/admin/users/(.+)$') {
-        if (-not (Require-AdminAccess -Request $Request -Response $Response -Config $Config)) { return $true }
+        if (-not (Test-AdminAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
         $userId = [System.Uri]::UnescapeDataString($Matches[1])
         try {
             Invoke-PGQuery -NonQuery -Query "DELETE FROM users WHERE user_id=@id;" -Parameters @{ id=$userId }
