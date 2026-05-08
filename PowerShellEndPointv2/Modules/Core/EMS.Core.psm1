@@ -18,7 +18,7 @@ function Add-CorsHeaders {
         $Response.Headers['Access-Control-Allow-Origin']  = $origin
         $Response.Headers['Vary']                         = 'Origin'
         $Response.Headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-EMS-Username, X-EMS-Groups, X-EMS-Role'
-        $Response.Headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+        $Response.Headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, PATCH, OPTIONS'
     }
 }
 
