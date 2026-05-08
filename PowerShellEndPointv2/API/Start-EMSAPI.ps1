@@ -216,18 +216,20 @@ try {
 
             # 3. Delegate to Modular Controllers
             $handled = $false
+            $modulePath = $path -replace '^/api', ''
+            if (-not $modulePath.StartsWith('/')) { $modulePath = "/$modulePath" }
             
             # Inventory & Dashboards
-            if (-not $handled) { $handled = Invoke-InventoryRoutes -Request $request -Response $response -Method $method -Path $path -Config $Global:EMSConfig }
+            if (-not $handled) { $handled = Invoke-InventoryRoutes -Request $request -Response $response -Method $method -Path $modulePath -Config $Global:EMSConfig }
             
             # Administrative Operations
-            if (-not $handled) { $handled = Invoke-AdminRoutes -Request $request -Response $response -Method $method -Path $path -Config $Global:EMSConfig }
+            if (-not $handled) { $handled = Invoke-AdminRoutes -Request $request -Response $response -Method $method -Path $modulePath -Config $Global:EMSConfig }
             
             # Scans & Errors
-            if (-not $handled) { $handled = Invoke-ScanRoutes -Request $request -Response $response -Method $method -Path $path -Config $Global:EMSConfig }
+            if (-not $handled) { $handled = Invoke-ScanRoutes -Request $request -Response $response -Method $method -Path $modulePath -Config $Global:EMSConfig }
 
             # Advanced Reports
-            if (-not $handled) { $handled = Invoke-ReportRoutes -Request $request -Response $response -Method $method -Path $path -Config $Global:EMSConfig }
+            if (-not $handled) { $handled = Invoke-ReportRoutes -Request $request -Response $response -Method $method -Path $modulePath -Config $Global:EMSConfig }
 
             # 4. Final Fallback
             if (-not $handled) {

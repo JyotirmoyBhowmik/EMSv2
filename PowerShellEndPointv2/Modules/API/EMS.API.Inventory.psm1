@@ -64,7 +64,7 @@ FROM scans WHERE scan_id = @scanId LIMIT 1;
 
     # Static Routes
     switch ("$Method $Path") {
-        'GET /api/dashboard/stats' {
+        'GET /dashboard/stats' {
             if (-not (Test-ViewerAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
             $range = $Request.QueryString['range'] # today, 24h, 7d, 30d, all
             $timeFilter = ""
@@ -161,14 +161,14 @@ $compWhere;
             return $true
         }
 
-        'GET /api/compliance/compliant' {
+        'GET /compliance/compliant' {
             if (-not (Test-ViewerAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
             $rows = Invoke-PGQuery -Query "SELECT * FROM v_ems_latest_compliance_classified WHERE compliance_bucket = 'Compliant' ORDER BY target;"
             Write-JsonResponse $Request $Response 200 @{ success=$true; count=@($rows).Count; results=@($rows) }
             return $true
         }
 
-        'GET /api/compliance/partial' {
+        'GET /compliance/partial' {
             if (-not (Test-ViewerAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
             $rows = Invoke-PGQuery -Query "SELECT * FROM v_ems_latest_compliance_classified WHERE compliance_bucket = 'Partial Compliant' ORDER BY target;"
             Write-JsonResponse $Request $Response 200 @{ success=$true; count=@($rows).Count; results=@($rows) }
