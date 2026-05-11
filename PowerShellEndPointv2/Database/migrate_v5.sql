@@ -1,13 +1,8 @@
 -- =============================================================================
--- EMS v5.0 Database Migration (REVISED)
+-- EMS v5.0 Database Migration (COMPLETE & FIXED)
 -- =============================================================================
 
--- ─── 1. Fix Permissions (Run as Superuser) ──────────────────────────────────
--- If running as postgres, ensure ems_service has rights
--- GRANT ALL PRIVILEGES ON TABLE computers TO ems_service;
--- GRANT ALL PRIVILEGES ON TABLE users TO ems_service;
-
--- ─── 2. Extend computers table ──────────────────────────────────────────────
+-- ─── 1. Extend computers table (§7.3) ────────────────────────────────────────
 DO $$ BEGIN
   -- Hardware extensions
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='computers' AND column_name='asset_tag')       THEN ALTER TABLE computers ADD COLUMN asset_tag VARCHAR(255); END IF;
@@ -22,7 +17,7 @@ DO $$ BEGIN
   -- User / session
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='computers' AND column_name='last_logged_on_user') THEN ALTER TABLE computers ADD COLUMN last_logged_on_user VARCHAR(255); END IF;
 
-  -- Uptime / Reboot
+  -- Uptime / Reboot (§7.2)
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='computers' AND column_name='last_boot_up_time') THEN ALTER TABLE computers ADD COLUMN last_boot_up_time TIMESTAMP; END IF;
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='computers' AND column_name='uptime_days')      THEN ALTER TABLE computers ADD COLUMN uptime_days NUMERIC(10,2); END IF;
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='computers' AND column_name='reboot_compliance') THEN ALTER TABLE computers ADD COLUMN reboot_compliance VARCHAR(20) DEFAULT 'Compliant'; END IF;
@@ -48,14 +43,13 @@ DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='computers' AND column_name='last_change_hash') THEN ALTER TABLE computers ADD COLUMN last_change_hash VARCHAR(64); END IF;
 END $$;
 
--- ─── 3. Core Tables ─────────────────────────────────────────────────────────
-
+-- ─── 2. Settings table + Seed Data ──────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS settings (
   setting_id    SERIAL PRIMARY KEY,
   category      VARCHAR(100) NOT NULL,
   setting_key   VARCHAR(200) NOT NULL,
   setting_value TEXT,
-  value_type    VARCHAR(20) DEFAULT 'string',
+  value_type    VARCHAR(20) DEFAULT 'string' CHECK (value_type IN ('string','number','boolean','json')),
   description   TEXT,
   is_sensitive  BOOLEAN DEFAULT false,
   updated_by    VARCHAR(255),
@@ -63,6 +57,17 @@ CREATE TABLE IF NOT EXISTS settings (
   UNIQUE(category, setting_key)
 );
 
+INSERT INTO settings (category, setting_key, setting_value, value_type, description) VALUES
+  ('general',    'org_name',       'Surya Nepal Pvt. Ltd.',  'string',  'Organization display name'),
+  ('general',    'timezone',       'Asia/Kathmandu',         'string',  'Default timezone'),
+  ('scan',       'ho_throttle',    '40',                     'number',  'HO parallel scan limit'),
+  ('scan',       'remote_throttle','4',                      'number',  'Remote/MPLS parallel scan limit'),
+  ('compliance', 'reboot_warn_d',  '3',                      'number',  'Uptime days for Warning'),
+  ('compliance', 'reboot_crit_d',  '7',                      'number',  'Uptime days for Critical'),
+  ('compliance', 'pending_warn_h', '24',                     'number',  'Pending reboot hours for Warning')
+ON CONFLICT (category, setting_key) DO NOTHING;
+
+-- ─── 3. Unified audit events table ──────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS audit_events (
   event_id      BIGSERIAL PRIMARY KEY,
   actor         VARCHAR(255) NOT NULL,
@@ -74,10 +79,12 @@ CREATE TABLE IF NOT EXISTS audit_events (
   ip_address    INET,
   user_agent    TEXT,
   request_id    VARCHAR(64),
-  severity      VARCHAR(20) DEFAULT 'Info',
+  severity      VARCHAR(20) DEFAULT 'Info' CHECK (severity IN ('Info','Warning','High','Critical')),
   created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+CREATE INDEX IF NOT EXISTS idx_audit_events_created ON audit_events(created_at DESC);
 
+-- ─── 4. Compliance rules ────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS compliance_rules (
   rule_id       VARCHAR(100) PRIMARY KEY,
   field         VARCHAR(200) NOT NULL,
@@ -92,61 +99,89 @@ CREATE TABLE IF NOT EXISTS compliance_rules (
   updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Note: Using computer_id OR id based on table detection
-DO $$ 
-DECLARE 
-    pk_col text;
-BEGIN
-    SELECT column_name INTO pk_col 
-    FROM information_schema.key_column_usage 
-    WHERE table_name = 'computers' AND constraint_name LIKE '%pkey%' LIMIT 1;
+-- ─── 5. Compliance Exceptions (FIXED FOR COMPUTER_NAME) ─────────────────────
+CREATE TABLE IF NOT EXISTS compliance_exceptions (
+  exception_id  SERIAL PRIMARY KEY,
+  rule_id       VARCHAR(100) REFERENCES compliance_rules(rule_id),
+  computer_name VARCHAR(255) REFERENCES computers(computer_name),
+  justification TEXT NOT NULL,
+  approved_by   VARCHAR(255),
+  approved_at   TIMESTAMP,
+  expires_at    TIMESTAMP NOT NULL,
+  created_by    VARCHAR(255) NOT NULL,
+  created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-    EXECUTE 'CREATE TABLE IF NOT EXISTS compliance_exceptions (
-      exception_id  SERIAL PRIMARY KEY,
-      rule_id       VARCHAR(100) REFERENCES compliance_rules(rule_id),
-      computer_id   INTEGER REFERENCES computers(' || pk_col || '),
-      justification TEXT NOT NULL,
-      approved_by   VARCHAR(255),
-      approved_at   TIMESTAMP,
-      expires_at    TIMESTAMP NOT NULL,
-      created_by    VARCHAR(255) NOT NULL,
-      created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )';
+-- ─── 6. Lifecycle Events (FIXED FOR COMPUTER_NAME) ──────────────────────────
+CREATE TABLE IF NOT EXISTS lifecycle_events (
+  event_id      BIGSERIAL PRIMARY KEY,
+  computer_name VARCHAR(255) REFERENCES computers(computer_name),
+  from_state    VARCHAR(50),
+  to_state      VARCHAR(50) NOT NULL,
+  reason_code   VARCHAR(100),
+  notes         TEXT,
+  performed_by  VARCHAR(255) NOT NULL,
+  created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-    EXECUTE 'CREATE TABLE IF NOT EXISTS lifecycle_events (
-      event_id      BIGSERIAL PRIMARY KEY,
-      computer_id   INTEGER REFERENCES computers(' || pk_col || '),
-      from_state    VARCHAR(50),
-      to_state      VARCHAR(50) NOT NULL,
-      reason_code   VARCHAR(100),
-      notes         TEXT,
-      performed_by  VARCHAR(255) NOT NULL,
-      created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )';
-END $$;
-
+-- ─── 7. Alerts table ────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS alerts (
   alert_id      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   event_type    VARCHAR(100) NOT NULL,
-  severity      VARCHAR(20) NOT NULL,
+  severity      VARCHAR(20) NOT NULL CHECK (severity IN ('Info','Warning','High','Critical')),
   title         VARCHAR(500) NOT NULL,
   description   TEXT,
   affected_hosts TEXT[] DEFAULT '{}',
   host_count    INTEGER DEFAULT 0,
   acknowledged  BOOLEAN DEFAULT false,
+  acknowledged_by VARCHAR(255),
+  acknowledged_at TIMESTAMP,
+  resolved_at   TIMESTAMP,
+  dedup_key     VARCHAR(255),
+  created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_alerts_created ON alerts(created_at DESC);
+
+-- ─── 8. Saved views ─────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS saved_views (
+  view_id       UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  view_name     VARCHAR(255) NOT NULL,
+  table_name    VARCHAR(100) NOT NULL,
+  columns       JSONB NOT NULL DEFAULT '[]',
+  filters       JSONB NOT NULL DEFAULT '[]',
+  sort_config   JSONB NOT NULL DEFAULT '[]',
+  is_default    BOOLEAN DEFAULT false,
+  is_shared     BOOLEAN DEFAULT false,
+  created_by    VARCHAR(255) NOT NULL,
   created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- ─── 4. User Table Extensions ───────────────────────────────────────────────
+-- ─── 9. Credential profiles ─────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS credential_profiles (
+  profile_id    UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_name  VARCHAR(255) NOT NULL UNIQUE,
+  profile_type  VARCHAR(50) NOT NULL CHECK (profile_type IN ('Domain-Admin','Local-Service','Workgroup')),
+  username      VARCHAR(255) NOT NULL,
+  encrypted_password TEXT NOT NULL,
+  subnets       TEXT[] DEFAULT '{}',
+  last_rotated  TIMESTAMP,
+  created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ─── 10. User Table Extensions ──────────────────────────────────────────────
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='ad_groups') THEN
     ALTER TABLE users ADD COLUMN ad_groups TEXT[] DEFAULT '{}';
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='scoped_sites') THEN
+    ALTER TABLE users ADD COLUMN scoped_sites TEXT[] DEFAULT '{}';
   END IF;
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='preferences') THEN
     ALTER TABLE users ADD COLUMN preferences JSONB DEFAULT '{}';
   END IF;
 END $$;
 
+-- ─── 11. Schema version ─────────────────────────────────────────────────────
 INSERT INTO schema_version (version, description)
-VALUES ('5.0.0', 'v5 migration — extended endpoints, settings, unified audit')
+VALUES ('5.0.0', 'v5 migration — full feature set with computer_name FK fix')
 ON CONFLICT DO NOTHING;
