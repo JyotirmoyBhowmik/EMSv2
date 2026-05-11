@@ -81,7 +81,12 @@ function Connect-EMSEndpoint {
         return $result
     }
     catch {
-        $result.Error = "All connection methods failed for '$ComputerName'. WinRM is down and DCOM/WMI is blocked or inaccessible. Last error: $($_.Exception.Message)"
+        $msg = $_.Exception.Message
+        $diag = "All connection methods failed. "
+        if ($msg -match "Access is denied") { $diag += "POTENTIAL BLOCK: Antivirus/EDR rejected the connection." }
+        elseif ($msg -match "RPC server is unavailable") { $diag += "FIREWALL: Ports 135/445/5985 blocked." }
+        
+        $result.Error = "$diag ($msg)"
     }
     
     return $result

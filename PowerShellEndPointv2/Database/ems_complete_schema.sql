@@ -310,15 +310,27 @@ CREATE TABLE IF NOT EXISTS feature_toggles (
 -- Insert default features if they don't exist
 INSERT INTO feature_toggles (feature_key, feature_name, description, enabled, category)
 VALUES
-    ('auto_scan',        'Auto Scan',         'Automatically scan endpoints on a schedule',         false, 'Scanning'),
-    ('bulk_scan',        'Bulk Scan',         'Enable scanning multiple endpoints at once',         true,  'Scanning'),
-    ('realtime_alerts',  'Real-time Alerts',  'Push notifications for critical events',             false, 'Notifications'),
-    ('email_reports',    'Email Reports',     'Send scheduled compliance reports via email',        false, 'Notifications'),
-    ('ad_integration',   'AD Integration',    'Active Directory authentication and group sync',     true,  'Authentication'),
-    ('remediation',      'Remediation',       'Allow automated remediation actions',                false, 'Operations'),
-    ('api_rate_limiting', 'API Rate Limiting', 'Limit API requests per IP address',                 true,  'Security'),
-    ('audit_logging',    'Audit Logging',     'Track all API requests and admin actions',           true,  'Security')
-ON CONFLICT (feature_key) DO NOTHING;
+    ('auto_scan',        'Auto Scan',              'Automatically scan endpoints on a schedule',              false, 'Scanning'),
+    ('bulk_scan',        'Bulk Scan',              'Enable scanning multiple endpoints at once',              true,  'Scanning'),
+    ('scan_scheduling',  'Scan Scheduling',        'Allow scheduling scans at specific times',                false, 'Scanning'),
+    ('deep_scan',        'Deep Scan',              'Enable extended collector modules for thorough analysis',  false, 'Scanning'),
+    ('realtime_alerts',  'Real-time Alerts',       'Push notifications for critical events',                  false, 'Notifications'),
+    ('email_reports',    'Email Reports',          'Send scheduled compliance reports via email',              false, 'Notifications'),
+    ('slack_integration', 'Slack Integration',     'Send alerts and summaries to Slack channels',              false, 'Notifications'),
+    ('ad_integration',   'AD Integration',         'Active Directory authentication and group sync',          true,  'Authentication'),
+    ('mfa_enforcement',  'MFA Enforcement',        'Require multi-factor authentication for admin access',    false, 'Security'),
+    ('api_rate_limiting', 'API Rate Limiting',     'Limit API requests per IP address',                       true,  'Security'),
+    ('audit_logging',    'Audit Logging',          'Track all API requests and admin actions',                 true,  'Security'),
+    ('ip_allowlisting',  'IP Allowlisting',        'Restrict API access to approved IP ranges',               false, 'Security'),
+    ('remediation',      'Remediation',            'Allow automated remediation actions on endpoints',        false, 'Administration'),
+    ('data_retention',   'Data Retention Policy',  'Automatically purge old scan data after N days',          false, 'Administration'),
+    ('export_reports',   'Export Reports',          'Enable CSV/PDF export of scan results and compliance',    true,  'Reporting'),
+    ('compliance_dashboard', 'Compliance Dashboard', 'Show compliance status and trend analysis',             true,  'Reporting')
+ON CONFLICT (feature_key) DO UPDATE SET 
+    feature_name = EXCLUDED.feature_name,
+    description = EXCLUDED.description,
+    category = EXCLUDED.category;
+
 
 -- ─── Audit & Compliance ──────────────────────────────────────────────────────
 
