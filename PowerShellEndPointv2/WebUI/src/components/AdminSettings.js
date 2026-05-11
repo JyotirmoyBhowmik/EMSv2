@@ -172,6 +172,12 @@ function AdminSettings() {
                     No features configured in the database.
                 </div>
             )}
+
+            {/* ── Service Credentials Section ── */}
+            <CredentialManager />
+
+            {/* ── Environment Config Section ── */}
+            <EnvironmentManager />
         </div>
     );
 }
@@ -243,6 +249,186 @@ function FeatureCard({ category, features, saving, onToggle }) {
                     </div>
                 </div>
             ))}
+        </div>
+    );
+}
+
+function CredentialManager() {
+    const [credentials, setCredentials] = useState([]);
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [saving, setSaving] = useState(false);
+    const [testing, setTesting] = useState(false);
+    const [msg, setMsg] = useState(null);
+
+    useEffect(() => {
+        adminService.getCredentials().then(setCredentials).catch(() => {});
+    }, []);
+
+    const handleSave = async () => {
+        if (!username || !password) { setMsg({ type: 'error', text: 'Username and password are required.' }); return; }
+        setSaving(true);
+        try {
+            await adminService.saveCredentials('ScanService', username, password);
+            setMsg({ type: 'success', text: 'Scan service credential saved and encrypted.' });
+            setPassword('');
+            const c = await adminService.getCredentials();
+            setCredentials(c);
+        } catch (err) {
+            setMsg({ type: 'error', text: err?.response?.data?.message || 'Failed to save credential.' });
+        } finally { setSaving(false); setTimeout(() => setMsg(null), 4000); }
+    };
+
+    const handleTest = async () => {
+        setTesting(true);
+        try {
+            const res = await adminService.testCredentials('ScanService');
+            setMsg({ type: res.success ? 'success' : 'error', text: res.message || 'Test completed.' });
+        } catch (err) {
+            setMsg({ type: 'error', text: 'Test failed: ' + (err?.response?.data?.message || err.message) });
+        } finally { setTesting(false); setTimeout(() => setMsg(null), 5000); }
+    };
+
+    const existing = credentials.find(c => c.credential_type === 'ScanService');
+
+    return (
+        <div style={{ marginTop: 32, borderRadius: 12, border: '1px solid #e2e8f0', background: '#fff', overflow: 'hidden' }}>
+            <div style={{ padding: '14px 20px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: '1.2rem' }}>🔐</span>
+                <span style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.95rem' }}>Scan Service Account</span>
+                <InfoIcon text="Set a domain service account that the scan engine uses to remotely connect to endpoints via CIM/DCOM. Credentials are encrypted with DPAPI." />
+            </div>
+            <div style={{ padding: 20 }}>
+                {existing && (
+                    <div style={{ marginBottom: 16, padding: '10px 14px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, fontSize: '0.85rem', color: '#166534' }}>
+                        ✅ Current: <strong>{existing.username}</strong> — Last updated: {existing.updated_at ? new Date(existing.updated_at).toLocaleString() : 'N/A'}
+                    </div>
+                )}
+                {msg && (
+                    <div style={{ marginBottom: 12, padding: '10px 14px', borderRadius: 8, background: msg.type === 'success' ? '#f0fdf4' : '#fef2f2', border: `1px solid ${msg.type === 'success' ? '#bbf7d0' : '#fecaca'}`, color: msg.type === 'success' ? '#166534' : '#991b1b', fontSize: '0.85rem' }}>
+                        {msg.text}
+                    </div>
+                )}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Service Username</label>
+                        <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="DOMAIN\svc_ems_scan" style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', boxSizing: 'border-box' }} />
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Service Password</label>
+                        <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', boxSizing: 'border-box' }} />
+                    </div>
+                </div>
+                <div style={{ display: 'flex', gap: 10 }}>
+                    <button onClick={handleSave} disabled={saving} style={{ padding: '10px 20px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}>
+                        {saving ? 'Encrypting & Saving...' : '🔒 Save Credential'}
+                    </button>
+                    {existing && (
+                        <button onClick={handleTest} disabled={testing} style={{ padding: '10px 20px', background: '#f1f5f9', color: '#475569', border: '1px solid #e2e8f0', borderRadius: 8, fontWeight: 600, cursor: testing ? 'not-allowed' : 'pointer' }}>
+                            {testing ? 'Testing...' : '🧪 Test Connection'}
+                        </button>
+                    )}
+                </div>
+                <p style={{ marginTop: 12, fontSize: '0.78rem', color: '#94a3b8' }}>
+                    Credentials are encrypted using DPAPI (Windows Data Protection API) and stored in the database. They can only be decrypted on this server by the same service account.
+                </p>
+            </div>
+        </div>
+    );
+}
+
+function EnvironmentManager() {
+    const [config, setConfig] = useState([]);
+    const [newKey, setNewKey] = useState('');
+    const [newValue, setNewValue] = useState('');
+    const [newDesc, setNewDesc] = useState('');
+    const [saving, setSaving] = useState(false);
+    const [msg, setMsg] = useState(null);
+
+    useEffect(() => {
+        adminService.getEnvironmentConfig().then(setConfig).catch(() => {});
+    }, []);
+
+    const handleSave = async () => {
+        if (!newKey || !newValue) { setMsg({ type: 'error', text: 'Key and value are required.' }); return; }
+        setSaving(true);
+        try {
+            await adminService.saveEnvironmentConfig(newKey, newValue, newDesc);
+            setMsg({ type: 'success', text: `Variable '${newKey}' saved.` });
+            setNewKey(''); setNewValue(''); setNewDesc('');
+            const c = await adminService.getEnvironmentConfig();
+            setConfig(c);
+        } catch (err) {
+            setMsg({ type: 'error', text: err?.response?.data?.message || 'Failed to save.' });
+        } finally { setSaving(false); setTimeout(() => setMsg(null), 4000); }
+    };
+
+    const presets = ['DB_PASSWORD', 'JWT_SECRET', 'API_PORT', 'AD_BIND_PASSWORD', 'SMTP_PASSWORD'];
+
+    return (
+        <div style={{ marginTop: 24, borderRadius: 12, border: '1px solid #e2e8f0', background: '#fff', overflow: 'hidden' }}>
+            <div style={{ padding: '14px 20px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ fontSize: '1.2rem' }}>⚙️</span>
+                <span style={{ fontWeight: 700, color: '#0f172a', fontSize: '0.95rem' }}>Environment Configuration</span>
+                <InfoIcon text="Manage encrypted environment variables. Sensitive values (containing 'password', 'secret', 'key', 'token') are automatically encrypted." />
+            </div>
+            <div style={{ padding: 20 }}>
+                {msg && (
+                    <div style={{ marginBottom: 12, padding: '10px 14px', borderRadius: 8, background: msg.type === 'success' ? '#f0fdf4' : '#fef2f2', border: `1px solid ${msg.type === 'success' ? '#bbf7d0' : '#fecaca'}`, color: msg.type === 'success' ? '#166534' : '#991b1b', fontSize: '0.85rem' }}>
+                        {msg.text}
+                    </div>
+                )}
+
+                {config.length > 0 && (
+                    <div style={{ marginBottom: 16 }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
+                            <thead>
+                                <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
+                                    <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 700, color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase' }}>Key</th>
+                                    <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 700, color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase' }}>Value</th>
+                                    <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 700, color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase' }}>Description</th>
+                                    <th style={{ padding: '10px 12px', textAlign: 'left', fontWeight: 700, color: '#64748b', fontSize: '0.75rem', textTransform: 'uppercase' }}>Updated</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {config.map((c, i) => (
+                                    <tr key={c.key || i} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                                        <td style={{ padding: '10px 12px', fontWeight: 600, color: '#1e293b' }}><code>{c.key}</code></td>
+                                        <td style={{ padding: '10px 12px', color: c.isSensitive ? '#94a3b8' : '#1e293b', fontFamily: 'monospace' }}>
+                                            {c.isSensitive ? (
+                                                <span style={{ background: '#f1f5f9', padding: '2px 8px', borderRadius: 4 }}>🔒 Encrypted</span>
+                                            ) : c.value}
+                                        </td>
+                                        <td style={{ padding: '10px 12px', color: '#64748b' }}>{c.description || '—'}</td>
+                                        <td style={{ padding: '10px 12px', color: '#94a3b8', fontSize: '0.8rem', whiteSpace: 'nowrap' }}>{c.updatedAt ? new Date(c.updatedAt).toLocaleDateString() : '—'}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 12 }}>
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Variable Name</label>
+                        <select value={newKey} onChange={e => setNewKey(e.target.value)} style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', background: '#fff' }}>
+                            <option value="">Select or type...</option>
+                            {presets.map(p => <option key={p} value={p}>{p}</option>)}
+                        </select>
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Value</label>
+                        <input type={newKey.match(/password|secret|key|token/i) ? 'password' : 'text'} value={newValue} onChange={e => setNewValue(e.target.value)} placeholder="Enter value..." style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', boxSizing: 'border-box' }} />
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Description</label>
+                        <input type="text" value={newDesc} onChange={e => setNewDesc(e.target.value)} placeholder="Optional description..." style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', boxSizing: 'border-box' }} />
+                    </div>
+                </div>
+                <button onClick={handleSave} disabled={saving} style={{ padding: '10px 20px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}>
+                    {saving ? 'Saving...' : '💾 Save Variable'}
+                </button>
+            </div>
         </div>
     );
 }

@@ -122,6 +122,15 @@ export const adminService = {
         const list = res?.connectors || res;
         return Array.isArray(list) ? list : [];
     }),
+    // SystemErrors.js calls this — was missing, causing runtime crash
+    getSystemErrors: () => get('/api/admin/audit', { type: 'ERROR' }).then(res => res?.logs || []),
+    // Credential management (Phase 4)
+    getCredentials: () => get('/api/admin/credentials').then(res => res?.credentials || []),
+    saveCredentials: (type, username, password) => post('/api/admin/credentials', { type, username, password }),
+    testCredentials: (type) => post('/api/admin/credentials/test', { type }),
+    // Environment config (Phase 4)
+    getEnvironmentConfig: () => get('/api/admin/environment').then(res => res?.config || []),
+    saveEnvironmentConfig: (key, value, description) => post('/api/admin/environment', { key, value, description }),
 };
 
 export const performanceService = {

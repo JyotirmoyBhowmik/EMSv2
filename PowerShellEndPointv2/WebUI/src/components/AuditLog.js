@@ -4,8 +4,10 @@ import { adminService } from '../services/api';
 function AuditLog() {
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [filters, setFilters] = useState({ type: 'all', user: '', dateFrom: '', dateTo: '' });
+    const [filters, setFilters] = useState({ user: '', dateFrom: '', dateTo: '', statusFilter: 'all' });
     const [logType, setLogType] = useState('api');
+    const [page, setPage] = useState(1);
+    const pageSize = 50;
 
     const logTypes = [
         { key: 'api',     label: 'API Requests'    },
@@ -17,7 +19,8 @@ function AuditLog() {
     const loadLogs = useCallback(async () => {
         setLoading(true);
         try {
-            const data = await adminService.getAuditLogs(logType, 200);
+            const params = { type: logType, limit: 500 };
+            const data = await adminService.getAuditLogs(params);
             setLogs(Array.isArray(data) ? data : []);
         } catch (err) {
             console.error('Failed to load audit logs:', err);
@@ -30,9 +33,25 @@ function AuditLog() {
     useEffect(() => { loadLogs(); }, [loadLogs]);
 
     const filteredLogs = logs.filter(log => {
-        if (filters.user && !(log.username || '').toLowerCase().includes(filters.user.toLowerCase())) return false;
+        if (filters.user && !(log.username || log.changed_by || '').toLowerCase().includes(filters.user.toLowerCase())) return false;
+        if (filters.dateFrom) {
+            const logDate = new Date(log.timestamp).toISOString().split('T')[0];
+            if (logDate < filters.dateFrom) return false;
+        }
+        if (filters.dateTo) {
+            const logDate = new Date(log.timestamp).toISOString().split('T')[0];
+            if (logDate > filters.dateTo) return false;
+        }
+        if (filters.statusFilter !== 'all' && logType === 'api') {
+            const code = log.status_code || 0;
+            if (filters.statusFilter === 'success' && code >= 400) return false;
+            if (filters.statusFilter === 'error' && code < 400) return false;
+        }
         return true;
     });
+
+    const totalPages = Math.ceil(filteredLogs.length / pageSize);
+    const paginatedLogs = filteredLogs.slice((page - 1) * pageSize, page * pageSize);
 
     const getRiskColor = (risk) => {
         switch (risk) {
@@ -115,19 +134,40 @@ function AuditLog() {
                 ))}
             </div>
 
-            <div className="card" style={{ marginBottom: '20px' }}>
-                <input
-                    type="text" placeholder="Filter by username..." value={filters.user}
-                    onChange={e => setFilters({ ...filters, user: e.target.value })}
-                    style={{
-                        padding: '10px 16px', border: '1px solid var(--border-color)',
-                        borderRadius: '6px', width: '300px', background: 'var(--bg-primary)',
-                        color: 'var(--text-primary)'
-                    }}
-                />
-                <span style={{ marginLeft: '15px', color: 'var(--text-secondary)' }}>
-                    Showing {filteredLogs.length} records
-                </span>
+            <div style={{ marginBottom: 16, padding: 16, background: '#fff', borderRadius: 10, border: '1px solid #e2e8f0', display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+                <div>
+                    <label style={filterLabel}>Username</label>
+                    <input type="text" placeholder="Filter by user..." value={filters.user}
+                        onChange={e => { setFilters({ ...filters, user: e.target.value }); setPage(1); }}
+                        style={filterInput} />
+                </div>
+                <div>
+                    <label style={filterLabel}>From Date</label>
+                    <input type="date" value={filters.dateFrom}
+                        onChange={e => { setFilters({ ...filters, dateFrom: e.target.value }); setPage(1); }}
+                        style={filterInput} />
+                </div>
+                <div>
+                    <label style={filterLabel}>To Date</label>
+                    <input type="date" value={filters.dateTo}
+                        onChange={e => { setFilters({ ...filters, dateTo: e.target.value }); setPage(1); }}
+                        style={filterInput} />
+                </div>
+                {logType === 'api' && (
+                    <div>
+                        <label style={filterLabel}>Status</label>
+                        <select value={filters.statusFilter}
+                            onChange={e => { setFilters({ ...filters, statusFilter: e.target.value }); setPage(1); }}
+                            style={filterInput}>
+                            <option value="all">All</option>
+                            <option value="success">Success (2xx/3xx)</option>
+                            <option value="error">Errors (4xx/5xx)</option>
+                        </select>
+                    </div>
+                )}
+                <div style={{ marginLeft: 'auto', fontSize: '0.85rem', color: '#64748b', alignSelf: 'center' }}>
+                    {filteredLogs.length} records · Page {page}/{totalPages || 1}
+                </div>
             </div>
 
             {loading ? <div className="spinner"></div> : (
@@ -144,15 +184,15 @@ function AuditLog() {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredLogs.map((log, i) => (
+                            {paginatedLogs.map((log, i) => (
                                 <tr key={i} style={{ borderBottom: '1px solid var(--border-color)' }}>
                                     <td style={tdStyle}>{new Date(log.timestamp).toLocaleString()}</td>
                                     <td style={tdStyle}>{log.username || log.changed_by || '—'}</td>
                                     {logType === 'api' && <>
-                                        <td style={tdStyle}><span className={`badge badge-${log.method === 'GET' ? 'info' : 'warning'}`}>{log.method}</span></td>
-                                        <td style={tdStyle}><code>{log.path}</code></td>
-                                        <td style={tdStyle}><span className={`badge badge-${log.status_code < 400 ? 'success' : 'danger'}`}>{log.status_code}</span></td>
-                                        <td style={tdStyle}>{log.response_time_ms}ms</td>
+                                        <td style={tdStyle}><span style={{ padding: '2px 8px', borderRadius: 4, fontSize: '0.75rem', fontWeight: 600, background: log.method === 'GET' ? '#eff6ff' : log.method === 'POST' ? '#f0fdf4' : '#fff7ed', color: log.method === 'GET' ? '#2563eb' : log.method === 'POST' ? '#16a34a' : '#ea580c' }}>{log.method}</span></td>
+                                        <td style={tdStyle}><code style={{ fontSize: '0.8rem' }}>{log.path}</code></td>
+                                        <td style={tdStyle}><span style={{ padding: '2px 8px', borderRadius: 4, fontSize: '0.75rem', fontWeight: 600, background: (log.status_code || 0) < 400 ? '#f0fdf4' : '#fef2f2', color: (log.status_code || 0) < 400 ? '#16a34a' : '#dc2626' }}>{log.status_code}</span></td>
+                                        <td style={tdStyle}>{log.response_time_ms != null ? `${Math.round(log.response_time_ms)}ms` : '—'}</td>
                                     </>}
                                     {logType === 'auth' && <>
                                         <td style={tdStyle}>{log.event_type}</td>
@@ -172,9 +212,30 @@ function AuditLog() {
                             ))}
                         </tbody>
                     </table>
-                    {filteredLogs.length === 0 && (
+                    {paginatedLogs.length === 0 && (
                         <p style={{ textAlign: 'center', padding: '30px', color: 'var(--text-secondary)' }}>No audit records found.</p>
                     )}
+                </div>
+            )}
+
+            {/* Pagination */}
+            {totalPages > 1 && (
+                <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 16 }}>
+                    <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+                        style={{ ...paginationBtn, opacity: page === 1 ? 0.4 : 1 }}>← Prev</button>
+                    {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                        let pn;
+                        if (totalPages <= 7) pn = i + 1;
+                        else if (page <= 4) pn = i + 1;
+                        else if (page >= totalPages - 3) pn = totalPages - 6 + i;
+                        else pn = page - 3 + i;
+                        return (
+                            <button key={pn} onClick={() => setPage(pn)}
+                                style={{ ...paginationBtn, background: page === pn ? '#2563eb' : '#f1f5f9', color: page === pn ? '#fff' : '#64748b' }}>{pn}</button>
+                        );
+                    })}
+                    <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+                        style={{ ...paginationBtn, opacity: page === totalPages ? 0.4 : 1 }}>Next →</button>
                 </div>
             )}
         </div>
@@ -183,5 +244,8 @@ function AuditLog() {
 
 const thStyle = { textAlign: 'left', padding: '12px 10px', fontSize: '0.85rem', color: 'var(--text-secondary)' };
 const tdStyle = { padding: '10px', fontSize: '0.9rem' };
+const filterLabel = { display: 'block', fontSize: '0.7rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 };
+const filterInput = { padding: '8px 12px', border: '1px solid #e2e8f0', borderRadius: 6, fontSize: '0.85rem', background: '#fff', minWidth: 140 };
+const paginationBtn = { padding: '6px 14px', border: '1px solid #e2e8f0', borderRadius: 6, fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', background: '#f1f5f9', color: '#64748b' };
 
 export default AuditLog;

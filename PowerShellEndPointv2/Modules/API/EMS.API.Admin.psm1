@@ -228,4 +228,99 @@ ORDER BY computer_name, timestamp DESC;
     return $false
 }
 
-Export-ModuleMember -Function Invoke-AdminRoutes
+# ─── Credential Management Routes ────────────────────────────────────
+function Invoke-CredentialRoutes {
+    param(
+        [System.Net.HttpListenerRequest]$Request,
+        [System.Net.HttpListenerResponse]$Response,
+        [string]$Method,
+        [string]$Path,
+        [pscustomobject]$Config
+    )
+
+    # Load security modules
+    $secRoot = Join-Path $PSScriptRoot '..\..\Modules\Security'
+    if (Test-Path "$secRoot\EMS.Credentials.psm1") {
+        Import-Module "$secRoot\EMS.Credentials.psm1" -Force -ErrorAction SilentlyContinue
+    }
+    if (Test-Path "$secRoot\EMS.Environment.psm1") {
+        Import-Module "$secRoot\EMS.Environment.psm1" -Force -ErrorAction SilentlyContinue
+    }
+
+    switch ("$Method $Path") {
+
+        'GET /admin/credentials' {
+            if (-not (Test-AdminAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
+            try {
+                $creds = Get-EMSServiceCredentialInfo
+                Write-JsonResponse $Request $Response 200 @{ success = $true; credentials = @($creds) }
+            } catch {
+                Write-JsonResponse $Request $Response 200 @{ success = $true; credentials = @() }
+            }
+            return $true
+        }
+
+        'POST /admin/credentials' {
+            if (-not (Test-AdminAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
+            try {
+                $body = Read-JsonBody $Request
+                if (-not $body.type -or -not $body.username -or -not $body.password) {
+                    Write-JsonResponse $Request $Response 400 @{ success = $false; message = 'type, username, and password are required' }
+                    return $true
+                }
+                $ctx = Get-RequestUserContext -Request $Request
+                $secPass = ConvertTo-SecureString $body.password -AsPlainText -Force
+                Set-EMSServiceCredential -CredentialType $body.type -Username $body.username -SecurePassword $secPass -CreatedBy $ctx.Username
+                Write-JsonResponse $Request $Response 200 @{ success = $true; message = "Credential '$($body.type)' saved successfully" }
+            } catch {
+                Write-JsonResponse $Request $Response 500 @{ success = $false; error = $_.Exception.Message }
+            }
+            return $true
+        }
+
+        'POST /admin/credentials/test' {
+            if (-not (Test-AdminAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
+            try {
+                $body = Read-JsonBody $Request
+                $testResult = Test-EMSServiceCredential -CredentialType ($body.type ?? 'ScanService')
+                Write-JsonResponse $Request $Response 200 @{ success = $testResult.Success; message = $testResult.Message }
+            } catch {
+                Write-JsonResponse $Request $Response 500 @{ success = $false; error = $_.Exception.Message }
+            }
+            return $true
+        }
+
+        'GET /admin/environment' {
+            if (-not (Test-AdminAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
+            try {
+                $envConfig = Get-EMSEnvironmentConfig
+                Write-JsonResponse $Request $Response 200 @{ success = $true; config = @($envConfig) }
+            } catch {
+                Write-JsonResponse $Request $Response 200 @{ success = $true; config = @() }
+            }
+            return $true
+        }
+
+        'POST /admin/environment' {
+            if (-not (Test-AdminAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
+            try {
+                $body = Read-JsonBody $Request
+                if (-not $body.key -or -not $body.value) {
+                    Write-JsonResponse $Request $Response 400 @{ success = $false; message = 'key and value are required' }
+                    return $true
+                }
+                $ctx = Get-RequestUserContext -Request $Request
+                $isSensitive = $body.key -match '(?i)(password|secret|key|token)'
+                Set-EMSEnvironmentVar -Key $body.key -Value $body.value -Description ($body.description ?? '') -IsSensitive $isSensitive -UpdatedBy $ctx.Username
+                Write-JsonResponse $Request $Response 200 @{ success = $true; message = "Environment variable '$($body.key)' saved" }
+            } catch {
+                Write-JsonResponse $Request $Response 500 @{ success = $false; error = $_.Exception.Message }
+            }
+            return $true
+        }
+    }
+
+    return $false
+}
+
+Export-ModuleMember -Function Invoke-AdminRoutes, Invoke-CredentialRoutes

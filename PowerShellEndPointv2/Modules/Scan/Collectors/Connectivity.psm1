@@ -3,6 +3,7 @@
     EMS Connectivity Layer
 .DESCRIPTION
     Manages CIM and DCOM sessions for remote endpoint interrogation.
+    Supports optional PSCredential for service account authentication.
 #>
 
 function Connect-EMSEndpoint {
@@ -11,7 +12,10 @@ function Connect-EMSEndpoint {
         [Parameter(Mandatory)]
         [string]$ComputerName,
         
-        [int]$TimeoutSeconds = 15
+        [int]$TimeoutSeconds = 15,
+
+        # Optional credential for service account scanning
+        [System.Management.Automation.PSCredential]$Credential = $null
     )
     
     $result = @{
@@ -22,33 +26,62 @@ function Connect-EMSEndpoint {
         Error        = $null
     }
     
-    # 1. Try CIM Session (WS-MAN / WinRM)
+    # 0. Basic Ping Test
     try {
-        $option = New-CimSessionOption -Protocol Dcom # As per user spec, Dcom is requested for CIM fallback? 
-        # Wait, the user's spec said:
-        # Primary method: New-CimSession -ComputerName $ComputerName -SessionOption (New-CimSessionOption -Protocol Dcom)
-        # That's actually CIM over DCOM. Let's follow that.
+        if (-not (Test-Connection -ComputerName $ComputerName -Count 1 -Quiet -TimeoutSeconds 5)) {
+            $result.Error = "Host unreachable — ping to '$ComputerName' failed. Verify the hostname/IP is correct and the machine is powered on."
+            return $result
+        }
+    } catch {
+        $result.Error = "Ping failed: $($_.Exception.Message)"
+        return $result
+    }
+
+    # 1. Try CIM Session (DCOM Protocol — works even if WinRM is disabled)
+    try {
+        $option = New-CimSessionOption -Protocol Dcom
         
-        $session = New-CimSession -ComputerName $ComputerName -SessionOption $option -OperationTimeoutSec ($TimeoutSeconds * 1000) -ErrorAction Stop
+        $cimParams = @{
+            ComputerName       = $ComputerName
+            SessionOption      = $option
+            # BUG FIX: OperationTimeoutSec is in SECONDS, not milliseconds.
+            # Was: ($TimeoutSeconds * 1000) which produced 15000s (4+ hours)
+            OperationTimeoutSec = $TimeoutSeconds
+            ErrorAction        = 'Stop'
+        }
+        if ($Credential) {
+            $cimParams['Credential'] = $Credential
+        }
         
-        $result.Protocol = 'CIM'
-        $result.Session = $session
+        $session = New-CimSession @cimParams
+        
+        $result.Protocol  = 'CIM-DCOM'
+        $result.Session   = $session
         $result.Connected = $true
         return $result
     }
     catch {
-        $result.Error = "CIM/DCOM failed: $($_.Exception.Message)"
+        $result.Error = "CIM/DCOM connection failed: $($_.Exception.Message)"
     }
     
-    # 2. Fallback: DCOM/WMI direct (Legacy)
+    # 2. Fallback: Legacy WMI/DCOM
     try {
-        $test = Get-WmiObject -Class Win32_ComputerSystem -ComputerName $ComputerName -ErrorAction Stop
-        $result.Protocol = 'DCOM'
+        $wmiParams = @{
+            Class         = 'Win32_ComputerSystem'
+            ComputerName  = $ComputerName
+            ErrorAction   = 'Stop'
+        }
+        if ($Credential) {
+            $wmiParams['Credential'] = $Credential
+        }
+        
+        $test = Get-WmiObject @wmiParams
+        $result.Protocol  = 'Legacy-DCOM'
         $result.Connected = $true
         return $result
     }
     catch {
-        $result.Error = "DCOM/WMI failed: $($_.Exception.Message)"
+        $result.Error = "All connection methods failed for '$ComputerName'. WinRM is down and DCOM/WMI is blocked or inaccessible. Last error: $($_.Exception.Message)"
     }
     
     return $result
@@ -57,7 +90,9 @@ function Connect-EMSEndpoint {
 function Disconnect-EMSEndpoint {
     param($Session)
     
-    if ($Session -and $Session.Protocol -eq 'CIM' -and $Session.Session) {
+    # BUG FIX: Protocol was changed from 'CIM' to 'CIM-DCOM' but this check was never updated,
+    # causing sessions to leak. Now matches the actual protocol string.
+    if ($Session -and $Session.Protocol -eq 'CIM-DCOM' -and $Session.Session) {
         try {
             Remove-CimSession -CimSession $Session.Session -ErrorAction SilentlyContinue
         } catch {}

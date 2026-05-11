@@ -3,6 +3,7 @@
     EMS Scan Worker (Collector-Based)
 .DESCRIPTION
     Orchestrates endpoint scans using modular collectors.
+    Runs each scan in a separate runspace for concurrency.
 #>
 
 Import-Module "$PSScriptRoot\ScanRunspacePool.psm1"
@@ -53,7 +54,9 @@ function Start-EMSScan {
         [Parameter(Mandatory)]
         [string]$Target,
 
-        [Parameter(Mandatory)]
+        # BUG FIX: Removed [Parameter(Mandatory)] — Protocol is optional.
+        # A Mandatory param with a default value causes the runspace to hang
+        # waiting for interactive input that will never come.
         [string]$Protocol = $null
     )
 
@@ -75,8 +78,32 @@ function Start-EMSScan {
             Import-Module "$root\Modules\Scan\HealthScore.psm1" -Force
             Import-Module "$root\Modules\Scan\Collectors\Connectivity.psm1" -Force
             
-            $config = Get-Content "$root\Config\EMSConfig.json" | ConvertFrom-Json
+            $config = Get-Content "$root\Config\EMSConfig.json" -Raw | ConvertFrom-Json
             Initialize-PostgreSQLConnection -Config $config
+
+            # --- Define Write-ScanTrace inside the runspace (no parent scope access) ---
+            function Write-ScanTrace {
+                param([Guid]$ScanId, [string]$StepName, [string]$ModuleName, [string]$Status = 'Info', [string]$Message = '')
+                try {
+                    Invoke-PGQuery -NonQuery -Query "INSERT INTO scan_trace (scan_id, step_name, module_name, status, message) VALUES (@id, @step, @mod, @stat, @msg)" -Parameters @{
+                        id = $ScanId; step = $StepName; mod = $ModuleName; stat = $Status; msg = $Message
+                    }
+                } catch {
+                    Write-EMSLog -Message "[$StepName][$ModuleName] $Message" -Category 'Trace' -CorrelationId $ScanId
+                }
+            }
+
+            # --- Load service credential if available ---
+            $scanCredential = $null
+            try {
+                $credModule = "$root\Modules\Security\EMS.Credentials.psm1"
+                if (Test-Path $credModule) {
+                    Import-Module $credModule -Force
+                    $scanCredential = Get-EMSServiceCredential -CredentialType 'ScanService'
+                }
+            } catch {
+                Write-EMSLog -Message "No stored scan credential found, using process identity" -Severity 'Info' -Category 'Scan'
+            }
 
             # 1. Initialize Scan
             Invoke-PGQuery -NonQuery -Query "UPDATE scans SET status='running' WHERE scan_id=@id" -Parameters @{ id = $ScanId }
@@ -88,7 +115,16 @@ function Start-EMSScan {
 
             # 2. Connect to Endpoint
             Write-ScanTrace -ScanId $ScanId -StepName "Connectivity" -ModuleName "Connectivity" -Message "Connecting to $Target..."
-            $conn = Connect-EMSEndpoint -ComputerName $Target -TimeoutSeconds $config.Topology.CIMSessionTimeout
+            
+            $connectParams = @{
+                ComputerName   = $Target
+                TimeoutSeconds = $config.Topology.CIMSessionTimeout
+            }
+            if ($scanCredential) {
+                $connectParams['Credential'] = $scanCredential
+            }
+            
+            $conn = Connect-EMSEndpoint @connectParams
             
             if (-not $conn.Connected) {
                 $errorMsg = if ($conn.Error) { $conn.Error } else { "Failed to connect to $Target" }
@@ -171,7 +207,8 @@ function Start-EMSScan {
             $score = Compute-EMSHealthScore -CollectorResults $collectorResults
             
             # 6. Finalize Scan
-            $duration = [int](Get-Date - $start).TotalSeconds
+            # BUG FIX: Was `(Get-Date - $start)` — invalid syntax. Must be `((Get-Date) - $start)`.
+            $duration = [int]((Get-Date) - $start).TotalSeconds
             
             Invoke-PGQuery -NonQuery -Query @"
                 UPDATE scans SET
@@ -190,14 +227,17 @@ function Start-EMSScan {
 
         }
         catch {
-            Invoke-PGQuery -NonQuery -Query "UPDATE scans SET status='failed', error_message=@err, completed_at=NOW() WHERE scan_id=@id" -Parameters @{
-                id  = $ScanId
-                err = $_.Exception.Message
-            }
-            Write-ScanTrace -ScanId $ScanId -StepName "Error" -ModuleName "ScanWorker" -Status "Error" -Message $_.Exception.Message
+            try {
+                Invoke-PGQuery -NonQuery -Query "UPDATE scans SET status='failed', error_message=@err, completed_at=NOW() WHERE scan_id=@id" -Parameters @{
+                    id  = $ScanId
+                    err = $_.Exception.Message
+                }
+                Write-ScanTrace -ScanId $ScanId -StepName "Error" -ModuleName "ScanWorker" -Status "Error" -Message $_.Exception.Message
+            } catch {}
             Write-EMSLog -Message "Scan failed for $($Target): $($_.Exception.Message)" -Severity 'Error' -Category 'Scan' -CorrelationId $ScanId
         }
-    }).AddArgument($ScanId).AddArgument($Target)
+    # BUG FIX: Pass all 3 arguments ($Protocol was missing before)
+    }).AddArgument($ScanId).AddArgument($Target).AddArgument($Protocol)
 
     $ps.BeginInvoke() | Out-Null
 }
@@ -206,7 +246,9 @@ function Start-EMSBatchScan {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        [string[]]$Targets
+        [string[]]$Targets,
+
+        [string]$Protocol = $null
     )
     
     # Resolve and expand targets
@@ -222,12 +264,13 @@ function Start-EMSBatchScan {
         Invoke-PGQuery -NonQuery -Query "INSERT INTO scans (scan_id, target, status, started_at) VALUES (@scanId, @target, 'queued', NOW());" -Parameters @{ scanId = $scanId; target = $target }
         
         # Start individual scan
-        Start-EMSScan -ScanId $scanId -Target $target -Protocol $protocol
+        Start-EMSScan -ScanId $scanId -Target $target -Protocol $Protocol
     }
 
     return [pscustomobject]@{
         targetCount = $resolvedTargets.Count
         scanIds     = $scanIds
+        targets     = $resolvedTargets
     }
 }
 

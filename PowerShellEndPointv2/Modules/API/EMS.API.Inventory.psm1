@@ -251,6 +251,64 @@ DO UPDATE SET ip_address=EXCLUDED.ip_address, computer_type=EXCLUDED.computer_ty
         }
     }
 
+    # ─── Compliance Routes ────────────────────────────────────────────────
+    switch ("$Method $Path") {
+
+        'GET /compliance/report' {
+            if (-not (Test-ViewerAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
+            try {
+                # Build compliance report from latest scan data per computer
+                $report = Invoke-PGQuery -Query @"
+                SELECT DISTINCT ON (s.target)
+                    s.target AS computer_name,
+                    s.health_score,
+                    s.status AS scan_status,
+                    s.completed_at,
+                    CASE
+                        WHEN s.health_score >= 90 THEN 'Compliant'
+                        WHEN s.health_score >= 70 THEN 'Partial'
+                        WHEN s.health_score IS NOT NULL THEN 'Non-Compliant'
+                        ELSE 'Unknown'
+                    END AS compliance_status
+                FROM scans s
+                WHERE s.status = 'completed'
+                  AND s.is_archived = false
+                ORDER BY s.target, s.completed_at DESC
+                LIMIT 500;
+"@
+                Write-JsonResponse $Request $Response 200 @{ success = $true; report = @($report) }
+            } catch {
+                Write-JsonResponse $Request $Response 500 @{ success = $false; error = $_.Exception.Message }
+            }
+            return $true
+        }
+
+        'GET /compliance/history' {
+            if (-not (Test-ViewerAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
+            try {
+                # Compliance trend over last 30 days
+                $history = Invoke-PGQuery -Query @"
+                SELECT
+                    DATE(completed_at) AS scan_date,
+                    COUNT(*)::int AS total_scans,
+                    COUNT(*) FILTER (WHERE health_score >= 90)::int AS compliant,
+                    COUNT(*) FILTER (WHERE health_score >= 70 AND health_score < 90)::int AS partial,
+                    COUNT(*) FILTER (WHERE health_score < 70)::int AS non_compliant,
+                    ROUND(AVG(health_score), 1) AS avg_score
+                FROM scans
+                WHERE status = 'completed'
+                  AND completed_at >= NOW() - INTERVAL '30 days'
+                GROUP BY DATE(completed_at)
+                ORDER BY scan_date DESC;
+"@
+                Write-JsonResponse $Request $Response 200 @{ success = $true; history = @($history) }
+            } catch {
+                Write-JsonResponse $Request $Response 500 @{ success = $false; error = $_.Exception.Message }
+            }
+            return $true
+        }
+    }
+
     return $false # Route not handled by this controller
 }
 

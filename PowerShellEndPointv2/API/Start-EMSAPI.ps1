@@ -225,6 +225,9 @@ try {
             # Administrative Operations
             if (-not $handled) { $handled = Invoke-AdminRoutes -Request $request -Response $response -Method $method -Path $modulePath -Config $Global:EMSConfig }
             
+            # Credential & Environment Management
+            if (-not $handled) { $handled = Invoke-CredentialRoutes -Request $request -Response $response -Method $method -Path $modulePath -Config $Global:EMSConfig }
+            
             # Scans & Errors
             if (-not $handled) { $handled = Invoke-ScanRoutes -Request $request -Response $response -Method $method -Path $modulePath -Config $Global:EMSConfig }
 
