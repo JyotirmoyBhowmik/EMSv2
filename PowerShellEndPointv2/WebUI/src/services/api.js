@@ -3,7 +3,7 @@ import axios from 'axios';
 // ── Auto-detect API URL ─────────────────────────────
 // This ensures the frontend knows where to find the PowerShell API
 const getBaseUrl = () => {
-    if (process.env.REACT_APP_API_URL) return process.env.REACT_APP_API_URL;
+    if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
     
     const { hostname, protocol, port, origin } = window.location;
     
