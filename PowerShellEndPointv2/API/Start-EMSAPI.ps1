@@ -173,7 +173,7 @@ try {
             }
 
             # 2. Authentication Logic (Legacy compatibility for /auth routes)
-            if ($Method -eq 'GET' -and $Path -eq '/auth/providers') {
+            if ($Method -eq 'GET' -and $Path -match '^(/api)?/auth/providers$') {
                 $providers = $Global:EMSConfig.Authentication.Providers | Where-Object Enabled | Sort-Object Priority | ForEach-Object {
                     [pscustomobject]@{ Name=$_.Name; DisplayName="$($_.Name) Authentication"; RequiresCredentials=$true; Priority=[int]$_.Priority; Id=$_.Name; Value=$_.Name; Label="$($_.Name) Authentication" }
                 }
@@ -181,7 +181,7 @@ try {
                 continue
             }
 
-            if ($Method -eq 'GET' -and $Path -eq '/auth/validate') {
+            if ($Method -eq 'GET' -and $Path -match '^(/api)?/auth/validate$') {
                 if (-not (Test-ViewerAccessRequirement -Request $request -Response $response -Config $Global:EMSConfig)) { continue }
                 $ctx  = Get-RequestUserContext -Request $request
                 $role = Resolve-UserRole -Groups $ctx.Groups -Config $Global:EMSConfig
@@ -189,7 +189,7 @@ try {
                 continue
             }
 
-            if ($Method -eq 'POST' -and $Path -eq '/auth/login') {
+            if ($Method -eq 'POST' -and $Path -match '^(/api)?/auth/login$') {
                 $body = Read-JsonBody $request
                 if (-not $body.username -or -not $body.password) {
                     Write-JsonResponse $request $response 400 @{ success = $false; message = 'Username and password are required' }

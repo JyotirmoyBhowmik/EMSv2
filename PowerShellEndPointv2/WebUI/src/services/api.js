@@ -9,12 +9,11 @@ const getBaseUrl = () => {
     
     // If running via 'npm start' or 'serve' on port 3000, assume API is on 5000
     if (port === '3000') {
-        return `${protocol}//${hostname}:5000`;
+        return `${protocol}//${hostname}:5000/api`;
     }
     
-    // If running on standard port (e.g. IIS), return origin.
-    // The service calls already start with /api (e.g. /api/dashboard/stats)
-    return origin;
+    // If running on standard port (e.g. IIS), return origin + /api
+    return origin.endsWith('/api') ? origin : `${origin}/api`;
 };
 
 const API_BASE_URL = getBaseUrl();
@@ -69,7 +68,7 @@ const del = (url) => apiClient.delete(url).then(r => r.data);
 
 export const authService = {
     login: (username, password, provider = 'Standalone') => 
-        post('/api/auth/login', { username, password, provider }).then(data => {
+        post('/auth/login', { username, password, provider }).then(data => {
             if (data.success && data.user) {
                 localStorage.setItem('auth_token', data.token || '');
                 localStorage.setItem('user', JSON.stringify(data.user));
@@ -77,24 +76,24 @@ export const authService = {
             return data;
         }),
     logout: () => { localStorage.clear(); window.location.href = '/login'; },
-    getProviders: () => get('/api/auth/providers'),
-    validate: () => get('/api/auth/validate'),
+    getProviders: () => get('/auth/providers'),
+    validate: () => get('/auth/validate'),
 };
 
 export const scanService = {
-    scanSingle:     (target, protocol) => post('/api/scan/single', { target, protocol }),
-    scanBulk:       (targets, protocol) => post('/api/scan/bulk', { targets, protocol }),
-    getScanStatus:  (scanId) => get('/api/scan/status', { scanId }),
-    getScanResult:  (scanId) => get('/api/scan/result', { scanId }),
-    getScanTrace:   (scanId) => get('/api/scan/trace',  { scanId }),
-    archiveScan:    (scanId, reason) => post(`/api/results/${scanId}/archive`, { reason }),
-    restoreScan:    (scanId) => post(`/api/results/${scanId}/restore`, {}),
+    scanSingle:     (target, protocol) => post('/scan/single', { target, protocol }),
+    scanBulk:       (targets, protocol) => post('/scan/bulk', { targets, protocol }),
+    getScanStatus:  (scanId) => get('/scan/status', { scanId }),
+    getScanResult:  (scanId) => get('/scan/result', { scanId }),
+    getScanTrace:   (scanId) => get('/scan/trace',  { scanId }),
+    archiveScan:    (scanId, reason) => post(`/results/${scanId}/archive`, { reason }),
+    restoreScan:    (scanId) => post(`/results/${scanId}/restore`, {}),
 };
 
 export const dashboardService = {
-    getStats: (range) => get('/api/dashboard/stats', { range }).then(res => res?.stats || res || {}),
-    getSummary: () => get('/api/dashboard/summary'),
-    getTopIssues: () => get('/api/dashboard/top-issues'),
+    getStats: (range) => get('/dashboard/stats', { range }).then(res => res?.stats || res || {}),
+    getSummary: () => get('/dashboard/summary'),
+    getTopIssues: () => get('/dashboard/top-issues'),
 };
 
 export const resultsService = {

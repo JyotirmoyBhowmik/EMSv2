@@ -54,6 +54,10 @@ BEGIN
     IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='computers' AND column_name='notes') THEN
         ALTER TABLE computers ADD COLUMN notes TEXT;
     END IF;
+    -- Added fix for is_blacklisted column
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='metric_installed_software' AND column_name='is_blacklisted') THEN
+        ALTER TABLE metric_installed_software ADD COLUMN is_blacklisted BOOLEAN DEFAULT false;
+    END IF;
 END $$;
 
 -- 3. Create scan_trace table if missing
@@ -109,7 +113,10 @@ VALUES
     ('data_retention',   'Data Retention Policy',  'Automatically purge old scan data after N days',          false, 'Administration'),
     ('export_reports',   'Export Reports',          'Enable CSV/PDF export of scan results and compliance',    true,  'Reporting'),
     ('compliance_dashboard', 'Compliance Dashboard', 'Show compliance status and trend analysis',             true,  'Reporting')
-ON CONFLICT (feature_key) DO NOTHING;
+ON CONFLICT (feature_key) DO UPDATE SET 
+    feature_name = EXCLUDED.feature_name,
+    description = EXCLUDED.description,
+    category = EXCLUDED.category;
 
 -- 6. Create security tables
 CREATE TABLE IF NOT EXISTS service_credentials (

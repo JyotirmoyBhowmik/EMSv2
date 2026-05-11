@@ -389,6 +389,8 @@ CREATE TABLE IF NOT EXISTS environment_config (
 
 -- ─── Performance Indexes ─────────────────────────────────────────────────────
 
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='metric_installed_software' AND column_name='is_blacklisted') THEN ALTER TABLE metric_installed_software ADD COLUMN is_blacklisted BOOLEAN DEFAULT false; END IF; END $$;
+
 CREATE INDEX IF NOT EXISTS idx_scans_target ON scans(target);
 CREATE INDEX IF NOT EXISTS idx_scans_status ON scans(status);
 CREATE INDEX IF NOT EXISTS idx_scans_started ON scans(started_at DESC);
@@ -397,6 +399,7 @@ CREATE INDEX IF NOT EXISTS idx_cpu_computer ON metric_cpu_usage(computer_name, t
 CREATE INDEX IF NOT EXISTS idx_mem_computer ON metric_memory(computer_name, timestamp DESC);
 CREATE INDEX IF NOT EXISTS idx_disk_computer ON metric_disk_space(computer_name, timestamp DESC);
 CREATE INDEX IF NOT EXISTS idx_sw_computer ON metric_installed_software(computer_name);
+
 CREATE INDEX IF NOT EXISTS idx_sw_blacklist ON metric_installed_software(is_blacklisted) WHERE is_blacklisted = true;
 CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
 CREATE INDEX IF NOT EXISTS idx_reboot_computer ON metric_reboot_tracking(computer_name, timestamp DESC);
