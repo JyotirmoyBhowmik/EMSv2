@@ -24,7 +24,7 @@ function Invoke-CPUCollection {
     $sw = [Diagnostics.Stopwatch]::StartNew()
     
     try {
-        $cim = if ($Session.Protocol -eq 'CIM') { $Session.Session } else { $null }
+        $cim = if ($Session.Protocol -match 'CIM') { $Session.Session } else { $null }
         
         $cpus = if ($cim) {
             Get-CimInstance -CimSession $cim -ClassName Win32_Processor -ErrorAction Stop

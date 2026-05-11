@@ -24,7 +24,7 @@ function Invoke-MemoryCollection {
     $sw = [Diagnostics.Stopwatch]::StartNew()
     
     try {
-        $cim = if ($Session.Protocol -eq 'CIM') { $Session.Session } else { $null }
+        $cim = if ($Session.Protocol -match 'CIM') { $Session.Session } else { $null }
         
         $os = if ($cim) {
             Get-CimInstance -CimSession $cim -ClassName Win32_OperatingSystem -ErrorAction Stop

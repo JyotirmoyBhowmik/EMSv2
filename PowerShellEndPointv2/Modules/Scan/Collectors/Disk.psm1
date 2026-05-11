@@ -24,7 +24,7 @@ function Invoke-DiskCollection {
     $sw = [Diagnostics.Stopwatch]::StartNew()
     
     try {
-        $cim = if ($Session.Protocol -eq 'CIM') { $Session.Session } else { $null }
+        $cim = if ($Session.Protocol -match 'CIM') { $Session.Session } else { $null }
         
         $disks = if ($cim) {
             Get-CimInstance -CimSession $cim -ClassName Win32_LogicalDisk -Filter "DriveType = 3" -ErrorAction Stop

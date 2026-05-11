@@ -24,7 +24,7 @@ function Invoke-ScheduledTasksCollection {
     $sw = [Diagnostics.Stopwatch]::StartNew()
     
     try {
-        if ($Session.Protocol -eq 'CIM' -and $Session.Session) {
+        if ($Session.Protocol -match 'CIM' -and $Session.Session) {
             # Use modern ScheduledTasks module with CIM session
             $tasks = Get-ScheduledTask -CimSession $Session.Session -ErrorAction Stop | Where-Object { $_.State -ne 'Disabled' }
             

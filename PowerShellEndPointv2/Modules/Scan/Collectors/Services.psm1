@@ -27,7 +27,7 @@ function Invoke-ServicesCollection {
     $criticalNames = @('WinRM', 'wuauserv', 'LanmanWorkstation', 'RpcSs', 'EventLog', 'MpsSvc')
     
     try {
-        $cim = if ($Session.Protocol -eq 'CIM') { $Session.Session } else { $null }
+        $cim = if ($Session.Protocol -match 'CIM') { $Session.Session } else { $null }
         
         $services = if ($cim) {
             Get-CimInstance -CimSession $cim -ClassName Win32_Service -ErrorAction Stop

@@ -24,7 +24,7 @@ function Invoke-BitLockerCollection {
     $sw = [Diagnostics.Stopwatch]::StartNew()
     
     try {
-        $cim = if ($Session.Protocol -eq 'CIM') { $Session.Session } else { $null }
+        $cim = if ($Session.Protocol -match 'CIM') { $Session.Session } else { $null }
         $namespace = 'Root\CIMV2\Security\MicrosoftVolumeEncryption'
         
         $volumes = if ($cim) {

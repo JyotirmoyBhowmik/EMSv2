@@ -24,7 +24,7 @@ function Invoke-DefenderCollection {
     $sw = [Diagnostics.Stopwatch]::StartNew()
     
     try {
-        $cim = if ($Session.Protocol -eq 'CIM') { $Session.Session } else { $null }
+        $cim = if ($Session.Protocol -match 'CIM') { $Session.Session } else { $null }
         
         # 1. Get AV Product Info from SecurityCenter2
         $avs = if ($cim) {

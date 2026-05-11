@@ -24,7 +24,7 @@ function Invoke-LoggedOnUsersCollection {
     $sw = [Diagnostics.Stopwatch]::StartNew()
     
     try {
-        $cim = if ($Session.Protocol -eq 'CIM') { $Session.Session } else { $null }
+        $cim = if ($Session.Protocol -match 'CIM') { $Session.Session } else { $null }
         
         $cs = if ($cim) {
             Get-CimInstance -CimSession $cim -ClassName Win32_ComputerSystem -ErrorAction Stop

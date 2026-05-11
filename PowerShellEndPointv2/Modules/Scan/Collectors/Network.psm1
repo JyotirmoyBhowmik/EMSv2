@@ -24,7 +24,7 @@ function Invoke-NetworkCollection {
     $sw = [Diagnostics.Stopwatch]::StartNew()
     
     try {
-        $cim = if ($Session.Protocol -eq 'CIM') { $Session.Session } else { $null }
+        $cim = if ($Session.Protocol -match 'CIM') { $Session.Session } else { $null }
         
         # 1. Get Adapter Config (IPs, DHCP, DNS)
         $configs = if ($cim) {

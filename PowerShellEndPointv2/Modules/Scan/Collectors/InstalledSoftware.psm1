@@ -24,7 +24,7 @@ function Invoke-InstalledSoftwareCollection {
     $sw = [Diagnostics.Stopwatch]::StartNew()
     
     try {
-        $cim = if ($Session.Protocol -eq 'CIM') { $Session.Session } else { $null }
+        $cim = if ($Session.Protocol -match 'CIM') { $Session.Session } else { $null }
         
         # Win32_Product is slow but standard.
         $software = if ($cim) {

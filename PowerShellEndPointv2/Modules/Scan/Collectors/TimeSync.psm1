@@ -26,7 +26,7 @@ function Invoke-TimeSyncCollection {
     try {
         # TimeSync info is in Win32_Service (W32Time) or registry
         # We'll just check if the service is running for now
-        $cim = if ($Session.Protocol -eq 'CIM') { $Session.Session } else { $null }
+        $cim = if ($Session.Protocol -match 'CIM') { $Session.Session } else { $null }
         $svc = if ($cim) {
             Get-CimInstance -CimSession $cim -ClassName Win32_Service -Filter "Name = 'W32Time'"
         } else {

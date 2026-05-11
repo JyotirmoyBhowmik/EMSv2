@@ -27,7 +27,7 @@ function Invoke-ProcessesCollection {
     $criticalNames = @('lsass', 'csrss', 'smss', 'services', 'wininit', 'svchost')
     
     try {
-        $cim = if ($Session.Protocol -eq 'CIM') { $Session.Session } else { $null }
+        $cim = if ($Session.Protocol -match 'CIM') { $Session.Session } else { $null }
         
         $procs = if ($cim) {
             Get-CimInstance -CimSession $cim -ClassName Win32_Process -ErrorAction Stop

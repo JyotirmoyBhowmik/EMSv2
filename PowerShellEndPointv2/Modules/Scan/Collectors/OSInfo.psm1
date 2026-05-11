@@ -24,7 +24,7 @@ function Invoke-OSInfoCollection {
     $sw = [Diagnostics.Stopwatch]::StartNew()
     
     try {
-        $cim = if ($Session.Protocol -eq 'CIM') { $Session.Session } else { $null }
+        $cim = if ($Session.Protocol -match 'CIM') { $Session.Session } else { $null }
         
         # 1. Get Operating System Info
         $os = if ($cim) {

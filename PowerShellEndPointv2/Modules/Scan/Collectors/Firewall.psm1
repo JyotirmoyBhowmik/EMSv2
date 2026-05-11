@@ -24,7 +24,7 @@ function Invoke-FirewallCollection {
     $sw = [Diagnostics.Stopwatch]::StartNew()
     
     try {
-        $cim = if ($Session.Protocol -eq 'CIM') { $Session.Session } else { $null }
+        $cim = if ($Session.Protocol -match 'CIM') { $Session.Session } else { $null }
         $namespace = 'Root\StandardCimv2'
         
         $profiles = if ($cim) {
