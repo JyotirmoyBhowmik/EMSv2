@@ -141,9 +141,11 @@ try {
             
             $method = $request.HttpMethod
             # Support both /api/... and /... for all routes
-            $path   = $request.Url.AbsolutePath -replace '^/api', ''
+            $rawPath = $request.Url.AbsolutePath
+            $path    = $rawPath -replace '^/api', ''
             if ($path -eq '') { $path = '/' }
             
+            Write-Host "[DEBUG] Incoming Request: $method $rawPath -> Routed as: $path" -ForegroundColor Gray
             $start  = [DateTime]::Now
 
             # 1. Handle CORS Preflight
@@ -239,7 +241,7 @@ try {
 
             # 4. Final Fallback
             if (-not $handled) {
-                Write-JsonResponse $request $response 404 @{ error = "Endpoint '$path' not found" }
+                Write-JsonResponse $request $response 404 @{ error = "Endpoint '$method $path' not found (Raw: $rawPath)" }
             }
 
             # 5. Telemetry
