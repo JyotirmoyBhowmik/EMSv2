@@ -157,7 +157,7 @@ function Layout() {
                         }}>E</div>
                         <div>
                             <div style={{ fontSize: '0.9rem', fontWeight: 700, lineHeight: 1.2 }}>EMS Enterprise</div>
-                            <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>v3.5-Enterprise · Monitoring</div>
+                            <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.45)', marginTop: 2 }}>v4.1.0-Enterprise · Monitoring</div>
                         </div>
                     </div>
                 </div>
