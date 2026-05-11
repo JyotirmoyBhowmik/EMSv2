@@ -37,11 +37,17 @@ const ScanEndpoint = () => {
         try {
             const result = await scanService.scanSingle(target, protocol || null);
             setLastResponse(result);
-            setMessage(`Scan submitted for ${target}.`);
-            if (result.scanId) {
-                setTimeout(() => navigate(`/scan/status/${result.scanId}`), 1500);
+            
+            const sId = result?.scanId || result?.ScanId;
+            if (sId) {
+                setMessage(`Scan submitted for ${target}. Redirecting to observer...`);
+                setTimeout(() => navigate(`/scan/status/${sId}`), 1000);
+            } else {
+                setMessage(`Scan submitted for ${target}.`);
+                console.warn('[EMS] API Success but no scanId found in response:', result);
             }
         } catch (err) {
+            console.error('[EMS] Scan Initiation Failed:', err);
             setError(err?.response?.data?.message || err?.message || 'Failed to submit scan.');
         } finally {
             setLoading(false);

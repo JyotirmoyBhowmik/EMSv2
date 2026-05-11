@@ -140,7 +140,10 @@ try {
             $response = $context.Response
             
             $method = $request.HttpMethod
-            $path   = $request.Url.AbsolutePath
+            # Support both /api/... and /... for all routes
+            $path   = $request.Url.AbsolutePath -replace '^/api', ''
+            if ($path -eq '') { $path = '/' }
+            
             $start  = [DateTime]::Now
 
             # 1. Handle CORS Preflight
