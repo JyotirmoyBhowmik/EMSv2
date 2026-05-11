@@ -1,7 +1,7 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/api';
-import { FaUserShield, FaNetworkWired, FaServer } from 'react-icons/fa';
+import { ShieldCheck, Network, Server } from 'lucide-react';
 
 function Login({ onLogin }) {
     const [username, setUsername] = useState('');
@@ -95,15 +95,15 @@ function Login({ onLogin }) {
     const providerMeta = {
         Standalone: {
             label: 'Local Account',
-            icon: <FaUserShield size={32} />
+            icon: <ShieldCheck size={32} />
         },
         ActiveDirectory: {
             label: 'Active Directory',
-            icon: <FaNetworkWired size={32} />
+            icon: <Network size={32} />
         },
         LDAP: {
             label: 'LDAP',
-            icon: <FaServer size={32} />
+            icon: <Server size={32} />
         }
     };
 
