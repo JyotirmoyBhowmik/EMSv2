@@ -10,18 +10,18 @@ const getBaseUrl = () => {
     // DEBUG: Log the current location to help identify why detection might fail
     console.log('[EMS] Detecting API URL. Current Origin:', origin, 'Port:', port);
 
-    // If we are on port 3000 (React Dev) or 3001, 3002 etc., 
-    // or if we are on port 80/443 but the API might be on 5000
-    if (port && port !== '5000') {
+    // 1. If running on a dev port (3000-3005) or if explicitly on a different port than API
+    const isDevPort = port === '3000' || port === '3001' || port === '3002';
+    if (isDevPort || (port && port !== '5000' && hostname === 'localhost')) {
         const url = `${protocol}//${hostname}:5000/api`;
-        console.log('[EMS] Redirecting API calls to:', url);
+        console.log('[EMS] Dev Mode: Redirecting API calls to:', url);
         return url;
     }
-    
-    // If we are already on port 5000, just use /api
+
+    // 2. If we are on port 5000 already
     if (port === '5000') return `${origin}/api`;
 
-    // Default: use current origin + /api
+    // 3. Production: If no port (80/443) or other port, assume API is proxied on /api 
     return `${origin}/api`;
 };
 
@@ -36,15 +36,10 @@ const apiClient = axios.create({
 
 // ── Request Interceptor ─────────────────────────────
 apiClient.interceptors.request.use((config) => {
-    const token = localStorage.getItem('auth_token') || localStorage.getItem('token');
-    
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-
+    // Add auth headers or correlation IDs if needed
     try {
-        const user = JSON.parse(localStorage.getItem('user') || 'null');
-        if (user?.username) config.headers['X-EMS-Username'] = user.username;
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (user?.username) config.headers['X-EMS-User']     = user.username;
         if (user?.role)     config.headers['X-EMS-Role']     = user.role;
         if (Array.isArray(user?.groups)) {
             config.headers['X-EMS-Groups'] = user.groups.join(';');
@@ -67,7 +62,7 @@ apiClient.interceptors.response.use(
 );
 
 // ── Helper Methods ──────────────────────────────────
-// Note: We remove the leading /api from URLs here because it's in the baseURL or handled by the listener
+// Note: We remove the leading /api from URLs here because it's in the baseURL
 const get = (url, params) => apiClient.get(url, { params }).then(r => r.data);
 const post = (url, data, config = {}) => apiClient.post(url, data, config).then(r => r.data);
 const put = (url, data) => apiClient.put(url, data).then(r => r.data);
@@ -130,13 +125,10 @@ export const adminService = {
         const list = res?.connectors || res;
         return Array.isArray(list) ? list : [];
     }),
-    // SystemErrors.js calls this — was missing, causing runtime crash
     getSystemErrors: () => get('/admin/audit', { type: 'ERROR' }).then(res => res?.logs || []),
-    // Credential management (Phase 4)
     getCredentials: () => get('/admin/credentials').then(res => res?.credentials || []),
     saveCredentials: (type, username, password) => post('/admin/credentials', { type, username, password }),
     testCredentials: (type) => post('/admin/credentials/test', { type }),
-    // Environment config (Phase 4)
     getEnvironmentConfig: () => get('/admin/environment').then(res => res?.config || []),
     saveEnvironmentConfig: (key, value, description) => post('/admin/environment', { key, value, description }),
 };
@@ -149,19 +141,19 @@ export const performanceService = {
 
 export const computerService = {
     getAll: (params) => get('/computers', params).then(res => res?.computers || res || []),
-    getByName: (name) => get('/computers/${encodeURIComponent(name)}`),
+    getByName: (name) => get(`/computers/${encodeURIComponent(name)}`),
 };
 
 export const inventoryService = {
     getAll:         (params) => get('/inventory', params).then(res => res?.inventory || res || []),
-    getByHostname:  (hostname) => get('/inventory/${hostname}`),
+    getByHostname:  (hostname) => get(`/inventory/${hostname}`),
     getLifecycle:   () => get('/inventory/lifecycle'),
     exportCSV:      (params) => get('/inventory/export', params),
 };
 
 export const historicalService = {
     getHeatmap:     (params) => get('/historical/heatmap', params),
-    getTimeline:    (computer) => get('/historical/timeline/${computer}`),
+    getTimeline:    (computer) => get(`/historical/timeline/${computer}`),
     getComparison:  (computers, period) => post('/historical/compare', { computers, period }),
     getDriftAnalysis: () => get('/historical/drift'),
     getCutoverReport: (params) => get('/historical/cutover', params),
