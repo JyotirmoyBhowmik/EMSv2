@@ -177,6 +177,12 @@ try {
                 }
             }
 
+            # 1.6 Health Check / Root
+            if ($Method -eq 'GET' -and $Path -eq '/') {
+                Write-JsonResponse $request $response 200 @{ success = $true; version = '5.0.0-Enterprise'; status = 'Running' }
+                continue
+            }
+
             # 2. Authentication Logic (Legacy compatibility for /auth routes)
             if ($Method -eq 'GET' -and $Path -match '^(/api)?/auth/providers$') {
                 $providers = $Global:EMSConfig.Authentication.Providers | Where-Object Enabled | Sort-Object Priority | ForEach-Object {
