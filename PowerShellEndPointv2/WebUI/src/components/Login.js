@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+ï»¿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/api';
 import { FaUserShield, FaNetworkWired, FaServer } from 'react-icons/fa';
@@ -229,7 +229,7 @@ function Login({ onLogin }) {
 
                 <div style={{ marginTop: '20px', textAlign: 'center' }}>
                     <small style={{ color: '#666' }}>
-                        Powered by EMS v2.1 | Using {providerMeta[provider]?.label || provider || '—'}
+                        Powered by EMS v3.5-Enterprise | Using {providerMeta[provider]?.label || provider || '-'}
                     </small>
                 </div>
             </div>

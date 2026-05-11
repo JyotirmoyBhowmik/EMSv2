@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { complianceService, scanService, resultsService } from '../services/api';
 import ComplianceReport from './ComplianceReport';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const WARNING_THRESHOLD = 70;
 const CRITICAL_THRESHOLD = 90;
@@ -484,6 +486,37 @@ const ResultsHistory = () => {
         URL.revokeObjectURL(url);
     };
 
+    const exportPdf = async () => {
+        const table = document.querySelector('.table-container table');
+        if (!table) return;
+
+        setLoading(true);
+        try {
+            const canvas = await html2canvas(table, {
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff'
+            });
+            
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF({
+                orientation: 'landscape',
+                unit: 'px',
+                format: [canvas.width, canvas.height]
+            });
+            
+            pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+            pdf.save(`EMS_Report_${timestamp}.pdf`);
+        } catch (err) {
+            console.error('PDF Export failed:', err);
+            setError('Failed to generate PDF report');
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     const columnCount = isMetricWarningView
         ? 8
@@ -595,10 +628,13 @@ const ResultsHistory = () => {
                     {rescanMessage}
                 </div>
             )}
-            {/* EMS Results History CSV Export */}
+            {/* EMS Results History PDF/CSV Export */}
             <div className="card" style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
                 <button className="btn btn-primary" onClick={exportCsv} disabled={filteredRows.length === 0}>
                     Export CSV
+                </button>
+                <button className="btn" onClick={exportPdf} disabled={filteredRows.length === 0 || loading}>
+                    {loading ? 'Generating PDF...' : 'Export PDF'}
                 </button>
                 <span>Showing {filteredRows.length} row(s)</span>
             </div>
@@ -741,6 +777,9 @@ const ResultsHistory = () => {
                                             <td>{value(row.lastchecked || row.LastChecked)}</td>
                                     {/* EMS_PATCH_RESULTS_HISTORY_COMMENT_TD_V1_BEGIN */}
                                     <td title={emsGetCommentText(row)}>{emsGetCommentText(row)}</td>
+                                    <td>
+                                        {row.scan_id ? <Link to={`/scan/trace/${row.scan_id}`} className="btn btn-sm" style={{ padding: '2px 8px', fontSize: '0.75rem' }}>View Trace</Link> : '-'}
+                                    </td>
                                     {/* EMS_PATCH_RESULTS_HISTORY_COMMENT_TD_V1_END */}
                                         </tr>
                                     );
@@ -755,7 +794,3 @@ const ResultsHistory = () => {
 };
 
 export default ResultsHistory;
-
-
-
-

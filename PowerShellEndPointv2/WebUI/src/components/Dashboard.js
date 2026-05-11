@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { dashboardService } from '../services/api';
+import { motion } from 'framer-motion';
 
 function Dashboard() {
     const navigate = useNavigate();
@@ -149,7 +150,12 @@ function Dashboard() {
                 <InfoIcon text="Real-time breakdown of endpoint security and collection status across the enterprise." />
             </h3>
 
-            <div className="stat-cards">
+            <motion.div 
+                className="stat-cards"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, staggerChildren: 0.1 }}
+            >
                 <button
                     type="button"
                     className="stat-card"
@@ -244,7 +250,7 @@ function Dashboard() {
                         Inventory completed but metric collection failed
                     </div>
                 </button>
-            </div>
+            </motion.div>
 
             <div className="card">
                 <h3 style={{ marginBottom: '20px', fontSize: '1.1rem', color: '#64748b' }}>
@@ -431,4 +437,3 @@ function Dashboard() {
 }
 
 export default Dashboard;
-

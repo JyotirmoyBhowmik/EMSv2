@@ -1,28 +1,70 @@
 {
     "name": "ems-web-ui",
-    "version": "3.2.0-Enterprise",
-    "description": "Enterprise Endpoint Monitoring System - Web UI v3.2",
+    "version": "4.1.0-Enterprise",
     "private": true,
+    "description": "Enterprise Endpoint Monitoring System - Web UI (agentless scan, error-resilient, workflow-aware)",
     "dependencies": {
         "@emotion/react": "^11.14.0",
         "@emotion/styled": "^11.14.1",
         "@mui/material": "^9.0.1",
+        "@mui/icons-material": "^9.0.1",
+        "@mui/lab": "^9.0.0-alpha.0",
+        "@mui/x-data-grid": "^9.0.0",
+        "@mui/x-charts": "^9.0.0",
+        "@mui/x-date-pickers": "^9.0.0",
+        "@mui/x-tree-view": "^9.0.0",
+        "@tanstack/react-query": "^5.100.9",
+        "@tanstack/react-query-devtools": "^5.100.9",
+        "@tanstack/react-table": "^8.21.0",
+        "@tanstack/react-virtual": "^3.13.0",
+        "@hookform/resolvers": "^3.10.0",
+        "react-hook-form": "^7.54.0",
+        "zod": "^3.24.0",
+        "zustand": "^5.0.3",
         "axios": "^1.7.9",
-        "cross-env": "^7.0.3",
+        "socket.io-client": "^4.8.1",
+        "jwt-decode": "^4.0.0",
         "date-fns": "^4.1.0",
+        "dayjs": "^1.11.13",
+        "framer-motion": "^12.0.0",
+        "lucide-react": "^0.469.0",
+        "@tabler/icons-react": "^3.26.0",
+        "react-icons": "^5.4.0",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
-        "react-hot-toast": "^2.5.1",
-        "react-icons": "^5.4.0",
-        "react-router-dom": "^6.28.0",
+        "react-router-dom": "^7.15.0",
         "react-scripts": "5.0.1",
-        "recharts": "^2.15.0"
+        "react-window": "^1.8.11",
+        "recharts": "^2.15.0",
+        "cross-env": "^7.0.3",
+        "react-hot-toast": "^2.5.1",
+        "notistack": "^3.0.1",
+        "sonner": "^1.7.1",
+        "cmdk": "^1.0.4",
+        "vaul": "^1.1.2",
+        "react-resizable-panels": "^2.1.7",
+        "react-dropzone": "^14.3.5",
+        "@tremor/react": "^3.18.7",
+        "@xyflow/react": "^12.10.2",
+        "dagre": "^0.8.5",
+        "elkjs": "^0.9.3",
+        "react-error-boundary": "^6.1.1",
+        "@sentry/react": "^8.47.0",
+        "jspdf": "^2.5.2",
+        "html2canvas": "^1.4.1",
+        "cidr-tools": "^11.3.5",
+        "ipaddr.js": "^2.2.0",
+        "is-ip": "^5.0.1",
+        "is-cidr": "^5.1.0",
+        "netmask": "^2.0.2",
+        "ip-regex": "^5.0.0"
     },
-    "scripts": {
-        "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-scripts start",
-        "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-scripts build",
-        "test": "react-scripts test",
-        "eject": "react-scripts eject"
+    "devDependencies": {
+        "@types/react": "^18.3.18",
+        "@types/react-dom": "^18.3.5",
+        "@types/dagre": "^0.7.52",
+        "eslint-plugin-react-hooks": "^5.1.0",
+        "prettier": "^3.4.2"
     },
     "overrides": {
         "cookie": "^0.7.2",
@@ -35,13 +77,21 @@
         "send": "^0.19.0",
         "serve-index": "^1.9.1",
         "underscore": "^1.13.6",
-        "webpack-dev-server": "^4.15.2"
+        "webpack-dev-server": "^4.15.2",
+        "postcss": "^8.4.49",
+        "rollup": "^4.30.0",
+        "semver": "^7.6.3",
+        "ws": "^8.18.0"
     },
-    "eslintConfig": {
-        "extends": [
-            "react-app"
-        ]
+    "scripts": {
+        "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-scripts start",
+        "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-scripts build",
+        "test": "react-scripts test",
+        "eject": "react-scripts eject",
+        "audit:fix": "npm audit fix",
+        "audit:check": "npm audit --production"
     },
+    "proxy": "http://localhost:5000",
     "browserslist": {
         "production": [
             ">0.2%",
@@ -53,6 +103,5 @@
             "last 1 firefox version",
             "last 1 safari version"
         ]
-    },
-    "proxy": "http://localhost:5000"
+    }
 }
