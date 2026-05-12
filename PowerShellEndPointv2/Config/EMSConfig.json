@@ -61,7 +61,6 @@
         "Port": 389,
         "BaseDN": "dc=snpl,dc=com,dc=np",
         "BindDN": "cn=ems_svc,ou=services,dc=snpl,dc=com,dc=np",
-        "BindPassword": "<SET_LDAP_BIND_PASSWORD>",
         "Priority": 3
       }
     ],
@@ -83,7 +82,6 @@
     "Port": 5432,
     "DatabaseName": "ems_production",
     "Username": "ems_service",
-    "Password": "YOUR_PRODUCTION_PASSWORD",
     "ConnectionTimeout": 30,
     "CommandTimeout": 300,
     "EnableSSL": false
@@ -95,7 +93,6 @@
     ],
     "EnableSSL": true,
     "EnableSwagger": true,
-    "JWTSecretKey": "ChangeMeToRandom32PlusCharSecret_2026!",
     "TokenExpirationMinutes": 60,
     "EnableCORS": true,
     "AllowedOrigins": [
