@@ -90,15 +90,20 @@
   },
   "API": {
     "Enabled": true,
-    "ListenAddress": "http://*:5000",
+    "Prefixes": [
+      "https://+:5443/"
+    ],
+    "EnableSSL": true,
     "EnableSwagger": true,
     "JWTSecretKey": "ChangeMeToRandom32PlusCharSecret_2026!",
     "TokenExpirationMinutes": 60,
     "EnableCORS": true,
     "AllowedOrigins": [
-      "http://localhost:3000", "https://ems.snpl.com.np",
-      "http://localhost:8080"
-    ]
+      "http://localhost:3000",
+      "http://localhost:8080",
+      "https://ems.snpl.com.np"
+    ],
+    "RequireHSTS": true
   },
   "WebUI": {
     "URL": "http://localhost:3000",
