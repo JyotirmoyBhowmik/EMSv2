@@ -3,23 +3,38 @@
     Security and RBAC logic for the Enterprise Monitoring System.
 #>
 
+Import-Module "$PSScriptRoot\..\Security\EMS.Jwt.psm1"         -Force -ErrorAction Stop
+Import-Module "$PSScriptRoot\..\Security\EMS.Environment.psm1" -Force -ErrorAction Stop
+
 function Get-RequestUserContext {
-    param([System.Net.HttpListenerRequest]$Request)
+    param([Parameter(Mandatory)] $Request)
 
-    $username  = $Request.Headers['X-EMS-Username']
-    $groupsRaw = $Request.Headers['X-EMS-Groups']
-    $role      = $Request.Headers['X-EMS-Role']
+    $authHeader = $Request.Headers['Authorization']
+    if (-not $authHeader -or -not $authHeader.StartsWith('Bearer ')) { return $null }
 
-    $groups = @()
-    if ($groupsRaw) {
-        $groups = $groupsRaw -split ';' | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+    $token  = $authHeader.Substring(7).Trim()
+    $secret = Get-EMSEnvironmentVar -Key 'JWT_SECRET'
+    if (-not $secret) {
+        Write-EMSLog -Message 'JWT_SECRET not configured' -Severity Error
+        return $null
     }
+    $claims = ConvertFrom-EMSJwt -Token $token -Secret $secret
+    if (-not $claims) { return $null }
 
-    return [pscustomobject]@{
-        Username = $username
-        Groups   = $groups
-        Role     = $role
+    [pscustomobject]@{
+        Username = [string]$claims.sub
+        Role     = [string]$claims.role
+        Groups   = @($claims.groups)
+        Jti      = [string]$claims.jti
+        Csrf     = [string]$claims.csrf       # populated in Phase 2
     }
+}
+
+function Test-EMSRole {
+    param($User, [string]$Required)
+    if (-not $User -or -not $User.Role) { return $false }
+    if ($Required -eq 'admin') { return $User.Role -eq 'admin' }
+    return $true   # any logged-in user
 }
 
 function Test-GroupMembership {
@@ -151,4 +166,4 @@ function Test-AdminAccessRequirement {
     return $true
 }
 
-Export-ModuleMember -Function Get-RequestUserContext, Test-GroupMembership, Resolve-UserRole, Get-UserPermissionsObject, Test-ViewerAccess, Test-AdminAccess, Test-ViewerAccessRequirement, Test-AdminAccessRequirement
+Export-ModuleMember -Function Get-RequestUserContext, Test-EMSRole, Test-GroupMembership, Resolve-UserRole, Get-UserPermissionsObject, Test-ViewerAccess, Test-AdminAccess, Test-ViewerAccessRequirement, Test-AdminAccessRequirement
