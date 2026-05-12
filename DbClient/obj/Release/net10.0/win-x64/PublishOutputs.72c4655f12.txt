@@ -1,7 +1,0 @@
-D:\ZORO\DbClient\bin\Release\net10.0\win-x64\publish\DbClient.exe
-D:\ZORO\DbClient\bin\Release\net10.0\win-x64\publish\DbClient.dll
-D:\ZORO\DbClient\bin\Release\net10.0\win-x64\publish\DbClient.deps.json
-D:\ZORO\DbClient\bin\Release\net10.0\win-x64\publish\DbClient.runtimeconfig.json
-D:\ZORO\DbClient\bin\Release\net10.0\win-x64\publish\DbClient.pdb
-D:\ZORO\DbClient\bin\Release\net10.0\win-x64\publish\Microsoft.Extensions.Logging.Abstractions.dll
-D:\ZORO\DbClient\bin\Release\net10.0\win-x64\publish\Npgsql.dll
