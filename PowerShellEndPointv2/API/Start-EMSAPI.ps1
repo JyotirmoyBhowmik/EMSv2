@@ -92,6 +92,11 @@ Write-Host "[INFO] EMS REST API (Modular) initializing on $prefix ..." -Foregrou
 $listener = [System.Net.HttpListener]::new()
 $listener.Prefixes.Add($prefix)
 
+$Global:ScanReaperTimer = New-Object System.Timers.Timer 30000
+Register-ObjectEvent -InputObject $Global:ScanReaperTimer -EventName Elapsed `
+    -Action { Invoke-EMSScanReaper } | Out-Null
+$Global:ScanReaperTimer.Start()
+
 try {
     try {
         $listener.Start()
@@ -128,9 +133,28 @@ try {
     }
     
     # 3. Rate Limiting Setup
-    $Global:RateLimitCache = @{} # IP -> @{ Count, ResetTime }
+    $Global:RateLimitCache = [System.Collections.Concurrent.ConcurrentDictionary[string,object]]::new()
     $RateLimitMaxRequests = 100
     $RateLimitWindowSeconds = 60
+
+    function Test-EMSRateLimit {
+        param(
+            [Parameter(Mandatory)][string]$Key,
+            [int]$Max         = $RateLimitMaxRequests,
+            [int]$WindowSec   = $RateLimitWindowSeconds
+        )
+        $now = Get-Date
+        $entry = $Global:RateLimitCache.AddOrUpdate(
+            $Key,
+            { @{ Count = 1; WindowStart = $now } },
+            { param($k,$old)
+                if (($now - $old.WindowStart).TotalSeconds -gt $WindowSec) {
+                    @{ Count = 1; WindowStart = $now }
+                } else {
+                    @{ Count = $old.Count + 1; WindowStart = $old.WindowStart }
+                } })
+        return $entry.Count -le $Max
+    }
 
     while ($listener.IsListening) {
         $context = $null
@@ -158,23 +182,11 @@ try {
 
             # 1.5 Rate Limiting
             $clientIp = $request.RemoteEndPoint.Address.ToString()
-            $now = [DateTime]::Now
-            if (-not $Global:RateLimitCache.ContainsKey($clientIp)) {
-                $Global:RateLimitCache[$clientIp] = @{ Count = 1; ResetTime = $now.AddSeconds($RateLimitWindowSeconds) }
-            } else {
-                $limitInfo = $Global:RateLimitCache[$clientIp]
-                if ($now -gt $limitInfo.ResetTime) {
-                    $limitInfo.Count = 1
-                    $limitInfo.ResetTime = $now.AddSeconds($RateLimitWindowSeconds)
-                } else {
-                    $limitInfo.Count++
-                    if ($limitInfo.Count -gt $RateLimitMaxRequests) {
-                        Write-EMSLog -Message "Rate limit exceeded for IP: $clientIp" -Severity Warning -Category "Security"
-                        Add-CorsHeaders -Request $request -Response $response
-                        Write-JsonResponse $request $response 429 @{ success = $false; error = "Too Many Requests. Please try again later." }
-                        continue
-                    }
-                }
+            if (-not (Test-EMSRateLimit -Key "ip:$clientIp")) {
+                Write-EMSLog -Message "Rate limit exceeded for IP: $clientIp" -Severity Warning -Category "Security"
+                Add-CorsHeaders -Request $request -Response $response
+                Write-JsonResponse $request $response 429 @{ success = $false; error = "Too Many Requests. Please try again later." }
+                continue
             }
 
             # 1.6 Health Check / Root
@@ -206,6 +218,15 @@ try {
                     Write-JsonResponse $request $response 400 @{ success = $false; message = 'Username and password are required' }
                     continue
                 }
+
+                $maxAttempts = if ($Global:EMSConfig.Authentication.MaxFailedAttempts) { $Global:EMSConfig.Authentication.MaxFailedAttempts } else { 5 }
+                if (-not (Test-EMSRateLimit -Key "login:$($body.username)" -Max $maxAttempts -WindowSec 300)) {
+                    Write-EMSLog -Message "Login rate limit exceeded for user: $($body.username)" -Severity Warning -Category "Security"
+                    Add-CorsHeaders -Request $request -Response $response
+                    Write-JsonResponse $request $response 429 @{ success = $false; error = "Too many failed login attempts. Please try again later." }
+                    continue
+                }
+
                 $provider = Resolve-ProviderValue -ProviderInput $body.provider
                 $securePassword = ConvertTo-SecureString $body.password -AsPlainText -Force
                 $auth = Invoke-MultiProviderAuth -Username $body.username -SecurePassword $securePassword -Provider $provider -Config $Global:EMSConfig
