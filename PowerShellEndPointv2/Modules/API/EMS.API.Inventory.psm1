@@ -79,6 +79,12 @@ FROM scans WHERE scan_id = @scanId LIMIT 1;
                 } 
             } catch {}
             
+            $dbParams = @{
+                applyToday = $applyToday;
+                applyInterval = $applyInterval;
+                intervalStr = $intervalStr
+            }
+
             try {
                 $scanQuery = @"
 SELECT
