@@ -67,29 +67,28 @@ FROM scans WHERE scan_id = @scanId LIMIT 1;
         'GET /dashboard/stats' {
             if (-not (Test-ViewerAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
             $range = $Request.QueryString['range'] # today, 24h, 7d, 30d, all
-            $timeFilter = ""
-            $complianceTimeFilter = ""
+            $applyToday = $false
+            $applyInterval = $false
+            $intervalStr = '0 days' # Default to valid interval string to prevent cast errors
             
             switch ($range) {
                 'today' { 
-                    $timeFilter = "AND completed_at >= CURRENT_DATE"
-                    $complianceTimeFilter = "WHERE lastchecked >= CURRENT_DATE"
+                    $applyToday = $true
                 }
                 '24h' { 
-                    $timeFilter = "AND completed_at >= NOW() - INTERVAL '24 hours'"
-                    $complianceTimeFilter = "WHERE lastchecked >= NOW() - INTERVAL '24 hours'"
+                    $applyInterval = $true
+                    $intervalStr = '24 hours'
                 }
                 '7d' { 
-                    $timeFilter = "AND completed_at >= NOW() - INTERVAL '7 days'"
-                    $complianceTimeFilter = "WHERE lastchecked >= NOW() - INTERVAL '7 days'"
+                    $applyInterval = $true
+                    $intervalStr = '7 days'
                 }
                 '30d' { 
-                    $timeFilter = "AND completed_at >= NOW() - INTERVAL '30 days'"
-                    $complianceTimeFilter = "WHERE lastchecked >= NOW() - INTERVAL '30 days'"
+                    $applyInterval = $true
+                    $intervalStr = '30 days'
                 }
                 default { 
-                    $timeFilter = "" 
-                    $complianceTimeFilter = ""
+                    # No filter
                 }
             }
 
@@ -103,6 +102,12 @@ FROM scans WHERE scan_id = @scanId LIMIT 1;
                 } 
             } catch {}
             
+            $dbParams = @{
+                applyToday = $applyToday;
+                applyInterval = $applyInterval;
+                intervalStr = $intervalStr
+            }
+
             try {
                 $scanQuery = @"
 SELECT
@@ -120,16 +125,17 @@ SELECT
     COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
     COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
 FROM scans
-WHERE COALESCE(is_deleted, false) = false $timeFilter;
+WHERE COALESCE(is_deleted, false) = false
+  AND (@applyToday = false OR completed_at >= CURRENT_DATE)
+  AND (@applyInterval = false OR completed_at >= NOW() - CAST(@intervalStr AS interval));
 "@
-                $row = Invoke-PGQuery -Query $scanQuery | Select-Object -First 1
+                $row = Invoke-PGQuery -Query $scanQuery -Parameters $dbParams | Select-Object -First 1
                 if ($row) {
                     $totalScans=[int]$row.total_scans; $healthyEndpoints=[int]$row.healthy_endpoints; $criticalAlerts=[int]$row.critical_alerts; $uniqueEndpoints=[int]$row.unique_endpoints; $completedScans=[int]$row.completed_scans; $failedScans=[int]$row.failed_scans; $inProgressScans=[int]$row.in_progress_scans; $averageScanTime = if ($row.average_scan_time -ne $null) { [double]$row.average_scan_time } else { $null }; $lastScan=$row.last_scan; $excellentCount=[int]$row.excellent_count; $goodCount=[int]$row.good_count; $fairCount=[int]$row.fair_count; $poorCount=[int]$row.poor_count
                 }
             } catch { Write-JsonResponse $Request $Response 500 @{ success = $false; error = $_.Exception.Message }; return $true }
             
             try {
-                $compWhere = if ($complianceTimeFilter) { "$complianceTimeFilter" } else { "" }
                 $complianceQuery = @"
 SELECT
     COUNT(*) FILTER (WHERE compliance_bucket = 'Compliant')::int AS compliant_count,
@@ -143,9 +149,10 @@ SELECT
           AND (COALESCE(poweron_password,'') <> 'Configured' OR COALESCE(admin_password,'') <> 'Configured')
     )::int AS bios_password_unknown_count
 FROM v_ems_latest_compliance_classified
-$compWhere;
+WHERE (@applyToday = false OR lastchecked >= CURRENT_DATE)
+  AND (@applyInterval = false OR lastchecked >= NOW() - CAST(@intervalStr AS interval));
 "@
-                $compRow = Invoke-PGQuery -Query $complianceQuery | Select-Object -First 1
+                $compRow = Invoke-PGQuery -Query $complianceQuery -Parameters $dbParams | Select-Object -First 1
                 if ($compRow) {
                     $compliantEndpoints = [int]$compRow.compliant_count
                     $partialCompliantEndpoints = [int]$compRow.partial_count
