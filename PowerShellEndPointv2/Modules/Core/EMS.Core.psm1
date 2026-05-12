@@ -34,6 +34,23 @@ function Write-JsonResponse {
     $Response.OutputStream.Close()
 }
 
+function Read-EMSRequestBody {
+    param(
+        [System.Net.HttpListenerRequest]$Request,
+        [int]$MaxBytes = 1048576 # 1MB default
+    )
+    $buffer = [byte[]]::new($MaxBytes)
+    $totalRead = 0
+    $stream = $Request.InputStream
+    while ($true) {
+        $bytesRead = $stream.Read($buffer, $totalRead, $MaxBytes - $totalRead)
+        if ($bytesRead -eq 0) { break }
+        $totalRead += $bytesRead
+        if ($totalRead -ge $MaxBytes) { break }
+    }
+    return [System.Text.Encoding]::UTF8.GetString($buffer, 0, $totalRead)
+}
+
 function Read-JsonBody {
     param([System.Net.HttpListenerRequest]$Request)
 
@@ -140,4 +157,4 @@ function Resolve-ScanTargets {
     return $uniqueTargets
 }
 
-Export-ModuleMember -Function Add-CorsHeaders, Write-JsonResponse, Read-JsonBody, Resolve-ProviderValue, Convert-IPv4ToUInt32, Convert-UInt32ToIPv4, Expand-CidrRange, Resolve-ScanTargets
+Export-ModuleMember -Function Add-CorsHeaders, Write-JsonResponse, Read-EMSRequestBody, Read-JsonBody, Resolve-ProviderValue, Convert-IPv4ToUInt32, Convert-UInt32ToIPv4, Expand-CidrRange, Resolve-ScanTargets

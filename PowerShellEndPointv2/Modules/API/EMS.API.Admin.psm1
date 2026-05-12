@@ -16,6 +16,7 @@ function Invoke-AdminRoutes {
     switch ("$Method $Path") {
 
         'GET /admin/health' {
+            if (-not (Test-AdminAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
             try {
                 $process = Get-Process -Id $PID
                 $uptime = [DateTime]::Now - $process.StartTime
