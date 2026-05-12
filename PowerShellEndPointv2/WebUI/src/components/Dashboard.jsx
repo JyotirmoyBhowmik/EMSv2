@@ -1,7 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { dashboardService } from '../services/api';
-import { motion } from 'framer-motion';
+
+import ComplianceClassification from './dashboard/ComplianceClassification';
+import SystemHealthOverview from './dashboard/SystemHealthOverview';
+import ScanStatusCard from './dashboard/ScanStatusCard';
+import PerformanceMetrics from './dashboard/PerformanceMetrics';
 
 function Dashboard() {
     const navigate = useNavigate();
@@ -78,35 +82,6 @@ function Dashboard() {
         return <div className="spinner"></div>;
     }
 
-    const totalHealth =
-        (stats.excellentCount || 0) +
-        (stats.goodCount || 0) +
-        (stats.fairCount || 0) +
-        (stats.poorCount || 0);
-
-    const getWidth = (value) => {
-        if (!totalHealth) return 0;
-        return `${(value / totalHealth) * 100}%`;
-    };
-
-    const clickableCardStyle = {
-        border: 'none',
-        textAlign: 'left',
-        width: '100%',
-        cursor: 'pointer'
-    };
-
-    const InfoIcon = ({ text }) => (
-        <span className="tooltip-container" style={{ marginLeft: '6px', cursor: 'help', verticalAlign: 'middle', display: 'inline-flex' }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.7 }}>
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="16" x2="12" y2="12"></line>
-                <line x1="12" y1="8" x2="12.01" y2="8"></line>
-            </svg>
-            <span className="tooltip-text">{text}</span>
-        </span>
-    );
-
     return (
         <div className="dashboard-container">
             <style>{`
@@ -145,198 +120,9 @@ function Dashboard() {
                 </div>
             </div>
 
-            <h3 style={{ marginBottom: '15px', fontSize: '1.1rem', color: '#64748b' }}>
-                Compliance Classification
-                <InfoIcon text="Real-time breakdown of endpoint security and collection status across the enterprise." />
-            </h3>
+            <ComplianceClassification stats={stats} navigate={navigate} />
 
-            <motion.div 
-                className="stat-cards"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, staggerChildren: 0.1 }}
-            >
-                <button
-                    type="button"
-                    className="stat-card"
-                    style={{
-                        ...clickableCardStyle,
-                        background: 'linear-gradient(135deg, #2e7d32, #66bb6a)'
-                    }}
-                    onClick={() => navigate('/results?view=compliant')}
-                >
-                    <div className="stat-label">
-                        COMPLIANT ENDPOINTS
-                        <InfoIcon text="Endpoints meeting 100% of defined enterprise security policies." />
-                    </div>
-                    <div className="stat-value">{stats.compliantEndpoints || 0}</div>
-                    <div style={{ fontSize: '0.85rem', marginTop: '8px', opacity: 0.9 }}>
-                        All required compliance fields valid
-                    </div>
-                </button>
-
-                <button
-                    type="button"
-                    className="stat-card"
-                    style={{
-                        ...clickableCardStyle,
-                        background: 'linear-gradient(135deg, #f57c00, #ffb74d)'
-                    }}
-                    onClick={() => navigate('/results?view=partial')}
-                >
-                    <div className="stat-label">
-                        PARTIAL COMPLIANT
-                        <InfoIcon text="Missing one or more secondary security configurations or policy data." />
-                    </div>
-                    <div className="stat-value">{stats.partialCompliantEndpoints || 0}</div>
-                    <div style={{ fontSize: '0.85rem', marginTop: '8px', opacity: 0.9 }}>
-                        One or more required fields missing or unknown
-                    </div>
-                </button>
-
-                <button
-                    type="button"
-                    className="stat-card"
-                    style={{
-                        ...clickableCardStyle,
-                        background: 'linear-gradient(135deg, #d32f2f, #ef5350)'
-                    }}
-                    onClick={() => navigate('/results?view=partial&issue=collectionFailed')}
-                >
-                    <div className="stat-label">
-                        COLLECTION FAILED
-                        <InfoIcon text="Inventory collection was blocked by firewall, RPC failure, or system being offline." />
-                    </div>
-                    <div className="stat-value">{stats.collectionFailedEndpoints || 0}</div>
-                    <div style={{ fontSize: '0.85rem', marginTop: '8px', opacity: 0.9 }}>
-                        Inventory collection failed / RPC unavailable
-                    </div>
-                </button>
-
-                <button
-                    type="button"
-                    className="stat-card"
-                    style={{
-                        ...clickableCardStyle,
-                        background: 'linear-gradient(135deg, #5e35b1, #7e57c2)'
-                    }}
-                    onClick={() => navigate('/results?view=partial&issue=biosPasswordUnknown')}
-                >
-                    <div className="stat-label">
-                        BIOS PASSWORD
-                        <InfoIcon text="The status of hardware-level passwords (Admin/System) cannot be verified." />
-                    </div>
-                    <div className="stat-value">{stats.biosPasswordUnknownEndpoints || 0}</div>
-                    <div style={{ fontSize: '0.85rem', marginTop: '8px', opacity: 0.9 }}>
-                        Power-on/Admin password status unknown
-                    </div>
-                </button>
-
-                <button
-                    type="button"
-                    className="stat-card"
-                    style={{
-                        ...clickableCardStyle,
-                        background: 'linear-gradient(135deg, #1976d2, #64b5f6)'
-                    }}
-                    onClick={() => navigate('/results?view=partial&issue=metricWarning')}
-                >
-                    <div className="stat-label">
-                        METRIC WARNING
-                        <InfoIcon text="System identity is confirmed, but performance/health telemetry collection failed." />
-                    </div>
-                    <div className="stat-value">{stats.metricWarningEndpoints || 0}</div>
-                    <div style={{ fontSize: '0.85rem', marginTop: '8px', opacity: 0.9 }}>
-                        Inventory completed but metric collection failed
-                    </div>
-                </button>
-            </motion.div>
-
-            <div className="card">
-                <h3 style={{ marginBottom: '20px', fontSize: '1.1rem', color: '#64748b' }}>
-                    System Health Overview
-                    <InfoIcon text="Aggregated health score based on security compliance, uptime, and hardware alerts." />
-                </h3>
-                <div
-                    style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                        gap: '25px'
-                    }}
-                >
-                    <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', alignItems: 'center' }}>
-                            <span style={{ fontWeight: 600, color: '#475569' }}>
-                                Excellent
-                                <InfoIcon text="Fully healthy: 100% compliant and active telemetry." />
-                            </span>
-                            <strong style={{ color: '#16a34a', fontSize: '1.1rem' }}>
-                                {stats.excellentCount || 0}
-                            </strong>
-                        </div>
-                        <div className="health-score-bar">
-                            <div
-                                className="health-score-fill health-excellent"
-                                style={{ width: getWidth(stats.excellentCount || 0) }}
-                            ></div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', alignItems: 'center' }}>
-                            <span style={{ fontWeight: 600, color: '#475569' }}>
-                                Good
-                                <InfoIcon text="Minor gaps: Mostly compliant with 1-2 non-critical missing data points." />
-                            </span>
-                            <strong style={{ color: '#2563eb', fontSize: '1.1rem' }}>
-                                {stats.goodCount || 0}
-                            </strong>
-                        </div>
-                        <div className="health-score-bar">
-                            <div
-                                className="health-score-fill health-good"
-                                style={{ width: getWidth(stats.goodCount || 0) }}
-                            ></div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', alignItems: 'center' }}>
-                            <span style={{ fontWeight: 600, color: '#475569' }}>
-                                Fair
-                                <InfoIcon text="Warning: Significant policy violations or outdated inventory data." />
-                            </span>
-                            <strong style={{ color: '#ca8a04', fontSize: '1.1rem' }}>
-                                {stats.fairCount || 0}
-                            </strong>
-                        </div>
-                        <div className="health-score-bar">
-                            <div
-                                className="health-score-fill health-fair"
-                                style={{ width: getWidth(stats.fairCount || 0) }}
-                            ></div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', alignItems: 'center' }}>
-                            <span style={{ fontWeight: 600, color: '#475569' }}>
-                                Poor
-                                <InfoIcon text="Critical: Major security vulnerabilities or failed management connectivity." />
-                            </span>
-                            <strong style={{ color: '#dc2626', fontSize: '1.1rem' }}>
-                                {stats.poorCount || 0}
-                            </strong>
-                        </div>
-                        <div className="health-score-bar">
-                            <div
-                                className="health-score-fill health-poor"
-                                style={{ width: getWidth(stats.poorCount || 0) }}
-                            ></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <SystemHealthOverview stats={stats} />
 
             <div
                 style={{
@@ -346,91 +132,8 @@ function Dashboard() {
                     marginTop: '20px'
                 }}
             >
-                <div className="card">
-                    <h3 style={{ marginBottom: '15px' }}>Scan Status</h3>
-
-                    <div
-                        style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            padding: '10px 0',
-                            borderBottom: '1px solid var(--border-color)'
-                        }}
-                    >
-                        <span>Completed</span>
-                        <span className="badge badge-success">{stats.completedScans || 0}</span>
-                    </div>
-
-                    <div
-                        style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            padding: '10px 0',
-                            borderBottom: '1px solid var(--border-color)'
-                        }}
-                    >
-                        <span>Failed</span>
-                        <span className="badge badge-danger">{stats.failedScans || 0}</span>
-                    </div>
-
-                    <div
-                        style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            padding: '10px 0'
-                        }}
-                    >
-                        <span>In Progress</span>
-                        <span className="badge badge-info">{stats.inProgressScans || 0}</span>
-                    </div>
-                </div>
-
-                <div className="card">
-                    <h3 style={{ marginBottom: '15px' }}>Performance Metrics</h3>
-
-                    <div
-                        style={{
-                            padding: '10px 0',
-                            borderBottom: '1px solid var(--border-color)'
-                        }}
-                    >
-                        <div
-                            style={{
-                                color: 'var(--text-secondary)',
-                                fontSize: '0.9rem',
-                                marginBottom: '5px'
-                            }}
-                        >
-                            Average Scan Time
-                        </div>
-                        <div
-                            style={{
-                                fontSize: '1.5rem',
-                                fontWeight: '600',
-                                color: 'var(--primary-color)'
-                            }}
-                        >
-                            {stats.averageScanTime !== null
-                                ? `${Number(stats.averageScanTime).toFixed(2)}s`
-                                : 'N/A'}
-                        </div>
-                    </div>
-
-                    <div style={{ padding: '10px 0', marginTop: '10px' }}>
-                        <div
-                            style={{
-                                color: 'var(--text-secondary)',
-                                fontSize: '0.9rem',
-                                marginBottom: '5px'
-                            }}
-                        >
-                            Last Scan
-                        </div>
-                        <div style={{ fontSize: '1rem', color: 'var(--text-primary)' }}>
-                            {stats.lastScan ? new Date(stats.lastScan).toLocaleString() : 'N/A'}
-                        </div>
-                    </div>
-                </div>
+                <ScanStatusCard stats={stats} />
+                <PerformanceMetrics stats={stats} />
             </div>
         </div>
     );
