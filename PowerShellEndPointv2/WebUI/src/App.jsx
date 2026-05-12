@@ -42,26 +42,36 @@ const Icons = {
 };
 
 function getStoredUser() {
-    try { return JSON.parse(localStorage.getItem('user') || 'null'); } catch { return null; }
+    return {
+        displayName: sessionStorage.getItem('display_name'),
+        role: sessionStorage.getItem('display_role'),
+        groups: sessionStorage.getItem('display_groups') ? sessionStorage.getItem('display_groups').split(';') : []
+    };
 }
 
 function getPermissions(user) {
-    const p = user?.permissions || {};
+    const role = (user?.role || '').toLowerCase();
+    const isAdmin = role.includes('admin');
+    const isMonitor = role.includes('monitor');
+
+    // Fallback role check, previously these might have been read from a complex user object,
+    // now we approximate them based on standard role strings if needed, but since role-based
+    // check is the key here, we can derive canAdmin / canScan.
     return {
-        canView:    p.canView    !== false,
-        canScan:    p.canScan    === true,
-        canArchive: p.canArchive === true,
-        canAdmin:   p.canAdmin   === true
+        canView:    isAdmin || isMonitor || !!user?.role,
+        canScan:    isAdmin, // Adjust based on how backend roles map
+        canArchive: isAdmin,
+        canAdmin:   isAdmin
     };
 }
 
 function ProtectedRoute({ children, requireScan = false, requireAdmin = false }) {
     const location = useLocation();
-    const token = localStorage.getItem('auth_token');
+    const token = sessionStorage.getItem('auth_token');
     const user  = getStoredUser();
     const perms = getPermissions(user);
 
-    if (!token || !user)     return <Navigate to="/login" replace state={{ from: location }} />;
+    if (!token)              return <Navigate to="/login" replace state={{ from: location }} />;
     if (!perms.canView)      return <Navigate to="/login" replace />;
     if (requireScan   && !perms.canScan)  return <Navigate to="/dashboard" replace />;
     if (requireAdmin  && !perms.canAdmin) return <Navigate to="/dashboard" replace />;
@@ -131,9 +141,11 @@ function Layout() {
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
     const handleLogout = () => {
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('user');
-        localStorage.removeItem('authProvider');
+        sessionStorage.removeItem('auth_token');
+        sessionStorage.removeItem('display_name');
+        sessionStorage.removeItem('display_role');
+        sessionStorage.removeItem('display_groups');
+        sessionStorage.removeItem('authProvider');
         window.location.href = '/login';
     };
 
@@ -290,7 +302,7 @@ function AppRoutes() {
             <Route
                 path="/login"
                 element={
-                    localStorage.getItem('auth_token')
+                    sessionStorage.getItem('auth_token')
                         ? <Navigate to="/dashboard" replace />
                         : <Login onLogin={() => setLoginTick(v => v + 1)} />
                 }

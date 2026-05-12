@@ -37,7 +37,7 @@ const apiClient = ky.create({
         afterResponse: [
             async (_request, _options, response) => {
                 if (response.status === 401) {
-                    localStorage.clear();
+                    sessionStorage.clear();
                     if (window.location.pathname !== '/login') window.location.href = '/login';
                 }
             },
@@ -58,12 +58,15 @@ export const authService = {
     login: (username, password, provider = 'Standalone') =>
         post('auth/login', { username, password, provider }).then(data => {
             if (data.success && data.user) {
-                localStorage.setItem('auth_token', data.token || '');
-                localStorage.setItem('user', JSON.stringify(data.user));
+                sessionStorage.setItem('auth_token', data.token || '');
+                sessionStorage.setItem('display_name', data.user.displayName || data.user.username);
+                sessionStorage.setItem('display_role', data.user.role || '');
+                sessionStorage.setItem('display_groups', Array.isArray(data.user.groups) ? data.user.groups.join(';') : '');
+                // Do NOT store user object, roles, etc. in localStorage.
             }
             return data;
         }),
-    logout: () => { localStorage.clear(); window.location.href = '/login'; },
+    logout: () => { sessionStorage.clear(); window.location.href = '/login'; },
     getProviders: () => get('auth/providers'),
     validate: () => get('auth/validate'),
 };
