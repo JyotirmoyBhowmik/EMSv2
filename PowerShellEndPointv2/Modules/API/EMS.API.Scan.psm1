@@ -3,6 +3,28 @@
     Handles scan execution, status, results, and archiving.
 #>
 
+$script:FrontendErrorBuckets =
+    [System.Collections.Concurrent.ConcurrentDictionary[string,object]]::new()
+
+function Test-FrontendErrorAllowed {
+    param([string]$Ip)
+    $now = [DateTime]::Now
+
+    $addValueFactory = [Func[string, object]] { param($k) return [pscustomobject]@{ Count=1; WindowStart=$now } }
+    $updateValueFactory = [Func[string, object, object]] {
+        param($k, $old)
+        $oldStart = $old.WindowStart
+        if (($now - $oldStart).TotalSeconds -gt 60) {
+            return [pscustomobject]@{ Count=1; WindowStart=$now }
+        } else {
+            return [pscustomobject]@{ Count=($old.Count + 1); WindowStart=$oldStart }
+        }
+    }
+
+    $entry = $script:FrontendErrorBuckets.AddOrUpdate($Ip, $addValueFactory, $updateValueFactory)
+    return ($entry.Count -le 5)
+}
+
 function Invoke-ScanRoutes {
     param(
         [System.Net.HttpListenerRequest]$Request,
@@ -148,21 +170,39 @@ function Invoke-ScanRoutes {
         }
 
         'POST /audit/frontend-error' {
-            $body = Read-JsonBody $Request
+            $ip = if ($Request.RemoteEndPoint) { $Request.RemoteEndPoint.Address.ToString() } else { '0.0.0.0' }
+            if (-not (Test-FrontendErrorAllowed -Ip $ip)) {
+                Write-JsonResponse $Request $Response 429 @{ error='rate-limited' }
+                return $true
+            }
+
+            $raw = Read-EMSRequestBody -Request $Request -MaxBytes 4096
+            if (-not $raw) { Write-JsonResponse $Request $Response 400 @{error='empty'}; return $true }
+
+            try { $body = $raw | ConvertFrom-Json -ErrorAction Stop }
+            catch { Write-JsonResponse $Request $Response 400 @{error='bad json'}; return $true }
+
+            $clip = { param($s,$n) if (-not $s) {''} elseif ($s.Length -gt $n) {$s.Substring(0,$n)} else {$s} }
+            $enc  = { param($s) [System.Net.WebUtility]::HtmlEncode($s) }
+
+            $msg = & $enc (& $clip ([string]$body.message) 1000)
+            $stk = & $enc (& $clip ([string]$body.stack)   4000)
+            $url = & $enc (& $clip ([string]$body.url)     500)
+
             $ctx = Get-RequestUserContext -Request $Request
             $performedBy = if ($ctx.Username) { $ctx.Username } else { 'FrontendApp' }
-            
+
             Invoke-PGQuery -NonQuery -Query @"
 INSERT INTO audit_api_requests (method, path, username, ip_address, status_code, response_time_ms, timestamp, error_message)
 VALUES ('ERROR', @path, @username, CAST(@ip AS inet), 500, 0, NOW(), @errorMsg);
 "@ -Parameters @{ 
-                path = if ($body.url) { $body.url } else { '/frontend' };
-                errorMsg = "[FRONTEND CRASH] " + ($body.message | Out-String).Trim() + " | Stack: " + ($body.stack | Out-String).Trim();
+                path = '/audit/frontend-error';
+                errorMsg = "[FRONTEND CRASH] " + (@{message=$msg; stack=$stk; url=$url} | ConvertTo-Json -Compress);
                 username = $performedBy;
-                ip = if ($Request.RemoteEndPoint) { $Request.RemoteEndPoint.Address.ToString() } else { '0.0.0.0' }
+                ip = $ip
             }
             
-            Write-JsonResponse $Request $Response 200 @{ success = $true; message = 'Error logged successfully' }
+            Write-JsonResponse $Request $Response 204 $null
             return $true
         }
     }
