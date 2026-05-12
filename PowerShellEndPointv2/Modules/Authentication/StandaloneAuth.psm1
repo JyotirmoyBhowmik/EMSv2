@@ -170,7 +170,7 @@ function Test-StandaloneAuth {
             ExternalID  = $null
             DisplayName = $user.display_name
             Email       = $null
-            Groups      = @()
+            Groups      = @($user.role)
         }
     }
     catch {
