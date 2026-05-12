@@ -240,12 +240,7 @@ function Update-StatusBar {
 #endregion
 
 #region Event Handlers
-function Register-EventHandlers {
-    <#
-    .SYNOPSIS
-        Registers all UI event handlers
-    #>
-    
+function Register-LoginEventHandlers {
     # Login button
     $Global:SyncHash.btnLogin.Add_Click({
             $username = $Global:SyncHash.txtUsername.Text
@@ -344,7 +339,9 @@ function Register-EventHandlers {
             $Global:CurrentUser = $null
             $Global:IsAuthorized = $false
         })
-    
+}
+
+function Register-ScanEventHandlers {
     # Scan button
     $Global:SyncHash.btnScan.Add_Click({
             $target = $Global:SyncHash.txtTarget.Text.Trim()
@@ -457,7 +454,9 @@ function Register-EventHandlers {
                 Write-LogToUI -Message "Bulk scan initiated. This may take several minutes..." -Severity 'Info'
             }
         })
-    
+}
+
+function Register-ActionEventHandlers {
     # Export button
     $Global:SyncHash.btnExport.Add_Click({
             if ($Global:SyncHash.dgResults.Items.Count -eq 0) {
@@ -506,6 +505,17 @@ function Register-EventHandlers {
         
             Write-LogToUI -Message "Results cleared" -Severity 'Info'
         })
+}
+
+function Register-EventHandlers {
+    <#
+    .SYNOPSIS
+        Registers all UI event handlers
+    #>
+
+    Register-LoginEventHandlers
+    Register-ScanEventHandlers
+    Register-ActionEventHandlers
 }
 #endregion
 
