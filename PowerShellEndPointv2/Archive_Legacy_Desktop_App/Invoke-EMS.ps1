@@ -161,6 +161,33 @@ function Get-CompletedJobs {
 #endregion
 
 #region UI Helpers
+function Initialize-UI {
+    <#
+    .SYNOPSIS
+        Loads XAML and initializes UI elements
+    #>
+    $xamlPath = Join-Path $PSScriptRoot "MainWindow.xaml"
+
+    if (-not (Test-Path $xamlPath)) {
+        Write-Host "[ERROR] XAML file not found: $xamlPath" -ForegroundColor Red
+        return $false
+    }
+
+    [xml]$xaml = Get-Content $xamlPath
+    $reader = New-Object System.Xml.XmlNodeReader $xaml
+    $Global:SyncHash.Window = [Windows.Markup.XamlReader]::Load($reader)
+
+    # Extract named elements
+    $xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]") | ForEach-Object {
+        $name = $_.Name
+        if ($name) {
+            $Global:SyncHash[$name] = $Global:SyncHash.Window.FindName($name)
+        }
+    }
+
+    return $true
+}
+
 function Update-UIElement {
     <#
     .SYNOPSIS
@@ -527,24 +554,9 @@ function Start-EMSApplication {
     # Initialize runspace pool
     Initialize-RunspacePool -MinRunspaces 2 -MaxRunspaces 50
     
-    # Load XAML
-    $xamlPath = Join-Path $PSScriptRoot "MainWindow.xaml"
-    
-    if (-not (Test-Path $xamlPath)) {
-        Write-Host "[ERROR] XAML file not found: $xamlPath" -ForegroundColor Red
+    # Initialize UI elements from XAML
+    if (-not (Initialize-UI)) {
         return
-    }
-    
-    [xml]$xaml = Get-Content $xamlPath
-    $reader = New-Object System.Xml.XmlNodeReader $xaml
-    $Global:SyncHash.Window = [Windows.Markup.XamlReader]::Load($reader)
-    
-    # Extract named elements
-    $xaml.SelectNodes("//*[@*[contains(translate(name(.),'n','N'),'Name')]]") | ForEach-Object {
-        $name = $_.Name
-        if ($name) {
-            $Global:SyncHash[$name] = $Global:SyncHash.Window.FindName($name)
-        }
     }
     
     # Register event handlers
