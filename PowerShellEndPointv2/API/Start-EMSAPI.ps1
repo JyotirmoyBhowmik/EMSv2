@@ -150,7 +150,7 @@ try {
 
             # 1. Handle CORS Preflight
             if ($method -eq 'OPTIONS') {
-                Add-CorsHeaders -Request $request -Response $response
+                Add-EMSCORSHeaders -Request $request -Response $response -Config $Global:EMSConfig
                 $response.StatusCode = 204
                 $response.Close()
                 continue
@@ -170,7 +170,7 @@ try {
                     $limitInfo.Count++
                     if ($limitInfo.Count -gt $RateLimitMaxRequests) {
                         Write-EMSLog -Message "Rate limit exceeded for IP: $clientIp" -Severity Warning -Category "Security"
-                        Add-CorsHeaders -Request $request -Response $response
+                        Add-EMSCORSHeaders -Request $request -Response $response -Config $Global:EMSConfig
                         Write-JsonResponse $request $response 429 @{ success = $false; error = "Too Many Requests. Please try again later." }
                         continue
                     }

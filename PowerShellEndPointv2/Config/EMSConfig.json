@@ -96,7 +96,7 @@
     "TokenExpirationMinutes": 60,
     "EnableCORS": true,
     "AllowedOrigins": [
-      "http://localhost:3000",
+      "http://localhost:3000", "https://ems.snpl.com.np",
       "http://localhost:8080"
     ]
   },
