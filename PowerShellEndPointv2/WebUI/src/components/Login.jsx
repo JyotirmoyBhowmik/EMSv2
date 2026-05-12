@@ -69,9 +69,7 @@ function Login({ onLogin }) {
             const response = await authService.login(username.trim(), password, provider);
 
             if (response?.success) {
-                localStorage.setItem('auth_token', response.token);
-                localStorage.setItem('user', JSON.stringify(response.user));
-                localStorage.setItem('authProvider', response.provider || provider);
+                sessionStorage.setItem('authProvider', response.provider || provider);
 
                 if (onLogin) {
                     onLogin(response.user);

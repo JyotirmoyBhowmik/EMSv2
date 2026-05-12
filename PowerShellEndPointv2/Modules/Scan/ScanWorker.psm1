@@ -16,6 +16,29 @@ Import-Module "$PSScriptRoot\Collectors\Connectivity.psm1"
 # Compute the project root path at import time (in the parent scope)
 $script:EMSRoot = (Resolve-Path "$PSScriptRoot\..\..").Path
 
+$script:InFlightScans = [System.Collections.Concurrent.ConcurrentBag[object]]::new()
+
+function Invoke-EMSScanReaper {
+    $still = [System.Collections.Generic.List[object]]::new()
+    $items = @($script:InFlightScans.ToArray())
+    $script:InFlightScans = [System.Collections.Concurrent.ConcurrentBag[object]]::new()
+
+    foreach ($r in $items) {
+        if ($r.Handle.IsCompleted) {
+            try { [void]$r.PS.EndInvoke($r.Handle) }
+            catch { Write-EMSLog "Scan $($r.ScanId) failed: $($_.Exception.Message)" -Severity Error }
+            finally { $r.PS.Dispose() }
+        } elseif (((Get-Date) - $r.Started).TotalMinutes -gt 30) {
+            try { $r.PS.Stop() } catch {}
+            $r.PS.Dispose()
+            Write-EMSLog "Scan $($r.ScanId) killed (timeout)" -Severity Warning
+        } else {
+            $still.Add($r)
+        }
+    }
+    foreach ($x in $still) { $script:InFlightScans.Add($x) }
+}
+
 # -------------------------
 # Trace Logging Helper
 # -------------------------
@@ -288,7 +311,9 @@ function Start-EMSScan {
 
     $handle = $ps.BeginInvoke()
     
-    # Store handle for monitoring (optional)
+    $script:InFlightScans.Add([pscustomobject]@{
+        PS=$ps; Handle=$handle; ScanId=$ScanId; Started=Get-Date })
+
     Write-EMSLog -Message "Scan dispatched for $Target (ScanId: $ScanId)" -Severity 'Info' -Category 'Scan'
 }
 

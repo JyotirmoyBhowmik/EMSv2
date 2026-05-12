@@ -21,7 +21,7 @@ function MetricDetail({ metricName, metricType, apiEndpoint }) {
             const params = new URLSearchParams(filters).toString();
             const response = await fetch(`${apiEndpoint}?${params}`, {
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${sessionStorage.getItem('auth_token')}`
                 }
             });
             const result = await response.json();
