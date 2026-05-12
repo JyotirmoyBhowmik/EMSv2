@@ -118,18 +118,30 @@ ORDER BY computer_name, timestamp DESC;
         'GET /admin/audit' {
             if (-not (Test-AdminAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
             try {
-                $type  = $Request.QueryString['type']
-                $limit = if ($Request.QueryString['limit']) { [int]$Request.QueryString['limit'] } else { 100 }
+                [int]$limit = 100
+                if (-not [string]::IsNullOrEmpty($Request.QueryString['limit'])) {
+                    [void][int]::TryParse($Request.QueryString['limit'], [ref]$limit)
+                }
+                $limit = [Math]::Max(1, [Math]::Min($limit, 1000))
+
+                [int]$offset = 0
+                if (-not [string]::IsNullOrEmpty($Request.QueryString['offset'])) {
+                    [void][int]::TryParse($Request.QueryString['offset'], [ref]$offset)
+                }
+                $offset = [Math]::Max(0, [Math]::Min($offset, 1000000))
+
+                $type = [string]$Request.QueryString['type']
 
                 $query = switch ($type) {
-                    'api'     { "SELECT timestamp, username, method, path, status_code, response_time_ms, error_message, ip_address FROM audit_api_requests ORDER BY timestamp DESC LIMIT @limit" }
-                    'auth'    { "SELECT timestamp, username, event_type, provider, risk_level FROM audit_auth_events ORDER BY timestamp DESC LIMIT @limit" }
-                    'config'  { "SELECT timestamp, changed_by, config_section, config_key, old_value, new_value FROM audit_config_changes ORDER BY timestamp DESC LIMIT @limit" }
-                    'feature' { "SELECT timestamp, feature_key, old_value, new_value, changed_by FROM audit_feature_toggles ORDER BY timestamp DESC LIMIT @limit" }
-                    'ERROR'   { "SELECT timestamp, username, method, path, status_code, error_message, ip_address FROM audit_api_requests WHERE method = 'ERROR' ORDER BY timestamp DESC LIMIT @limit" }
-                    default   { "SELECT timestamp, username, method, path, status_code, response_time_ms, ip_address FROM audit_api_requests ORDER BY timestamp DESC LIMIT @limit" }
+                    'api'     { "SELECT timestamp, username, method, path, status_code, response_time_ms, error_message, ip_address FROM audit_api_requests ORDER BY timestamp DESC LIMIT @lim OFFSET @off" }
+                    'auth'    { "SELECT timestamp, username, event_type, provider, risk_level FROM audit_auth_events ORDER BY timestamp DESC LIMIT @lim OFFSET @off" }
+                    'config'  { "SELECT timestamp, changed_by, config_section, config_key, old_value, new_value FROM audit_config_changes ORDER BY timestamp DESC LIMIT @lim OFFSET @off" }
+                    'feature' { "SELECT timestamp, feature_key, old_value, new_value, changed_by FROM audit_feature_toggles ORDER BY timestamp DESC LIMIT @lim OFFSET @off" }
+                    'ERROR'   { "SELECT timestamp, username, method, path, status_code, error_message, ip_address FROM audit_api_requests WHERE method = 'ERROR' ORDER BY timestamp DESC LIMIT @lim OFFSET @off" }
+                    default   { "SELECT timestamp, username, method, path, status_code, response_time_ms, ip_address FROM audit_api_requests ORDER BY timestamp DESC LIMIT @lim OFFSET @off" }
                 }
-                $rows = Invoke-PGQuery -Query $query -Parameters @{ limit = $limit }
+
+                $rows = Invoke-PGQuery -Query $query -Parameters @{ lim=$limit; off=$offset }
                 Write-JsonResponse $Request $Response 200 @{ success = $true; logs = @($rows) }
             } catch {
                 Write-JsonResponse $Request $Response 500 @{ success = $false; error = $_.Exception.Message }
