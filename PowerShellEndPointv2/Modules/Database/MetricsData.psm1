@@ -171,24 +171,35 @@ function Save-DiskMetrics {
         [array]$Disks
     )
     
-    foreach ($disk in $Disks) {
-        $query = @"
-INSERT INTO metric_disk_space (computer_name, drive_letter, volume_name, total_gb, free_gb, used_gb, usage_percent, file_system, is_system_drive)
-VALUES (@computer, @letter, @volume, @total, @free, @used, @percent, @fs, @system)
-"@
-        
-        Invoke-PGQuery -Query $query -Parameters @{
-            computer = $ComputerName
-            letter   = $disk.DriveLetter
-            volume   = $disk.VolumeName
-            total    = $disk.TotalGB
-            free     = $disk.FreeGB
-            used     = $disk.UsedGB
-            percent  = $disk.UsagePercent
-            fs       = $disk.FileSystem
-            system   = $disk.IsSystemDrive
-        } -NonQuery | Out-Null
+    if (-not $Disks -or $Disks.Count -eq 0) {
+        return
     }
+
+    $valuesStrList = @()
+    $params = @{
+        computer = $ComputerName
+    }
+
+    $i = 0
+    foreach ($disk in $Disks) {
+        $valuesStrList += "(@computer, @letter_$i, @volume_$i, @total_$i, @free_$i, @used_$i, @percent_$i, @fs_$i, @system_$i)"
+        
+        $params["letter_$i"]  = $disk.DriveLetter
+        $params["volume_$i"]  = $disk.VolumeName
+        $params["total_$i"]   = $disk.TotalGB
+        $params["free_$i"]    = $disk.FreeGB
+        $params["used_$i"]    = $disk.UsedGB
+        $params["percent_$i"] = $disk.UsagePercent
+        $params["fs_$i"]      = $disk.FileSystem
+        $params["system_$i"]  = $disk.IsSystemDrive
+
+        $i++
+    }
+
+    $joinedValues = $valuesStrList -join ", "
+    $query = "INSERT INTO metric_disk_space (computer_name, drive_letter, volume_name, total_gb, free_gb, used_gb, usage_percent, file_system, is_system_drive) VALUES $joinedValues"
+
+    Invoke-PGQuery -Query $query -Parameters $params -NonQuery | Out-Null
 }
 
 <#
@@ -270,22 +281,32 @@ function Save-InstalledSoftware {
         [array]$Software
     )
     
-    foreach ($app in $Software) {
-        $query = @"
-INSERT INTO metric_installed_software (computer_name, software_name, version, vendor, install_date, install_location, size_mb)
-VALUES (@computer, @name, @version, @vendor, @date, @location, @size)
-ON CONFLICT (computer_name, timestamp, software_name, version) DO NOTHING
-"@
+    if (-not $Software -or $Software.Count -eq 0) {
+        return
+    }
+
+    $batchSize = 1000
+    for ($batchStart = 0; $batchStart -lt $Software.Count; $batchStart += $batchSize) {
+        $batchEnd = [Math]::Min($batchStart + $batchSize - 1, $Software.Count - 1)
         
-        Invoke-PGQuery -Query $query -Parameters @{
-            computer = $ComputerName
-            name     = $app.Name
-            version  = $app.Version
-            vendor   = $app.Vendor
-            date     = $app.InstallDate
-            location = $app.InstallLocation
-            size     = $app.SizeMB
-        } -NonQuery | Out-Null
+        $queryTemplate = "INSERT INTO metric_installed_software (computer_name, software_name, version, vendor, install_date, install_location, size_mb) VALUES "
+        $valuesList = [System.Collections.Generic.List[string]]::new()
+        $parameters = @{ computer = $ComputerName }
+
+        for ($i = $batchStart; $i -le $batchEnd; $i++) {
+            $app = $Software[$i]
+            $valuesList.Add("(@computer, @name$i, @version$i, @vendor$i, @date$i, @location$i, @size$i)")
+
+            $parameters["name$i"]     = $app.Name
+            $parameters["version$i"]  = $app.Version
+            $parameters["vendor$i"]   = $app.Vendor
+            $parameters["date$i"]     = $app.InstallDate
+            $parameters["location$i"] = $app.InstallLocation
+            $parameters["size$i"]     = $app.SizeMB
+        }
+
+        $query = $queryTemplate + ($valuesList -join ", ") + " ON CONFLICT (computer_name, timestamp, software_name, version) DO NOTHING"
+        Invoke-PGQuery -Query $query -Parameters $parameters -NonQuery | Out-Null
     }
 }
 
