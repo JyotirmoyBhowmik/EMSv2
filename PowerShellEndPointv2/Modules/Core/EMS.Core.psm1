@@ -3,15 +3,16 @@
     Shared infrastructure utilities for the Enterprise Monitoring System.
 #>
 
-function Add-CorsHeaders {
-    param(
-        [System.Net.HttpListenerRequest]$Request,
-        [System.Net.HttpListenerResponse]$Response
-    )
-
-    $Response.Headers['Access-Control-Allow-Origin']  = '*'
-    $Response.Headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-    $Response.Headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-EMS-Username, X-EMS-Groups, X-EMS-Role'
+function Add-EMSCORSHeaders {
+    param($Response,$Request,$Config)
+    $origin = $Request.Headers['Origin']
+    if ($origin -and ($Config.API.AllowedOrigins -contains $origin)) {
+        $Response.Headers.Add('Access-Control-Allow-Origin', $origin)
+        $Response.Headers.Add('Vary', 'Origin')
+        $Response.Headers.Add('Access-Control-Allow-Credentials','true')
+    }
+    $Response.Headers.Add('Access-Control-Allow-Methods','GET,POST,PUT,DELETE,OPTIONS')
+    $Response.Headers.Add('Access-Control-Allow-Headers','Authorization,Content-Type,X-CSRF-Token')
 }
 
 function Write-JsonResponse {
@@ -22,7 +23,7 @@ function Write-JsonResponse {
         [object]$Body
     )
 
-    Add-CorsHeaders -Request $Request -Response $Response
+    Add-EMSCORSHeaders -Request $Request -Response $Response -Config $Global:EMSConfig
 
     $json = $Body | ConvertTo-Json -Depth 10 -Compress
     $buffer = [System.Text.Encoding]::UTF8.GetBytes($json)
@@ -140,4 +141,4 @@ function Resolve-ScanTargets {
     return $uniqueTargets
 }
 
-Export-ModuleMember -Function Add-CorsHeaders, Write-JsonResponse, Read-JsonBody, Resolve-ProviderValue, Convert-IPv4ToUInt32, Convert-UInt32ToIPv4, Expand-CidrRange, Resolve-ScanTargets
+Export-ModuleMember -Function Add-EMSCORSHeaders, Write-JsonResponse, Read-JsonBody, Resolve-ProviderValue, Convert-IPv4ToUInt32, Convert-UInt32ToIPv4, Expand-CidrRange, Resolve-ScanTargets

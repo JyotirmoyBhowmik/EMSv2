@@ -180,7 +180,7 @@ try {
 
             # 1. Handle CORS Preflight
             if ($method -eq 'OPTIONS') {
-                Add-CorsHeaders -Request $request -Response $response
+                Add-EMSCORSHeaders -Request $request -Response $response -Config $Global:EMSConfig
                 $response.StatusCode = 204
                 $response.Close()
                 continue
@@ -188,11 +188,23 @@ try {
 
             # 1.5 Rate Limiting
             $clientIp = $request.RemoteEndPoint.Address.ToString()
-            if (-not (Test-EMSRateLimit -Key "ip:$clientIp")) {
-                Write-EMSLog -Message "Rate limit exceeded for IP: $clientIp" -Severity Warning -Category "Security"
-                Add-CorsHeaders -Request $request -Response $response
-                Write-JsonResponse $request $response 429 @{ success = $false; error = "Too Many Requests. Please try again later." }
-                continue
+            $now = [DateTime]::Now
+            if (-not $Global:RateLimitCache.ContainsKey($clientIp)) {
+                $Global:RateLimitCache[$clientIp] = @{ Count = 1; ResetTime = $now.AddSeconds($RateLimitWindowSeconds) }
+            } else {
+                $limitInfo = $Global:RateLimitCache[$clientIp]
+                if ($now -gt $limitInfo.ResetTime) {
+                    $limitInfo.Count = 1
+                    $limitInfo.ResetTime = $now.AddSeconds($RateLimitWindowSeconds)
+                } else {
+                    $limitInfo.Count++
+                    if ($limitInfo.Count -gt $RateLimitMaxRequests) {
+                        Write-EMSLog -Message "Rate limit exceeded for IP: $clientIp" -Severity Warning -Category "Security"
+                        Add-EMSCORSHeaders -Request $request -Response $response -Config $Global:EMSConfig
+                        Write-JsonResponse $request $response 429 @{ success = $false; error = "Too Many Requests. Please try again later." }
+                        continue
+                    }
+                }
             }
 
             # 1.6 Health Check / Root
