@@ -270,22 +270,32 @@ function Save-InstalledSoftware {
         [array]$Software
     )
     
-    foreach ($app in $Software) {
-        $query = @"
-INSERT INTO metric_installed_software (computer_name, software_name, version, vendor, install_date, install_location, size_mb)
-VALUES (@computer, @name, @version, @vendor, @date, @location, @size)
-ON CONFLICT (computer_name, timestamp, software_name, version) DO NOTHING
-"@
+    if (-not $Software -or $Software.Count -eq 0) {
+        return
+    }
+
+    $batchSize = 1000
+    for ($batchStart = 0; $batchStart -lt $Software.Count; $batchStart += $batchSize) {
+        $batchEnd = [Math]::Min($batchStart + $batchSize - 1, $Software.Count - 1)
         
-        Invoke-PGQuery -Query $query -Parameters @{
-            computer = $ComputerName
-            name     = $app.Name
-            version  = $app.Version
-            vendor   = $app.Vendor
-            date     = $app.InstallDate
-            location = $app.InstallLocation
-            size     = $app.SizeMB
-        } -NonQuery | Out-Null
+        $queryTemplate = "INSERT INTO metric_installed_software (computer_name, software_name, version, vendor, install_date, install_location, size_mb) VALUES "
+        $valuesList = [System.Collections.Generic.List[string]]::new()
+        $parameters = @{ computer = $ComputerName }
+
+        for ($i = $batchStart; $i -le $batchEnd; $i++) {
+            $app = $Software[$i]
+            $valuesList.Add("(@computer, @name$i, @version$i, @vendor$i, @date$i, @location$i, @size$i)")
+
+            $parameters["name$i"]     = $app.Name
+            $parameters["version$i"]  = $app.Version
+            $parameters["vendor$i"]   = $app.Vendor
+            $parameters["date$i"]     = $app.InstallDate
+            $parameters["location$i"] = $app.InstallLocation
+            $parameters["size$i"]     = $app.SizeMB
+        }
+
+        $query = $queryTemplate + ($valuesList -join ", ") + " ON CONFLICT (computer_name, timestamp, software_name, version) DO NOTHING"
+        Invoke-PGQuery -Query $query -Parameters $parameters -NonQuery | Out-Null
     }
 }
 
