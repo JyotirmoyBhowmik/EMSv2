@@ -34,7 +34,7 @@ foreach ($asm in $assemblies) {
 # -------------------------
 # Module-scope connection
 # -------------------------
-$script:ConnectionString = $null
+$script:ConnString = $null
 
 # -------------------------
 # Connection Initialization
@@ -52,32 +52,21 @@ function Initialize-PostgreSQLConnection {
         throw "Database configuration missing"
     }
 
-    $sb = New-Object System.Text.StringBuilder
-    $sb.Append("Host=$($db.Host);")             | Out-Null
-    $sb.Append("Port=$($db.Port);")             | Out-Null
-    $sb.Append("Database=$($db.DatabaseName);") | Out-Null
-    $sb.Append("Username=$($db.Username);")     | Out-Null
+    Import-Module "$PSScriptRoot\..\Security\EMS.Environment.psm1" -Force
+    $dbPassword = Get-EMSEnvironmentVar -Key 'DB_PASSWORD'
+    if (-not $dbPassword) { throw "DB_PASSWORD not set in DPAPI store. Run Setup-EMS.ps1." }
 
-    if ($db.Password) {
-        $sb.Append("Password=$($db.Password);") | Out-Null
-    }
-    elseif ($db.PasswordSecure) {
-        $plain = [Runtime.InteropServices.Marshal]::PtrToStringAuto(
-            [Runtime.InteropServices.Marshal]::SecureStringToBSTR($db.PasswordSecure)
-        )
-        $sb.Append("Password=$plain;") | Out-Null
-    }
-    else {
-        throw "Database password not provided"
-    }
-
-    $sb.Append("Pooling=true;Minimum Pool Size=1;Maximum Pool Size=30;Timeout=30;") | Out-Null
-
-    if ($db.EnableSSL) {
-        $sb.Append("SSL Mode=Require;") | Out-Null
-    }
-
-    $script:ConnectionString = $sb.ToString()
+    $csb = [Npgsql.NpgsqlConnectionStringBuilder]::new()
+    $csb.Host                   = $db.Host
+    $csb.Port                   = [int]$db.Port
+    $csb.Database               = $db.DatabaseName
+    $csb.Username               = $db.Username
+    $csb.Password               = $dbPassword
+    $csb.SslMode                = [Npgsql.SslMode]::Require
+    $csb.TrustServerCertificate = $false
+    $csb.IncludeErrorDetail     = $false
+    $csb.ApplicationName        = 'EMSv2'
+    $script:ConnString          = $csb.ConnectionString
 
     Write-EMSLog -Message "PostgreSQL initialized ($($db.DatabaseName))" -Category Database
 }
@@ -86,11 +75,11 @@ function Initialize-PostgreSQLConnection {
 # Connection Guard
 # -------------------------
 function Get-PGConnection {
-    if (-not $script:ConnectionString) {
+    if (-not $script:ConnString) {
         throw "PostgreSQL connection not initialized"
     }
 
-    $conn = New-Object Npgsql.NpgsqlConnection($script:ConnectionString)
+    $conn = New-Object Npgsql.NpgsqlConnection($script:ConnString)
     $conn.Open()
     return $conn
 }
