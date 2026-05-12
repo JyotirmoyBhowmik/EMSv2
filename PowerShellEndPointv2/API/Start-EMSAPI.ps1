@@ -68,38 +68,38 @@ if (-not $Global:EMSConfig.Security.PSObject.Properties['AdminGroup']) { $Global
 if (-not $Global:EMSConfig.Security.PSObject.Properties['MonitorGroup']) { $Global:EMSConfig.Security | Add-Member -NotePropertyName MonitorGroup -NotePropertyValue 'EMS_Monitor' }
 
 # Parse Listen Port from Config
-$listenUrl = "http://localhost:5000"
-if ($Global:EMSConfig.API -and $Global:EMSConfig.API.ListenAddress) {
-    $listenUrl = $Global:EMSConfig.API.ListenAddress
+$prefixes = @("https://+:5443/")
+if ($Global:EMSConfig.API -and $Global:EMSConfig.API.Prefixes) {
+    $prefixes = $Global:EMSConfig.API.Prefixes
 }
-
-$port = 5000
-if ($listenUrl -match ':(\d+)') {
-    $port = $matches[1]
-}
-
-# Ensure trailing slash for HttpListener
-$prefix = $listenUrl
-if (-not $prefix.EndsWith('/')) {
-    $prefix += '/'
-}
-
-Write-Host "[INFO] EMS REST API (Modular) initializing on $prefix ..." -ForegroundColor Cyan
 
 # -------------------------
 # 2. Main Service Loop
 # -------------------------
 $listener = [System.Net.HttpListener]::new()
-$listener.Prefixes.Add($prefix)
+foreach ($prefix in $prefixes) {
+    $p = $prefix
+    if (-not $p.EndsWith('/')) { $p += '/' }
+    $listener.Prefixes.Add($p)
+}
+
+Write-Host "[INFO] EMS REST API (Modular) initializing on $($prefixes -join ', ') ..." -ForegroundColor Cyan
 
 try {
     try {
         $listener.Start()
-        Write-EMSLog -Message "API Service started on $prefix" -Severity Success
+        Write-EMSLog -Message "API Service started on $($prefixes -join ', ')" -Severity Success
     } catch {
         $exMsg = $_.Exception.Message
         if ($exMsg -match "conflicts with an existing registration") {
-            Write-Host "[ERROR] Port $port is already in use." -ForegroundColor Red
+            Write-Host "[ERROR] A port is already in use." -ForegroundColor Red
+
+            # Try to extract a port to check for a blocking process
+            $port = 5443
+            if ($prefixes -and $prefixes.Count -gt 0 -and $prefixes[0] -match ':(\d+)') {
+                $port = $matches[1]
+            }
+
             # Try to find the blocking process
             $netstat = netstat -ano | Select-String ":$port\s" | Select-Object -First 1
             if ($netstat) {
@@ -118,7 +118,7 @@ try {
             Write-EMSLog -Message "Failed to start API listener: Port $port in use." -Severity Error
             exit 1
         } elseif ($exMsg -match "Access is denied") {
-            Write-Host "[ERROR] Access is denied when binding to port $port." -ForegroundColor Red
+            Write-Host "[ERROR] Access is denied when binding to the port." -ForegroundColor Red
             Write-Host "[ACTION REQUIRED] You must run PowerShell as Administrator to start the API Service." -ForegroundColor Yellow
             Write-EMSLog -Message "Failed to start API listener: Access Denied. Requires Administrator privileges." -Severity Error
             exit 1
@@ -147,6 +147,12 @@ try {
             
             Write-Host "[DEBUG] Incoming Request: $method $rawPath -> Routed as: $path" -ForegroundColor Gray
             $start  = [DateTime]::Now
+
+            # Apply Security Headers
+            $response.Headers.Add('Strict-Transport-Security','max-age=31536000; includeSubDomains')
+            $response.Headers.Add('X-Content-Type-Options','nosniff')
+            $response.Headers.Add('X-Frame-Options','DENY')
+            $response.Headers.Add('Referrer-Policy','strict-origin-when-cross-origin')
 
             # 1. Handle CORS Preflight
             if ($method -eq 'OPTIONS') {
