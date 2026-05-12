@@ -67,31 +67,7 @@ FROM scans WHERE scan_id = @scanId LIMIT 1;
         'GET /dashboard/stats' {
             if (-not (Test-ViewerAccessRequirement -Request $Request -Response $Response -Config $Config)) { return $true }
             $range = $Request.QueryString['range'] # today, 24h, 7d, 30d, all
-            $timeFilter = ""
-            $complianceTimeFilter = ""
-            
-            switch ($range) {
-                'today' { 
-                    $timeFilter = "AND completed_at >= CURRENT_DATE"
-                    $complianceTimeFilter = "WHERE lastchecked >= CURRENT_DATE"
-                }
-                '24h' { 
-                    $timeFilter = "AND completed_at >= NOW() - INTERVAL '24 hours'"
-                    $complianceTimeFilter = "WHERE lastchecked >= NOW() - INTERVAL '24 hours'"
-                }
-                '7d' { 
-                    $timeFilter = "AND completed_at >= NOW() - INTERVAL '7 days'"
-                    $complianceTimeFilter = "WHERE lastchecked >= NOW() - INTERVAL '7 days'"
-                }
-                '30d' { 
-                    $timeFilter = "AND completed_at >= NOW() - INTERVAL '30 days'"
-                    $complianceTimeFilter = "WHERE lastchecked >= NOW() - INTERVAL '30 days'"
-                }
-                default { 
-                    $timeFilter = "" 
-                    $complianceTimeFilter = ""
-                }
-            }
+            if (-not $range) { $range = 'all' }
 
             $totalComputers=0; $activeComputers=0; $totalScans=0; $healthyEndpoints=0; $criticalAlerts=0; $uniqueEndpoints=0; $completedScans=0; $failedScans=0; $inProgressScans=0; $averageScanTime=$null; $lastScan=$null; $excellentCount=0; $goodCount=0; $fairCount=0; $poorCount=0; $compliantEndpoints=0; $partialCompliantEndpoints=0; $collectionFailedEndpoints=0; $dellBiosUnknownEndpoints=0; $biosPasswordUnknownEndpoints=0; $metricWarningEndpoints=0
             
@@ -120,16 +96,22 @@ SELECT
     COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
     COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
 FROM scans
-WHERE COALESCE(is_deleted, false) = false $timeFilter;
+WHERE COALESCE(is_deleted, false) = false
+  AND (
+      @range = 'all' OR
+      (@range = 'today' AND completed_at >= CURRENT_DATE) OR
+      (@range = '24h' AND completed_at >= NOW() - INTERVAL '24 hours') OR
+      (@range = '7d' AND completed_at >= NOW() - INTERVAL '7 days') OR
+      (@range = '30d' AND completed_at >= NOW() - INTERVAL '30 days')
+  );
 "@
-                $row = Invoke-PGQuery -Query $scanQuery | Select-Object -First 1
+                $row = Invoke-PGQuery -Query $scanQuery -Parameters @{ range = $range } | Select-Object -First 1
                 if ($row) {
                     $totalScans=[int]$row.total_scans; $healthyEndpoints=[int]$row.healthy_endpoints; $criticalAlerts=[int]$row.critical_alerts; $uniqueEndpoints=[int]$row.unique_endpoints; $completedScans=[int]$row.completed_scans; $failedScans=[int]$row.failed_scans; $inProgressScans=[int]$row.in_progress_scans; $averageScanTime = if ($row.average_scan_time -ne $null) { [double]$row.average_scan_time } else { $null }; $lastScan=$row.last_scan; $excellentCount=[int]$row.excellent_count; $goodCount=[int]$row.good_count; $fairCount=[int]$row.fair_count; $poorCount=[int]$row.poor_count
                 }
             } catch { Write-JsonResponse $Request $Response 500 @{ success = $false; error = $_.Exception.Message }; return $true }
             
             try {
-                $compWhere = if ($complianceTimeFilter) { "$complianceTimeFilter" } else { "" }
                 $complianceQuery = @"
 SELECT
     COUNT(*) FILTER (WHERE compliance_bucket = 'Compliant')::int AS compliant_count,
@@ -143,9 +125,15 @@ SELECT
           AND (COALESCE(poweron_password,'') <> 'Configured' OR COALESCE(admin_password,'') <> 'Configured')
     )::int AS bios_password_unknown_count
 FROM v_ems_latest_compliance_classified
-$compWhere;
+WHERE (
+    @range = 'all' OR
+    (@range = 'today' AND lastchecked >= CURRENT_DATE) OR
+    (@range = '24h' AND lastchecked >= NOW() - INTERVAL '24 hours') OR
+    (@range = '7d' AND lastchecked >= NOW() - INTERVAL '7 days') OR
+    (@range = '30d' AND lastchecked >= NOW() - INTERVAL '30 days')
+);
 "@
-                $compRow = Invoke-PGQuery -Query $complianceQuery | Select-Object -First 1
+                $compRow = Invoke-PGQuery -Query $complianceQuery -Parameters @{ range = $range } | Select-Object -First 1
                 if ($compRow) {
                     $compliantEndpoints = [int]$compRow.compliant_count
                     $partialCompliantEndpoints = [int]$compRow.partial_count
