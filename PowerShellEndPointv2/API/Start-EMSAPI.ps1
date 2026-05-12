@@ -26,6 +26,7 @@ Import-Module "$ModuleRoot\Core\EMS.Auth.psm1" -Force
 
 # Load API Controllers
 Import-Module "$ModuleRoot\API\EMS.API.Admin.psm1" -Force
+Import-Module "$ModuleRoot\API\EMS.API.Auth.psm1" -Force
 Import-Module "$ModuleRoot\API\EMS.API.Inventory.psm1" -Force
 Import-Module "$ModuleRoot\API\EMS.API.Scan.psm1" -Force
 Import-Module "$ModuleRoot\API\EMS.API.Reports.psm1" -Force
@@ -200,36 +201,16 @@ try {
                 continue
             }
 
-            if ($Method -eq 'POST' -and $Path -match '^(/api)?/auth/login$') {
-                $body = Read-JsonBody $request
-                if (-not $body.username -or -not $body.password) {
-                    Write-JsonResponse $request $response 400 @{ success = $false; message = 'Username and password are required' }
-                    continue
-                }
-                $provider = Resolve-ProviderValue -ProviderInput $body.provider
-                $securePassword = ConvertTo-SecureString $body.password -AsPlainText -Force
-                $auth = Invoke-MultiProviderAuth -Username $body.username -SecurePassword $securePassword -Provider $provider -Config $Global:EMSConfig
-                
-                if (-not $auth.Success) {
-                    Write-JsonResponse $request $response 401 @{ success = $false; message = 'Authentication failed' }
-                    continue
-                }
-                
-                $role = Resolve-UserRole -Groups $auth.Groups -Config $Global:EMSConfig
-                if (-not $role) {
-                    Write-JsonResponse $request $response 403 @{ success = $false; message = 'Access denied. Missing role assignment.' }
-                    continue
-                }
-                
-                Write-JsonResponse $request $response 200 @{ success=$true; user=@{ username=$auth.User; displayName=$auth.DisplayName; role=$role; permissions=(Get-UserPermissionsObject -Role $role) } }
-                continue
-            }
+
 
             # 3. Delegate to Modular Controllers
             $handled = $false
             $modulePath = $path -replace '^/api', ''
             if (-not $modulePath.StartsWith('/')) { $modulePath = "/$modulePath" }
             
+            # Auth
+            if (-not $handled) { $handled = Invoke-AuthRoutes -Request $request -Response $response -Method $method -Path $modulePath -Config $Global:EMSConfig }
+
             # Inventory & Dashboards
             if (-not $handled) { $handled = Invoke-InventoryRoutes -Request $request -Response $response -Method $method -Path $modulePath -Config $Global:EMSConfig }
             
