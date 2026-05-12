@@ -40,12 +40,27 @@ $config = Get-Content $configPath -Raw | ConvertFrom-Json
 $config.Database.Host = $DBHost
 $config.Database.DatabaseName = $DBName
 $config.Database.Username = $DBUser
-$config.Database.Password = $DBPassword
-if ($config.API.JWTSecretKey -eq 'REPLACE_WITH_SECURE_KEY' -or $config.API.JWTSecretKey.Length -lt 32) {
-    $jwtSecret = -join ((65..90) + (97..122) + (48..57) | Get-Random -Count 32 | ForEach-Object { [char]$_ })
-    $config.API.JWTSecretKey = $jwtSecret
+
+Import-Module "$PSScriptRoot\Modules\Security\EMS.Environment.psm1" -Force
+Set-EMSEnvironmentVar -Key 'DB_PASSWORD' -Value $DBPassword -IsSensitive $true `
+                      -Description 'PostgreSQL password for ems_service'
+
+foreach ($prop in @('Password')) {
+    if ($config.Database.PSObject.Properties[$prop]) {
+        $config.Database.PSObject.Properties.Remove($prop)
+    }
 }
-$config | ConvertTo-Json -Depth 10 | Set-Content $configPath
+foreach ($prop in @('JWTSecretKey')) {
+    if ($config.API.PSObject.Properties[$prop]) {
+        $config.API.PSObject.Properties.Remove($prop)
+    }
+}
+foreach ($prop in @('BindPassword')) {
+    if ($config.LDAP.PSObject.Properties[$prop]) {
+        $config.LDAP.PSObject.Properties.Remove($prop)
+    }
+}
+$config | ConvertTo-Json -Depth 10 | Set-Content $configPath -Encoding UTF8
 Write-Host '  [OK] Configuration updated' -ForegroundColor Green
 
 if (-not $SkipDatabaseTest) {

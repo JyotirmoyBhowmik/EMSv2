@@ -1,32 +1,6 @@
-# Node.js
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnp*
-.pnp.js
-
-# Production build
-build/
-dist/
-
-# PowerShell
-*.log
-*.xml
-!Npgsql.xml
-
-# IDEs
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-Thumbs.db
+DbClient/obj/
+DbClient/bin/
+PowerShellEndPointv2/WebUI/build/
+PowerShellEndPointv2/WebUI/node_modules/
+*.tsbuildinfo
 .DS_Store
-
-# EMS Specific
-Logs/
-Config/db_password.xml
-*.csv
-!EMS_Historical_Scan_Report.csv
