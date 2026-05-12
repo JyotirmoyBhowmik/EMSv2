@@ -11,7 +11,7 @@ function Add-CorsHeaders {
 
     $Response.Headers['Access-Control-Allow-Origin']  = '*'
     $Response.Headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
-    $Response.Headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization, X-EMS-Username, X-EMS-Groups, X-EMS-Role'
+    $Response.Headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
 }
 
 function Write-JsonResponse {

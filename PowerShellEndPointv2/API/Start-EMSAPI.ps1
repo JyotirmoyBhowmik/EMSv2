@@ -139,6 +139,13 @@ try {
             $request  = $context.Request
             $response = $context.Response
             
+            foreach ($h in @('X-EMS-Username','X-EMS-Role','X-EMS-Groups','X-EMS-User')) {
+                if ($request.Headers[$h]) {
+                    Write-EMSLog -Message "Stripped client header: $h (value ignored)" -Severity Warning -Category Security
+                }
+            }
+            # Downstream code must NEVER read $request.Headers['X-EMS-*'].
+
             $method = $request.HttpMethod
             # Support both /api/... and /... for all routes
             $rawPath = $request.Url.AbsolutePath
