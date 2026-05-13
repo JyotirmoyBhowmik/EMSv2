@@ -17,17 +17,22 @@ var db = JsonDocument.Parse(json)
                      .RootElement
                      .GetProperty("Database");
 
-var connString =
-    $"Host={db.GetProperty("Host").GetString()};" +
-    $"Port={db.GetProperty("Port").GetInt32()};" +
-    $"Database={db.GetProperty("DatabaseName").GetString()};" +
-    $"Username={db.GetProperty("Username").GetString()};" +
-    $"Password={db.GetProperty("Password").GetString()};";
+var csb = new NpgsqlConnectionStringBuilder {
+    Host                   = db.GetProperty("Host").GetString(),
+    Port                   = db.GetProperty("Port").GetInt32(),
+    Database               = db.GetProperty("DatabaseName").GetString(),
+    Username               = db.GetProperty("Username").GetString(),
+    Password               = Environment.GetEnvironmentVariable("EMS_DB_PASSWORD")
+                             ?? throw new InvalidOperationException("EMS_DB_PASSWORD not set"),
+    SslMode                = SslMode.Require,
+    TrustServerCertificate = false,
+    ApplicationName        = "EMSv2.DbClient"
+};
 
 try
 {
-    using var conn = new NpgsqlConnection(connString);
-    conn.Open();
+    using var conn = new NpgsqlConnection(csb.ConnectionString);
+    await conn.OpenAsync();
 
     Console.WriteLine(
         JsonSerializer.Serialize(new {

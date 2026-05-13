@@ -8,13 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="Npgsql">
-      <HintPath>D:\ZORO\Lib\Npgsql.dll</HintPath>
-    </Reference>
-
-    <Reference Include="Microsoft.Extensions.Logging.Abstractions">
-      <HintPath>D:\ZORO\Lib\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
-    </Reference>
+    <PackageReference Include="Npgsql" Version="8.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
   </ItemGroup>
 
 </Project>
