@@ -164,12 +164,7 @@ try {
             $request  = $context.Request
             $response = $context.Response
             
-            foreach ($h in @('X-EMS-Username','X-EMS-Role','X-EMS-Groups','X-EMS-User')) {
-                if ($request.Headers[$h]) {
-                    Write-EMSLog -Message "Stripped client header: $h (value ignored)" -Severity Warning -Category Security
-                }
-            }
-            # Downstream code must NEVER read $request.Headers['X-EMS-*'].
+            # 1.4 Route Processing
 
             $method = $request.HttpMethod
             # Support both /api/... and /... for all routes
@@ -209,16 +204,10 @@ try {
                     if ($limitInfo.Count -gt $RateLimitMaxRequests) {
                         Write-EMSLog -Message "Rate limit exceeded for IP: $clientIp" -Severity Warning -Category "Security"
                         Add-EMSCORSHeaders -Request $request -Response $response -Config $Global:EMSConfig
-                        Write-JsonResponse $request $response 429 @{ success = $false; error = "Too Many Requests. Please try again later." }
+                        Write-EMSJsonResponse $request $response 429 @{ success = $false; error = "Too Many Requests. Please try again later." }
                         continue
                     }
                 }
-            }
-
-            # 1.6 Health Check / Root
-            if ($Method -eq 'GET' -and $Path -eq '/') {
-                Write-JsonResponse $request $response 200 @{ success = $true; version = '5.0.0-Enterprise'; status = 'Running' }
-                continue
             }
 
             # 1.6 Health Check / Root
@@ -232,7 +221,7 @@ try {
                 $providers = $Global:EMSConfig.Authentication.Providers | Where-Object Enabled | Sort-Object Priority | ForEach-Object {
                     [pscustomobject]@{ Name=$_.Name; DisplayName="$($_.Name) Authentication"; RequiresCredentials=$true; Priority=[int]$_.Priority; Id=$_.Name; Value=$_.Name; Label="$($_.Name) Authentication" }
                 }
-                Write-JsonResponse $request $response 200 @{ providers = $providers; defaultProvider = if ($providers.Count -gt 0) { $providers[0].Name } else { $null } }
+                Write-EMSJsonResponse $request $response 200 @{ providers = $providers; defaultProvider = if ($providers.Count -gt 0) { $providers[0].Name } else { $null } }
                 continue
             }
 
@@ -240,22 +229,22 @@ try {
                 if (-not (Test-ViewerAccessRequirement -Request $request -Response $response -Config $Global:EMSConfig)) { continue }
                 $ctx  = Get-RequestUserContext -Request $request
                 $role = Resolve-UserRole -Groups $ctx.Groups -Config $Global:EMSConfig
-                Write-JsonResponse $request $response 200 @{ valid = $true; role = $role; permissions = (Get-UserPermissionsObject -Role $role) }
+                Write-EMSJsonResponse $request $response 200 @{ valid = $true; role = $role; permissions = (Get-UserPermissionsObject -Role $role) }
                 continue
             }
 
             if ($Method -eq 'POST' -and $Path -match '^(/api)?/auth/login$') {
                 $body = Read-JsonBody $request
                 if (-not $body.username -or -not $body.password) {
-                    Write-JsonResponse $request $response 400 @{ success = $false; message = 'Username and password are required' }
+                    Write-EMSJsonResponse $request $response 400 @{ success = $false; message = 'Username and password are required' }
                     continue
                 }
 
                 $maxAttempts = if ($Global:EMSConfig.Authentication.MaxFailedAttempts) { $Global:EMSConfig.Authentication.MaxFailedAttempts } else { 5 }
                 if (-not (Test-EMSRateLimit -Key "login:$($body.username)" -Max $maxAttempts -WindowSec 300)) {
                     Write-EMSLog -Message "Login rate limit exceeded for user: $($body.username)" -Severity Warning -Category "Security"
-                    Add-CorsHeaders -Request $request -Response $response
-                    Write-JsonResponse $request $response 429 @{ success = $false; error = "Too many failed login attempts. Please try again later." }
+                    Add-EMSCORSHeaders -Request $request -Response $response -Config $Global:EMSConfig
+                    Write-EMSJsonResponse $request $response 429 @{ success = $false; error = "Too many failed login attempts. Please try again later." }
                     continue
                 }
 
@@ -264,17 +253,17 @@ try {
                 $auth = Invoke-MultiProviderAuth -Username $body.username -SecurePassword $securePassword -Provider $provider -Config $Global:EMSConfig
                 
                 if (-not $auth.Success) {
-                    Write-JsonResponse $request $response 401 @{ success = $false; message = 'Authentication failed' }
+                    Write-EMSJsonResponse $request $response 401 @{ success = $false; message = 'Authentication failed' }
                     continue
                 }
                 
                 $role = Resolve-UserRole -Groups $auth.Groups -Config $Global:EMSConfig
                 if (-not $role) {
-                    Write-JsonResponse $request $response 403 @{ success = $false; message = 'Access denied. Missing role assignment.' }
+                    Write-EMSJsonResponse $request $response 403 @{ success = $false; message = 'Access denied. Missing role assignment.' }
                     continue
                 }
                 
-                Write-JsonResponse $request $response 200 @{ success=$true; user=@{ username=$auth.User; displayName=$auth.DisplayName; role=$role; permissions=(Get-UserPermissionsObject -Role $role) } }
+                Write-EMSJsonResponse $request $response 200 @{ success=$true; user=@{ username=$auth.User; displayName=$auth.DisplayName; role=$role; permissions=(Get-UserPermissionsObject -Role $role) } }
                 continue
             }
 
@@ -303,7 +292,7 @@ try {
 
             # 4. Final Fallback
             if (-not $handled) {
-                Write-JsonResponse $request $response 404 @{ error = "Endpoint '$method $path' not found (Raw: $rawPath)" }
+                Write-EMSJsonResponse $request $response 404 @{ error = "Endpoint '$method $path' not found (Raw: $rawPath)" }
             }
 
             # 5. Telemetry
@@ -315,7 +304,7 @@ try {
             $err = $_.Exception.Message
             Write-EMSLog -Message "Request Error ($path): $err" -Severity Error
             if ($context -and $context.Response) {
-                try { Write-JsonResponse $context.Request $context.Response 500 @{ error = $err } } catch {}
+                try { Write-EMSJsonResponse $context.Request $context.Response 500 @{ error = $err } } catch {}
             }
         }
     }
