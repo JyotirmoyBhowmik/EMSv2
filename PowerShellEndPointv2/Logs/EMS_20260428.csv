@@ -1,0 +1,589 @@
+"Timestamp","Severity","Category","User","Target","CorrelationId","Message"
+"2026-04-28 12:10:58","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 12:10:58","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 12:10:58","Info","General","appuser","","","EMS REST API starting (Production Mode)"
+"2026-04-28 12:10:58","Success","General","appuser","","","EMS API listening on port 5000"
+"2026-04-28 12:16:15","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 12:16:15","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 12:16:15","Info","General","appuser","","","EMS REST API starting (Production Mode)"
+"2026-04-28 12:16:15","Success","General","appuser","","","EMS API listening on port 5000"
+"2026-04-28 12:17:10","Info","General","appuser","","","Request: GET /auth/login"
+"2026-04-28 12:17:28","Info","General","appuser","","","Request: GET /auth/login"
+"2026-04-28 12:27:01","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 12:27:01","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 12:27:01","Info","General","appuser","","","EMS REST API starting (Production Mode)"
+"2026-04-28 12:27:01","Success","General","appuser","","","EMS API listening on port 5000"
+"2026-04-28 12:28:27","Info","General","appuser","","","Request: POST /auth/login"
+"2026-04-28 12:29:14","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 12:29:14","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 12:29:14","Info","General","appuser","","","Request: GET /favicon.ico"
+"2026-04-28 12:29:14","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 12:30:06","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 12:30:06","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 12:30:06","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 12:30:10","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 12:30:10","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 12:30:10","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 12:30:11","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 12:30:11","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 12:30:11","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 12:30:12","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 12:30:12","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 12:30:12","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 12:30:45","Info","General","appuser","","","Request: POST /scan/single"
+"2026-04-28 12:34:01","Info","General","appuser","","","Request: GET /scan/status"
+"2026-04-28 12:34:01","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42883: operator does not exist: uuid = text"""
+"2026-04-28 12:34:01","Error","Database","appuser","","","Query: SELECT status FROM scans WHERE scan_id=@id"
+"2026-04-28 12:41:39","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 12:41:39","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 12:41:39","Info","General","appuser","","","EMS REST API starting (Production Mode)"
+"2026-04-28 12:41:39","Success","General","appuser","","","EMS API listening on port 5000"
+"2026-04-28 12:50:19","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 12:50:19","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 12:50:19","Info","General","appuser","","","EMS REST API starting (Production Mode)"
+"2026-04-28 12:50:19","Success","General","appuser","","","EMS API listening on port 5000"
+"2026-04-28 12:51:27","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 12:51:27","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 12:51:27","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 12:51:33","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 12:51:33","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 12:51:33","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 12:57:55","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 12:57:55","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 12:57:55","Info","General","appuser","","","EMS REST API starting (Production Mode)"
+"2026-04-28 12:57:55","Success","General","appuser","","","EMS API listening on port 5000"
+"2026-04-28 12:58:44","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 12:59:04","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 12:59:05","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 12:59:05","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 12:59:05","Info","General","appuser","","","Request: GET /favicon.ico"
+"2026-04-28 12:59:05","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 12:59:05","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 12:59:05","Info","General","appuser","","","Request: GET /favicon.ico"
+"2026-04-28 12:59:05","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 12:59:05","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 12:59:05","Info","General","appuser","","","Request: GET /favicon.ico"
+"2026-04-28 13:02:49","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 13:02:49","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 13:03:26","Info","Authentication","appuser","snpl\000870","","Auth attempt via ActiveDirectory"
+"2026-04-28 13:03:26","Error","Authentication","appuser","","","Unsupported auth provider: ActiveDirectory"
+"2026-04-28 13:05:41","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 13:05:41","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 13:08:07","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 13:08:07","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 13:08:40","Warning","General","appuser","","","Get-ADUser fallback failed for snpl\000870 : The server has rejected the client credentials."
+"2026-04-28 13:14:12","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 13:14:12","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 13:14:12","Info","General","appuser","","","EMS REST API starting (Production Mode)"
+"2026-04-28 13:14:12","Success","General","appuser","","","EMS API listening on port 5000"
+"2026-04-28 13:14:57","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:14:57","Info","General","appuser","","","Request: GET /favicon.ico"
+"2026-04-28 13:14:57","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:14:57","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:15:02","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:15:02","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:15:02","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:15:19","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:15:19","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:15:19","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:18:22","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:18:22","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:18:22","Info","General","appuser","","","Request: GET /favicon.ico"
+"2026-04-28 13:18:22","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:18:25","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:18:25","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:18:25","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:19:52","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 13:19:53","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 13:20:24","Info","Authentication","appuser","snpl\000870","","Auth attempt via ActiveDirectory"
+"2026-04-28 13:20:24","Error","Authentication","appuser","","","Unsupported auth provider: ActiveDirectory"
+"2026-04-28 13:20:42","Info","Authentication","appuser","snpl\000870","","Auth attempt via ActiveDirectory"
+"2026-04-28 13:20:42","Error","Authentication","appuser","","","Unsupported auth provider: ActiveDirectory"
+"2026-04-28 13:20:52","Info","Authentication","appuser","admin","","Auth attempt via Standalone"
+"2026-04-28 13:23:01","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 13:23:01","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 13:23:01","Info","General","appuser","","","EMS REST API starting (Production Mode)"
+"2026-04-28 13:23:01","Success","General","appuser","","","EMS API listening on port 5000"
+"2026-04-28 13:23:32","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:23:32","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:23:32","Info","General","appuser","","","Request: GET /favicon.ico"
+"2026-04-28 13:23:32","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:24:31","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:25:03","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:25:03","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:25:03","Info","General","appuser","","","Request: GET /favicon.ico"
+"2026-04-28 13:25:03","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:25:04","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:25:05","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:25:05","Info","General","appuser","","","Request: GET /favicon.ico"
+"2026-04-28 13:25:05","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:25:06","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:25:06","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:25:07","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:25:07","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:25:07","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:25:07","Info","General","appuser","","","Request: GET /favicon.ico"
+"2026-04-28 13:25:07","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:25:08","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:25:09","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:25:10","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:25:10","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:25:11","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:25:11","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:25:11","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:25:12","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:25:12","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:25:12","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:25:13","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:25:14","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:25:15","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:25:15","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:25:15","Info","General","appuser","","","Request: GET /favicon.ico"
+"2026-04-28 13:25:15","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:33:03","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 13:33:03","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 13:33:03","Info","General","appuser","","","EMS REST API starting (Production Mode)"
+"2026-04-28 13:33:03","Success","General","appuser","","","EMS API listening on port 5000"
+"2026-04-28 13:33:18","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:33:19","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:33:19","Info","General","appuser","","","Request: GET /favicon.ico"
+"2026-04-28 13:33:19","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:33:20","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:33:20","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:33:20","Info","General","appuser","","","Request: GET /favicon.ico"
+"2026-04-28 13:33:20","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:33:21","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:33:21","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:33:22","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:33:22","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:33:22","Info","General","appuser","","","Request: GET /favicon.ico"
+"2026-04-28 13:33:22","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:33:29","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:33:29","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:33:29","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:34:42","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:34:42","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:34:42","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:37:26","Info","General","appuser","","","Request: GET /api/auth/providers"
+"2026-04-28 13:37:26","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:37:26","Info","General","appuser","","","Request: GET /auth/providers"
+"2026-04-28 13:51:48","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 13:51:48","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 13:51:48","Info","General","appuser","","","EMS REST API starting (Production Mode)"
+"2026-04-28 13:53:57","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 13:53:57","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 13:54:11","Info","Authentication","appuser","snpl\000870","","Auth attempt via ActiveDirectory"
+"2026-04-28 13:54:11","Error","Authentication","appuser","","","Unsupported auth provider: ActiveDirectory"
+"2026-04-28 13:54:25","Info","Authentication","appuser","snpl\000870","","Auth attempt via ActiveDirectory"
+"2026-04-28 13:54:25","Error","Authentication","appuser","","","Unsupported auth provider: ActiveDirectory"
+"2026-04-28 13:55:58","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 13:55:58","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 13:56:12","Warning","General","appuser","","","Get-ADUser fallback failed for snpl\000870 : The server has rejected the client credentials."
+"2026-04-28 13:57:47","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""23505: duplicate key value violates unique constraint ""computers_pkey"""""
+"2026-04-28 13:57:47","Error","Database","appuser","","","Query: INSERT INTO computers (computer_name, ip_address, computer_type, operating_system, domain)
+VALUES ('ktmmislprajupds', '10.192.10.207', 'Laptop', '', '');"
+"2026-04-28 13:59:02","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""23505: duplicate key value violates unique constraint ""computers_pkey"""""
+"2026-04-28 13:59:02","Error","Database","appuser","","","Query: INSERT INTO computers (computer_name, ip_address, computer_type, operating_system, domain)
+VALUES ('ktmmislprajupds', '10.192.10.207', 'Laptop', '', '');"
+"2026-04-28 13:59:05","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""23505: duplicate key value violates unique constraint ""computers_pkey"""""
+"2026-04-28 13:59:05","Error","Database","appuser","","","Query: INSERT INTO computers (computer_name, ip_address, computer_type, operating_system, domain)
+VALUES ('ktmmislprajupds', '10.192.10.207', 'Laptop', '', '');"
+"2026-04-28 13:59:20","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""23505: duplicate key value violates unique constraint ""computers_pkey"""""
+"2026-04-28 13:59:20","Error","Database","appuser","","","Query: INSERT INTO computers (computer_name, ip_address, computer_type, operating_system, domain)
+VALUES ('ktmmislprajupds', '10.192.10.207', 'Laptop', '', '');"
+"2026-04-28 14:17:06","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 14:17:06","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 14:18:21","Warning","General","appuser","","","Get-ADUser fallback failed for snpl\000870 : The server has rejected the client credentials."
+"2026-04-28 14:19:45","Warning","General","appuser","","","Get-ADUser fallback failed for snpl\000870 : The server has rejected the client credentials."
+"2026-04-28 14:21:58","Warning","General","appuser","","","Get-ADUser fallback failed for snpl\000870 : The server has rejected the client credentials."
+"2026-04-28 14:35:11","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 14:35:11","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 15:00:47","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 15:00:47","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 15:02:08","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""ad_username"" does not exist"""
+"2026-04-28 15:02:08","Error","Database","appuser","","","Query: SELECT
+    computer_name,
+    ad_username,
+    display_name,
+    email,
+    department,
+    title,
+    last_logon
+FROM computer_ad_users
+WHERE computer_name = @computerName
+ORDER BY ad_username;"
+"2026-04-28 15:19:04","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 15:19:04","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 15:19:28","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 15:19:28","Info","Scan","appuser","ktmmislprajupds","","Scan started"
+"2026-04-28 15:19:31","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 15:19:31","Error","Database","appuser","","","Query: UPDATE scans
+SET
+    status='completed',
+    health_score=@hs,
+    critical_alerts=@c,
+    warning_alerts=@w,
+    info_alerts=@i,
+    execution_time_sec=@d,
+    result_json=@json,
+    completed_at=NOW()
+WHERE scan_id=@id;"
+"2026-04-28 15:19:31","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 15:19:31","Error","Scan","appuser","ktmmislprajupds","","Scan failed: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 15:20:25","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 15:20:25","Info","Scan","appuser","ktmmislprajupds","","Scan started"
+"2026-04-28 15:20:28","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 15:20:28","Error","Database","appuser","","","Query: UPDATE scans
+SET
+    status='completed',
+    health_score=@hs,
+    critical_alerts=@c,
+    warning_alerts=@w,
+    info_alerts=@i,
+    execution_time_sec=@d,
+    result_json=@json,
+    completed_at=NOW()
+WHERE scan_id=@id;"
+"2026-04-28 15:20:28","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 15:20:28","Error","Scan","appuser","ktmmislprajupds","","Scan failed: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 15:53:17","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 15:53:17","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 15:54:05","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 15:54:05","Info","Scan","appuser","ktmmislprajupds","","Scan started"
+"2026-04-28 15:54:07","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 15:54:07","Info","Scan","appuser","ktmmislprajupds","","Scan started"
+"2026-04-28 15:54:08","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 15:54:08","Info","Scan","appuser","ktmmislprajupds","","Scan started"
+"2026-04-28 15:54:08","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 15:54:08","Error","Database","appuser","","","Query: UPDATE scans
+SET
+    status             = 'completed',
+    health_score       = @hs,
+    critical_alerts    = @c,
+    warning_alerts     = @w,
+    info_alerts        = @i,
+    execution_time_sec = @d,
+    result_json        = @json,
+    completed_at       = NOW()
+WHERE scan_id = @scanId;"
+"2026-04-28 15:54:08","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 15:54:08","Error","Scan","appuser","ktmmislprajupds","","Scan failed: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 15:54:09","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 15:54:09","Info","Scan","appuser","ktmmislprajupds","","Scan started"
+"2026-04-28 15:54:10","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 15:54:10","Info","Scan","appuser","ktmmislprajupds","","Scan started"
+"2026-04-28 15:54:10","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 15:54:10","Error","Database","appuser","","","Query: UPDATE scans
+SET
+    status             = 'completed',
+    health_score       = @hs,
+    critical_alerts    = @c,
+    warning_alerts     = @w,
+    info_alerts        = @i,
+    execution_time_sec = @d,
+    result_json        = @json,
+    completed_at       = NOW()
+WHERE scan_id = @scanId;"
+"2026-04-28 15:54:10","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 15:54:10","Error","Scan","appuser","ktmmislprajupds","","Scan failed: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 15:54:11","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 15:54:11","Error","Database","appuser","","","Query: UPDATE scans
+SET
+    status             = 'completed',
+    health_score       = @hs,
+    critical_alerts    = @c,
+    warning_alerts     = @w,
+    info_alerts        = @i,
+    execution_time_sec = @d,
+    result_json        = @json,
+    completed_at       = NOW()
+WHERE scan_id = @scanId;"
+"2026-04-28 15:54:11","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 15:54:11","Error","Scan","appuser","ktmmislprajupds","","Scan failed: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 15:54:12","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 15:54:12","Error","Database","appuser","","","Query: UPDATE scans
+SET
+    status             = 'completed',
+    health_score       = @hs,
+    critical_alerts    = @c,
+    warning_alerts     = @w,
+    info_alerts        = @i,
+    execution_time_sec = @d,
+    result_json        = @json,
+    completed_at       = NOW()
+WHERE scan_id = @scanId;"
+"2026-04-28 15:54:12","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 15:54:12","Error","Scan","appuser","ktmmislprajupds","","Scan failed: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 15:54:13","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 15:54:13","Error","Database","appuser","","","Query: UPDATE scans
+SET
+    status             = 'completed',
+    health_score       = @hs,
+    critical_alerts    = @c,
+    warning_alerts     = @w,
+    info_alerts        = @i,
+    execution_time_sec = @d,
+    result_json        = @json,
+    completed_at       = NOW()
+WHERE scan_id = @scanId;"
+"2026-04-28 15:54:13","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 15:54:13","Error","Scan","appuser","ktmmislprajupds","","Scan failed: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 15:54:24","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 15:54:24","Info","Scan","appuser","ktmmislprajupds","","Scan started"
+"2026-04-28 15:54:27","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 15:54:27","Error","Database","appuser","","","Query: UPDATE scans
+SET
+    status             = 'completed',
+    health_score       = @hs,
+    critical_alerts    = @c,
+    warning_alerts     = @w,
+    info_alerts        = @i,
+    execution_time_sec = @d,
+    result_json        = @json,
+    completed_at       = NOW()
+WHERE scan_id = @scanId;"
+"2026-04-28 15:54:27","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 15:54:27","Error","Scan","appuser","ktmmislprajupds","","Scan failed: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 16:19:20","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 16:19:20","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 16:19:51","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 16:19:51","Info","Scan","appuser","ktmmislprajupds","","Scan started"
+"2026-04-28 16:19:54","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 16:19:54","Error","Database","appuser","","","Query: UPDATE scans
+SET
+    status             = 'completed',
+    health_score       = @hs,
+    critical_alerts    = @c,
+    warning_alerts     = @w,
+    info_alerts        = @i,
+    execution_time_sec = @d,
+    result_json        = @json,
+    completed_at       = NOW()
+WHERE scan_id = @scanId;"
+"2026-04-28 16:19:54","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 16:19:54","Error","Scan","appuser","ktmmislprajupds","","Scan failed: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 16:20:33","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 16:20:33","Info","Scan","appuser","10.192.10.257","","Scan started"
+"2026-04-28 16:20:33","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 16:20:33","Error","Scan","appuser","10.192.10.257","","Scan failed: Testing connection to computer '10.192.10.257' failed: Cannot resolve the target name."
+"2026-04-28 16:20:42","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 16:20:42","Info","Scan","appuser","10.192.10.257","","Scan started"
+"2026-04-28 16:20:42","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 16:20:42","Error","Scan","appuser","10.192.10.257","","Scan failed: Testing connection to computer '10.192.10.257' failed: Cannot resolve the target name."
+"2026-04-28 16:21:17","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 16:21:17","Info","Scan","appuser","ktmmislprajupds","","Scan started"
+"2026-04-28 16:21:20","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 16:21:20","Error","Database","appuser","","","Query: UPDATE scans
+SET
+    status             = 'completed',
+    health_score       = @hs,
+    critical_alerts    = @c,
+    warning_alerts     = @w,
+    info_alerts        = @i,
+    execution_time_sec = @d,
+    result_json        = @json,
+    completed_at       = NOW()
+WHERE scan_id = @scanId;"
+"2026-04-28 16:21:20","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 16:21:20","Error","Scan","appuser","ktmmislprajupds","","Scan failed: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 16:48:25","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 16:48:26","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 16:48:44","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 16:48:44","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 16:56:47","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 16:56:47","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:01:03","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:01:03","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:03:08","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:03:08","Info","Scan","appuser","ktmmislprajupds","","Scan started"
+"2026-04-28 17:03:11","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 17:03:11","Error","Database","appuser","","","Query: UPDATE scans
+SET
+    status             = 'completed',
+    health_score       = @hs,
+    critical_alerts    = @c,
+    warning_alerts     = @w,
+    info_alerts        = @i,
+    execution_time_sec = @d,
+    result_json        = @json,
+    completed_at       = NOW()
+WHERE scan_id = @scanId;"
+"2026-04-28 17:03:11","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:03:11","Error","Scan","appuser","ktmmislprajupds","","Scan failed: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 17:06:29","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:06:29","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:07:12","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:07:12","Info","Scan","appuser","ktmmislprajupds","","Scan started"
+"2026-04-28 17:07:14","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42883: operator does not exist: uuid = text"""
+"2026-04-28 17:07:14","Error","Database","appuser","","","Query: SELECT
+    scan_id,
+    target,
+    status,
+    started_at,
+    completed_at,
+    error_message
+FROM scans
+WHERE scan_id = @scanId
+LIMIT 1;"
+"2026-04-28 17:07:15","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 17:07:15","Error","Database","appuser","","","Query: UPDATE scans
+SET
+    status             = 'completed',
+    health_score       = @hs,
+    critical_alerts    = @c,
+    warning_alerts     = @w,
+    info_alerts        = @i,
+    execution_time_sec = @d,
+    result_json        = @json,
+    completed_at       = NOW()
+WHERE scan_id = @scanId;"
+"2026-04-28 17:07:15","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:07:15","Error","Scan","appuser","ktmmislprajupds","","Scan failed: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 17:07:44","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:07:44","Info","Scan","appuser","ktmmisdtkumarar","","Scan started"
+"2026-04-28 17:07:46","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42883: operator does not exist: uuid = text"""
+"2026-04-28 17:07:46","Error","Database","appuser","","","Query: SELECT
+    scan_id,
+    target,
+    status,
+    started_at,
+    completed_at,
+    error_message
+FROM scans
+WHERE scan_id = @scanId
+LIMIT 1;"
+"2026-04-28 17:07:47","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 17:07:47","Error","Database","appuser","","","Query: UPDATE scans
+SET
+    status             = 'completed',
+    health_score       = @hs,
+    critical_alerts    = @c,
+    warning_alerts     = @w,
+    info_alerts        = @i,
+    execution_time_sec = @d,
+    result_json        = @json,
+    completed_at       = NOW()
+WHERE scan_id = @scanId;"
+"2026-04-28 17:07:47","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:07:47","Error","Scan","appuser","ktmmisdtkumarar","","Scan failed: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 17:08:29","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:08:30","Info","Scan","appuser","ktmmisdtkumarar","","Scan started"
+"2026-04-28 17:08:32","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42883: operator does not exist: uuid = text"""
+"2026-04-28 17:08:32","Error","Database","appuser","","","Query: SELECT
+    scan_id,
+    target,
+    status,
+    started_at,
+    completed_at,
+    error_message
+FROM scans
+WHERE scan_id = @scanId
+LIMIT 1;"
+"2026-04-28 17:08:33","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 17:08:33","Error","Database","appuser","","","Query: UPDATE scans
+SET
+    status             = 'completed',
+    health_score       = @hs,
+    critical_alerts    = @c,
+    warning_alerts     = @w,
+    info_alerts        = @i,
+    execution_time_sec = @d,
+    result_json        = @json,
+    completed_at       = NOW()
+WHERE scan_id = @scanId;"
+"2026-04-28 17:08:33","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:08:33","Error","Scan","appuser","ktmmisdtkumarar","","Scan failed: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 17:10:24","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:10:24","Info","Scan","appuser","ktmmislprajupds","","Scan started"
+"2026-04-28 17:10:26","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42883: operator does not exist: uuid = text"""
+"2026-04-28 17:10:26","Error","Database","appuser","","","Query: SELECT
+    scan_id,
+    target,
+    status,
+    started_at,
+    completed_at,
+    error_message
+FROM scans
+WHERE scan_id = @scanId
+LIMIT 1;"
+"2026-04-28 17:10:27","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 17:10:27","Error","Database","appuser","","","Query: UPDATE scans
+SET
+    status             = 'completed',
+    health_score       = @hs,
+    critical_alerts    = @c,
+    warning_alerts     = @w,
+    info_alerts        = @i,
+    execution_time_sec = @d,
+    result_json        = @json,
+    completed_at       = NOW()
+WHERE scan_id = @scanId;"
+"2026-04-28 17:10:27","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:10:27","Error","Scan","appuser","ktmmislprajupds","","Scan failed: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 17:10:39","Warning","General","appuser","","","Get-ADUser fallback failed for snpl\000870 : The server has rejected the client credentials."
+"2026-04-28 17:16:42","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:16:42","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:17:18","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:17:18","Info","Scan","appuser","ktmmislprajupds","","Scan started"
+"2026-04-28 17:17:21","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 17:17:21","Error","Database","appuser","","","Query: UPDATE scans
+SET
+    status             = 'completed',
+    health_score       = @hs,
+    critical_alerts    = @c,
+    warning_alerts     = @w,
+    info_alerts        = @i,
+    execution_time_sec = @d,
+    result_json        = @json,
+    completed_at       = NOW()
+WHERE scan_id = @scanId;"
+"2026-04-28 17:17:21","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:17:21","Error","Scan","appuser","ktmmislprajupds","","Scan failed: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 17:17:44","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:17:44","Info","Scan","appuser","ktmmislprajupds","","Scan started"
+"2026-04-28 17:17:47","Error","Database","appuser","","","PG query error: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 17:17:47","Error","Database","appuser","","","Query: UPDATE scans
+SET
+    status             = 'completed',
+    health_score       = @hs,
+    critical_alerts    = @c,
+    warning_alerts     = @w,
+    info_alerts        = @i,
+    execution_time_sec = @d,
+    result_json        = @json,
+    completed_at       = NOW()
+WHERE scan_id = @scanId;"
+"2026-04-28 17:17:47","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:17:47","Error","Scan","appuser","ktmmislprajupds","","Scan failed: Exception calling ""ExecuteNonQuery"" with ""0"" argument(s): ""42804: column ""result_json"" is of type jsonb but expression is of type text"""
+"2026-04-28 17:31:46","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:31:46","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:41:44","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:41:44","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:42:13","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:42:13","Info","Scan","appuser","KTMMISLPRAJUPDS","","Scan started"
+"2026-04-28 17:42:17","Success","Scan","appuser","KTMMISLPRAJUPDS","","Scan completed successfully"
+"2026-04-28 17:42:43","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:42:43","Info","Scan","appuser","ktmmislprajupds","","Scan started"
+"2026-04-28 17:42:46","Success","Scan","appuser","ktmmislprajupds","","Scan completed successfully"
+"2026-04-28 17:44:09","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 17:44:09","Info","Scan","appuser","KTMMISDTKUMARAR","","Scan started"
+"2026-04-28 17:44:12","Success","Scan","appuser","KTMMISDTKUMARAR","","Scan completed successfully"
+"2026-04-28 18:39:33","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 18:39:33","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 18:46:18","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 18:46:18","Info","Scan","appuser","ktmmislprajupds","","Scan started"
+"2026-04-28 18:46:21","Success","Scan","appuser","ktmmislprajupds","","Scan completed successfully"
+"2026-04-28 18:46:50","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 18:46:50","Info","Scan","appuser","ktmmislprajupds","","Scan started"
+"2026-04-28 18:46:53","Success","Scan","appuser","ktmmislprajupds","","Scan completed successfully"
+"2026-04-28 18:47:20","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 18:47:20","Info","Scan","appuser","ktmmislpnpathak","","Scan started"
+"2026-04-28 18:47:23","Success","Scan","appuser","ktmmislpnpathak","","Scan completed successfully"
+"2026-04-28 22:37:23","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 22:37:23","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 22:38:12","Warning","General","appuser","","","Get-ADUser fallback failed for snpl\000870 : The server has rejected the client credentials."
+"2026-04-28 22:38:39","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 22:38:40","Info","Scan","appuser","ktmmisdtkumarar","","Scan started"
+"2026-04-28 22:38:43","Success","Scan","appuser","ktmmisdtkumarar","","Scan completed successfully"
+"2026-04-28 23:18:59","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"
+"2026-04-28 23:18:59","Info","Database","appuser","","","PostgreSQL initialized (ems_production)"

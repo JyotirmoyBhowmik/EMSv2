@@ -1,0 +1,163 @@
+"Timestamp","Severity","Category","User","Target","CorrelationId","Message"
+"2026-05-08 09:52:06","Info","Database","jyotu","","","PostgreSQL initialized (ems_production)"
+"2026-05-08 09:52:06","Error","General","jyotu","","","Critical Service Failure: Exception calling ""Start"" with ""0"" argument(s): ""Access is denied."""
+"2026-05-08 09:53:02","Info","Database","jyotu","","","PostgreSQL initialized (ems_production)"
+"2026-05-08 09:53:02","Error","General","jyotu","","","Failed to start API listener: Access Denied. Requires Administrator privileges."
+"2026-05-08 10:57:39","Info","Database","jyotu","","","PostgreSQL initialized (ems_production)"
+"2026-05-08 10:57:39","Error","General","jyotu","","","Failed to start API listener: Access Denied. Requires Administrator privileges."
+"2026-05-08 10:59:06","Info","Database","jyotu","","","PostgreSQL initialized (ems_production)"
+"2026-05-08 10:59:06","Success","General","jyotu","","","API Service started on http://localhost:5005/"
+"2026-05-08 10:59:14","Error","General","jyotu","","","Request Error (/api/dashboard/stats): The term 'Require-ViewerAccess' is not recognized as a name of a cmdlet, function, script file, or executable program.
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again."
+"2026-05-08 19:46:56","Info","Database","jyotu","","","PostgreSQL initialized (ems_production)"
+"2026-05-08 19:46:56","Success","General","jyotu","","","API Service started on http://localhost:5005/"
+"2026-05-08 20:20:49","Info","Database","jyotu","","","PostgreSQL initialized (ems_production)"
+"2026-05-08 20:20:49","Success","General","jyotu","","","API Service started on http://localhost:5005/"
+"2026-05-08 20:20:58","Error","Database","jyotu","","","PG query error: Exception calling ""Open"" with ""0"" argument(s): ""28P01: password authentication failed for user ""ems_service"""""
+"2026-05-08 20:20:58","Error","Database","jyotu","","","Query: INSERT INTO audit_api_requests (method, path, username, ip_address, status_code, response_time_ms, timestamp) VALUES (@m, @p, @u, CAST(@ip AS inet), @s, @d, NOW());"
+"2026-05-08 20:20:58","Error","General","jyotu","","","Request Error (/api/dashboard/stats): Exception calling ""Open"" with ""0"" argument(s): ""28P01: password authentication failed for user ""ems_service"""""
+"2026-05-08 21:47:27","Info","Database","jyotu","","","PostgreSQL initialized (ems_production)"
+"2026-05-08 21:47:28","Error","Database","jyotu","","","PG query error: The following exception occurred while retrieving member ""Open"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-05-08 21:47:28","Error","Database","jyotu","","","Query: SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';"
+"2026-05-08 22:12:54","Info","Database","jyotu","","","PostgreSQL initialized (ems_production)"
+"2026-05-08 22:12:54","Error","Database","jyotu","","","PG query error: The following exception occurred while retrieving member ""Open"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-05-08 22:12:54","Error","Database","jyotu","","","Query: SELECT target, status, error_message, completed_at FROM scans WHERE status = 'failed' ORDER BY completed_at DESC LIMIT 10;"
+"2026-05-08 22:30:11","Info","Database","jyotu","","","PostgreSQL initialized (ems_production)"
+"2026-05-08 22:30:11","Error","Database","jyotu","","","PG query error: The following exception occurred while retrieving member ""Open"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-05-08 22:30:11","Error","Database","jyotu","","","Query: SELECT COUNT(*)::int AS total FROM computers;"
+"2026-05-08 22:30:12","Error","Database","jyotu","","","PG query error: The following exception occurred while retrieving member ""Open"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-05-08 22:30:12","Error","Database","jyotu","","","Query: SELECT COUNT(*)::int AS total FROM computers WHERE is_active = true;"
+"2026-05-08 22:30:12","Error","Database","jyotu","","","PG query error: The following exception occurred while retrieving member ""Open"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-05-08 22:30:12","Error","Database","jyotu","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(COALESCE(AVG(execution_time_sec) FILTER (WHERE status = 'completed' AND execution_time_sec IS NOT NULL),0)::numeric,2) AS average_scan_time,
+    MAX(completed_at) AS last_scan
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-08 22:30:12","Error","Database","jyotu","","","PG query error: The following exception occurred while retrieving member ""Open"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-05-08 22:30:12","Error","Database","jyotu","","","Query: SELECT
+    compliance_bucket,
+    COUNT(*)::int AS endpoint_count
+FROM v_ems_latest_compliance_classified
+GROUP BY compliance_bucket;"
+"2026-05-08 22:30:12","Error","Database","jyotu","","","PG query error: The following exception occurred while retrieving member ""Open"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-05-08 22:30:12","Error","Database","jyotu","","","Query: SELECT COUNT(*)::int AS count FROM v_ems_latest_compliance_classified WHERE compliance_issues ILIKE '%Inventory collection failed%';"
+"2026-05-08 22:30:12","Error","Database","jyotu","","","PG query error: The following exception occurred while retrieving member ""Open"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-05-08 22:30:12","Error","Database","jyotu","","","Query: SELECT COUNT(*)::int AS count
+FROM v_ems_latest_compliance_classified
+WHERE COALESCE(manufacturer,'') NOT IN ('', 'Unknown')
+  AND COALESCE(model,'') NOT IN ('', 'Unknown')
+  AND COALESCE(compliance_issues,'') NOT ILIKE '%Inventory collection failed%'
+  AND (COALESCE(poweron_password,'') <> 'Configured' OR COALESCE(admin_password,'') <> 'Configured');"
+"2026-05-08 22:39:27","Error","Database","jyotu","","","PG query error: PostgreSQL connection not initialized"
+"2026-05-08 22:39:27","Error","Database","jyotu","","","Query: -- Migration: Add scan_trace table for real-time scan observability
+-- Description: Tracks individual steps of a scan in progress
+
+CREATE TABLE IF NOT EXISTS scan_trace (
+    trace_id BIGSERIAL PRIMARY KEY,
+    scan_id BIGINT NOT NULL,
+    step_name VARCHAR(100) NOT NULL,
+    module_name VARCHAR(100) NOT NULL,
+    status VARCHAR(50) DEFAULT 'Info' CHECK (status IN ('Info', 'Success', 'Warning', 'Error')),
+    message TEXT,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    -- No foreign key to scan_results because scan_results is partitioned
+    -- and we don't want trace logs to block partition routing or be deleted with partitions if we want to keep them longer.
+    -- However, for performance, we index the scan_id.
+    CONSTRAINT fk_scan_trace_scan_id FOREIGN KEY (scan_id) REFERENCES scan_results(scan_id) ON DELETE CASCADE
+) NOT PARTITIONED; -- Traces are ephemeral but useful for debugging
+
+CREATE INDEX idx_scan_trace_scan_id ON scan_trace(scan_id);
+CREATE INDEX idx_scan_trace_timestamp ON scan_trace(timestamp DESC);
+
+-- Update schema version
+INSERT INTO schema_version (version, description) 
+VALUES ('1.1.0', 'Added scan_trace table for real-time observability');
+"
+"2026-05-08 22:39:40","Error","Database","jyotu","","","PG query error: PostgreSQL connection not initialized"
+"2026-05-08 22:39:40","Error","Database","jyotu","","","Query: -- Migration: Add scan_trace table for real-time scan observability
+-- Description: Tracks individual steps of a scan in progress
+
+CREATE TABLE IF NOT EXISTS scan_trace (
+    trace_id BIGSERIAL PRIMARY KEY,
+    scan_id BIGINT NOT NULL,
+    step_name VARCHAR(100) NOT NULL,
+    module_name VARCHAR(100) NOT NULL,
+    status VARCHAR(50) DEFAULT 'Info' CHECK (status IN ('Info', 'Success', 'Warning', 'Error')),
+    message TEXT,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    -- No foreign key to scan_results because scan_results is partitioned
+    -- and we don't want trace logs to block partition routing or be deleted with partitions if we want to keep them longer.
+    -- However, for performance, we index the scan_id.
+    CONSTRAINT fk_scan_trace_scan_id FOREIGN KEY (scan_id) REFERENCES scan_results(scan_id) ON DELETE CASCADE
+) NOT PARTITIONED; -- Traces are ephemeral but useful for debugging
+
+CREATE INDEX idx_scan_trace_scan_id ON scan_trace(scan_id);
+CREATE INDEX idx_scan_trace_timestamp ON scan_trace(timestamp DESC);
+
+-- Update schema version
+INSERT INTO schema_version (version, description) 
+VALUES ('1.1.0', 'Added scan_trace table for real-time observability');
+"
+"2026-05-08 22:39:57","Info","Database","jyotu","","","PostgreSQL initialized (ems_production)"
+"2026-05-08 22:39:57","Error","Database","jyotu","","","PG query error: The following exception occurred while retrieving member ""Open"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-05-08 22:39:57","Error","Database","jyotu","","","Query: -- Migration: Add scan_trace table for real-time scan observability
+-- Description: Tracks individual steps of a scan in progress
+
+CREATE TABLE IF NOT EXISTS scan_trace (
+    trace_id BIGSERIAL PRIMARY KEY,
+    scan_id BIGINT NOT NULL,
+    step_name VARCHAR(100) NOT NULL,
+    module_name VARCHAR(100) NOT NULL,
+    status VARCHAR(50) DEFAULT 'Info' CHECK (status IN ('Info', 'Success', 'Warning', 'Error')),
+    message TEXT,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    -- No foreign key to scan_results because scan_results is partitioned
+    -- and we don't want trace logs to block partition routing or be deleted with partitions if we want to keep them longer.
+    -- However, for performance, we index the scan_id.
+    CONSTRAINT fk_scan_trace_scan_id FOREIGN KEY (scan_id) REFERENCES scan_results(scan_id) ON DELETE CASCADE
+) NOT PARTITIONED; -- Traces are ephemeral but useful for debugging
+
+CREATE INDEX idx_scan_trace_scan_id ON scan_trace(scan_id);
+CREATE INDEX idx_scan_trace_timestamp ON scan_trace(timestamp DESC);
+
+-- Update schema version
+INSERT INTO schema_version (version, description) 
+VALUES ('1.1.0', 'Added scan_trace table for real-time observability');
+"
+"2026-05-08 22:40:15","Info","Database","jyotu","","","PostgreSQL initialized (ems_production)"
+"2026-05-08 22:40:15","Error","Database","jyotu","","","PG query error: The following exception occurred while retrieving member ""Open"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-05-08 22:40:15","Error","Database","jyotu","","","Query: -- Migration: Add scan_trace table for real-time scan observability
+-- Description: Tracks individual steps of a scan in progress
+
+CREATE TABLE IF NOT EXISTS scan_trace (
+    trace_id BIGSERIAL PRIMARY KEY,
+    scan_id BIGINT NOT NULL,
+    step_name VARCHAR(100) NOT NULL,
+    module_name VARCHAR(100) NOT NULL,
+    status VARCHAR(50) DEFAULT 'Info' CHECK (status IN ('Info', 'Success', 'Warning', 'Error')),
+    message TEXT,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    -- No foreign key to scan_results because scan_results is partitioned
+    -- and we don't want trace logs to block partition routing or be deleted with partitions if we want to keep them longer.
+    -- However, for performance, we index the scan_id.
+    CONSTRAINT fk_scan_trace_scan_id FOREIGN KEY (scan_id) REFERENCES scan_results(scan_id) ON DELETE CASCADE
+) NOT PARTITIONED; -- Traces are ephemeral but useful for debugging
+
+CREATE INDEX idx_scan_trace_scan_id ON scan_trace(scan_id);
+CREATE INDEX idx_scan_trace_timestamp ON scan_trace(timestamp DESC);
+
+-- Update schema version
+INSERT INTO schema_version (version, description) 
+VALUES ('1.1.0', 'Added scan_trace table for real-time observability');
+"

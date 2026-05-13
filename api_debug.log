@@ -1,0 +1,15 @@
+﻿[2026-05-07 13:06:01] [Info] PostgreSQL initialized (ems_production)
+[2026-05-07 13:06:01] [Info] PostgreSQL initialized (ems_production)
+[INFO] EMS REST API initializing...
+========================================
+ EMS REST API (Async Scan Mode + RBAC)
+========================================
+ Address: http://10.192.6.87:5000
+ Allowed AD groups:
+   Admin   : EMS_Admins
+   Monitor : EMS_Monitor
+========================================
+[GET] 
+[GET] /favicon.ico
+[GET] 
+[GET] 

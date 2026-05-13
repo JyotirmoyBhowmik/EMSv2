@@ -1,0 +1,15 @@
+# Enterprise Endpoint Monitoring System (EMS) - Sample Target List
+
+# This CSV file demonstrates the bulk import format.
+# The system will automatically detect the column name (supports: Hostname, ComputerName, Target, IP, Computer, Name)
+# You can use either hostnames or IP addresses.
+
+# Example format:
+Hostname
+WKSTN-HO-01
+WKSTN-HO-02
+WKSTN-HO-05
+WKSTN-RM-10
+WKSTN-RM-15
+10.192.10.50
+10.192.20.25

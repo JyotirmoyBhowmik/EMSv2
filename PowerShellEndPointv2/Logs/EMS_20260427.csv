@@ -1,0 +1,225 @@
+"Timestamp","Computer","User","Severity","Category","Target","Message"
+"2026-04-27 07:35:24","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for System.Text.Encodings.Web.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 07:35:24","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for System.Text.Json.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 07:35:24","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Npgsql.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 07:35:24","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 07:35:24","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 08:00:17","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for System.Text.Encodings.Web.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 08:00:17","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for System.Text.Json.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 08:00:17","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Npgsql.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 08:00:17","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 08:00:18","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 11:11:38","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Microsoft.Bcl.AsyncInterfaces.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 11:11:38","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for System.Text.Json.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 11:11:38","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Npgsql.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 11:11:38","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 11:11:38","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 11:21:29","KTMHOEPSAUDIT","appuser","Error","General","","Standalone authentication error: Connection string not initialized."
+"2026-04-27 11:21:29","KTMHOEPSAUDIT","appuser","Info","General","","Audit: Action=Login; User=admin; Result=Failed; Details=Authentication failed for all configured providers"
+"2026-04-27 11:21:47","KTMHOEPSAUDIT","appuser","Error","General","","Standalone authentication error: Connection string not initialized."
+"2026-04-27 11:21:47","KTMHOEPSAUDIT","appuser","Info","General","","Audit: Action=Login; User=admin; Result=Failed; Details=Authentication failed for all configured providers"
+"2026-04-27 11:23:37","KTMHOEPSAUDIT","appuser","Error","General","","Standalone authentication error: Connection string not initialized."
+"2026-04-27 11:23:37","KTMHOEPSAUDIT","appuser","Info","General","","Audit: Action=Login; User=admin; Result=Failed; Details=Authentication failed for all configured providers"
+"2026-04-27 11:24:01","KTMHOEPSAUDIT","appuser","Error","General","","Standalone authentication error: Connection string not initialized."
+"2026-04-27 11:24:01","KTMHOEPSAUDIT","appuser","Info","General","","Audit: Action=Login; User=admin; Result=Failed; Details=Authentication failed for all configured providers"
+"2026-04-27 14:27:55","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 14:27:55","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 14:28:42","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Microsoft.Bcl.AsyncInterfaces.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 14:28:42","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for System.Text.Json.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 14:28:42","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Npgsql.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 14:28:43","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 14:28:43","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 14:33:58","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 14:33:58","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 14:48:45","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Microsoft.Bcl.AsyncInterfaces.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 14:48:45","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for System.Text.Json.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 14:48:46","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Npgsql.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 14:48:46","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 14:48:46","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 15:01:20","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Microsoft.Bcl.AsyncInterfaces.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 15:01:20","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for System.Text.Json.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 15:01:20","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Npgsql.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 15:01:21","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 15:01:21","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 15:11:22","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 15:11:22","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 15:16:13","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Microsoft.Bcl.AsyncInterfaces.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 15:16:13","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for System.Text.Json.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 15:16:13","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Npgsql.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 15:16:13","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 15:16:13","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 15:20:08","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 15:20:08","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 15:21:14","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Microsoft.Bcl.AsyncInterfaces.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 15:21:14","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for System.Text.Json.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 15:21:14","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Npgsql.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 15:21:14","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 15:21:14","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 15:22:18","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Microsoft.Bcl.AsyncInterfaces.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 15:22:18","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for System.Text.Json.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 15:22:18","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Npgsql.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 15:22:18","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 15:22:18","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 15:35:06","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Microsoft.Bcl.AsyncInterfaces.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 15:35:06","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for System.Text.Json.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 15:35:06","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Npgsql.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 15:35:07","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 15:35:07","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 16:07:29","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Microsoft.Bcl.AsyncInterfaces.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 16:07:30","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for System.Text.Json.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 16:07:30","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Npgsql.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 16:07:30","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 16:07:30","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 16:08:03","KTMHOEPSAUDIT","appuser","Error","General","","PostgreSQL query error: The following exception occurred while retrieving member ""Open"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-04-27 16:08:03","KTMHOEPSAUDIT","appuser","Error","General","","Query: CREATE TABLE IF NOT EXISTS user_credentials (
+    user_id          integer PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
+    password_hash    text NOT NULL,
+    password_salt    text NOT NULL,
+    is_active        boolean NOT NULL DEFAULT true,
+    created_at       timestamp NOT NULL DEFAULT now(),
+    updated_at       timestamp NULL
+)"
+"2026-04-27 16:08:03","KTMHOEPSAUDIT","appuser","Error","General","","Standalone authentication error: The following exception occurred while retrieving member ""Close"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-04-27 16:08:20","KTMHOEPSAUDIT","appuser","Error","General","","PostgreSQL query error: The following exception occurred while retrieving member ""Open"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-04-27 16:08:20","KTMHOEPSAUDIT","appuser","Error","General","","Query: CREATE TABLE IF NOT EXISTS user_credentials (
+    user_id          integer PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
+    password_hash    text NOT NULL,
+    password_salt    text NOT NULL,
+    is_active        boolean NOT NULL DEFAULT true,
+    created_at       timestamp NOT NULL DEFAULT now(),
+    updated_at       timestamp NULL
+)"
+"2026-04-27 16:08:20","KTMHOEPSAUDIT","appuser","Error","General","","Standalone authentication error: The following exception occurred while retrieving member ""Close"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-04-27 16:10:09","KTMHOEPSAUDIT","appuser","Error","General","","PostgreSQL query error: The following exception occurred while retrieving member ""Open"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-04-27 16:10:09","KTMHOEPSAUDIT","appuser","Error","General","","Query: CREATE TABLE IF NOT EXISTS user_credentials (
+    user_id          integer PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
+    password_hash    text NOT NULL,
+    password_salt    text NOT NULL,
+    is_active        boolean NOT NULL DEFAULT true,
+    created_at       timestamp NOT NULL DEFAULT now(),
+    updated_at       timestamp NULL
+)"
+"2026-04-27 16:10:09","KTMHOEPSAUDIT","appuser","Error","General","","Standalone authentication error: The following exception occurred while retrieving member ""Close"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-04-27 16:10:24","KTMHOEPSAUDIT","appuser","Error","General","","PostgreSQL query error: The following exception occurred while retrieving member ""Open"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-04-27 16:10:24","KTMHOEPSAUDIT","appuser","Error","General","","Query: CREATE TABLE IF NOT EXISTS user_credentials (
+    user_id          integer PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
+    password_hash    text NOT NULL,
+    password_salt    text NOT NULL,
+    is_active        boolean NOT NULL DEFAULT true,
+    created_at       timestamp NOT NULL DEFAULT now(),
+    updated_at       timestamp NULL
+)"
+"2026-04-27 16:10:24","KTMHOEPSAUDIT","appuser","Error","General","","Standalone authentication error: The following exception occurred while retrieving member ""Close"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-04-27 16:14:44","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Microsoft.Bcl.AsyncInterfaces.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 16:14:44","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for System.Text.Json.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 16:14:45","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Npgsql.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 16:14:45","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 16:14:45","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 16:23:48","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Microsoft.Bcl.AsyncInterfaces.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 16:23:48","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for System.Text.Json.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 16:23:48","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Npgsql.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 16:23:48","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 16:23:48","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 20:26:21","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Microsoft.Bcl.AsyncInterfaces.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 20:26:21","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for System.Text.Json.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 20:26:21","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Npgsql.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 20:26:21","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 20:26:21","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 20:29:28","KTMHOEPSAUDIT","appuser","Error","General","","PostgreSQL query error: The following exception occurred while retrieving member ""Open"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-04-27 20:29:28","KTMHOEPSAUDIT","appuser","Error","General","","Query: CREATE TABLE IF NOT EXISTS user_credentials (
+    user_id          integer PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
+    password_hash    text NOT NULL,
+    password_salt    text NOT NULL,
+    is_active        boolean NOT NULL DEFAULT true,
+    created_at       timestamp NOT NULL DEFAULT now(),
+    updated_at       timestamp NULL
+)"
+"2026-04-27 20:29:28","KTMHOEPSAUDIT","appuser","Error","General","","Standalone authentication error: The following exception occurred while retrieving member ""Close"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-04-27 20:41:52","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Microsoft.Bcl.AsyncInterfaces.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 20:41:52","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for System.Text.Json.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 20:41:52","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Npgsql.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 20:41:53","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 20:41:53","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 20:43:43","KTMHOEPSAUDIT","appuser","Error","General","","PostgreSQL query error: The following exception occurred while retrieving member ""Open"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-04-27 20:43:43","KTMHOEPSAUDIT","appuser","Error","General","","Query: CREATE TABLE IF NOT EXISTS user_credentials (
+    user_id          integer PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
+    password_hash    text NOT NULL,
+    password_salt    text NOT NULL,
+    is_active        boolean NOT NULL DEFAULT true,
+    created_at       timestamp NOT NULL DEFAULT now(),
+    updated_at       timestamp NULL
+)"
+"2026-04-27 20:43:43","KTMHOEPSAUDIT","appuser","Error","General","","Standalone authentication error: The following exception occurred while retrieving member ""Close"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-04-27 20:44:47","KTMHOEPSAUDIT","appuser","Error","General","","PostgreSQL query error: The following exception occurred while retrieving member ""Open"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-04-27 20:44:48","KTMHOEPSAUDIT","appuser","Error","General","","Query: CREATE TABLE IF NOT EXISTS user_credentials (
+    user_id          integer PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
+    password_hash    text NOT NULL,
+    password_salt    text NOT NULL,
+    is_active        boolean NOT NULL DEFAULT true,
+    created_at       timestamp NOT NULL DEFAULT now(),
+    updated_at       timestamp NULL
+)"
+"2026-04-27 20:44:48","KTMHOEPSAUDIT","appuser","Error","General","","Standalone authentication error: The following exception occurred while retrieving member ""Close"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-04-27 20:53:27","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Microsoft.Bcl.AsyncInterfaces.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 20:53:27","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for System.Text.Json.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 20:53:27","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Npgsql.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 20:53:28","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 20:53:28","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 20:54:09","KTMHOEPSAUDIT","appuser","Error","General","","PostgreSQL query error: The following exception occurred while retrieving member ""Open"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-04-27 20:54:09","KTMHOEPSAUDIT","appuser","Error","General","","Query: CREATE TABLE IF NOT EXISTS user_credentials (
+    user_id          integer PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
+    password_hash    text NOT NULL,
+    password_salt    text NOT NULL,
+    is_active        boolean NOT NULL DEFAULT true,
+    created_at       timestamp NOT NULL DEFAULT now(),
+    updated_at       timestamp NULL
+)"
+"2026-04-27 20:54:09","KTMHOEPSAUDIT","appuser","Error","General","","Standalone authentication error: The following exception occurred while retrieving member ""Close"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-04-27 20:54:32","KTMHOEPSAUDIT","appuser","Error","General","","PostgreSQL query error: The following exception occurred while retrieving member ""Open"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-04-27 20:54:32","KTMHOEPSAUDIT","appuser","Error","General","","Query: CREATE TABLE IF NOT EXISTS user_credentials (
+    user_id          integer PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
+    password_hash    text NOT NULL,
+    password_salt    text NOT NULL,
+    is_active        boolean NOT NULL DEFAULT true,
+    created_at       timestamp NOT NULL DEFAULT now(),
+    updated_at       timestamp NULL
+)"
+"2026-04-27 20:54:32","KTMHOEPSAUDIT","appuser","Error","General","","Standalone authentication error: The following exception occurred while retrieving member ""Close"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-04-27 20:57:38","KTMHOEPSAUDIT","appuser","Error","General","","PostgreSQL query error: The following exception occurred while retrieving member ""Open"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-04-27 20:57:38","KTMHOEPSAUDIT","appuser","Error","General","","Query: CREATE TABLE IF NOT EXISTS user_credentials (
+    user_id          integer PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
+    password_hash    text NOT NULL,
+    password_salt    text NOT NULL,
+    is_active        boolean NOT NULL DEFAULT true,
+    created_at       timestamp NOT NULL DEFAULT now(),
+    updated_at       timestamp NULL
+)"
+"2026-04-27 20:57:38","KTMHOEPSAUDIT","appuser","Error","General","","Standalone authentication error: The following exception occurred while retrieving member ""Close"": ""Could not load file or assembly 'System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51' or one of its dependencies. The system cannot find the file specified."""
+"2026-04-27 21:24:01","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Microsoft.Bcl.AsyncInterfaces.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 21:24:02","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for System.Text.Json.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 21:24:02","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Npgsql.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 21:24:02","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 21:24:02","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 21:29:52","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Npgsql.dll : Could not load file or assembly 'Npgsql, Version=4.1.13.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7'. Assembly with same name is already loaded"
+"2026-04-27 21:29:52","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 21:29:52","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 21:43:20","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Npgsql.dll : Could not load file or assembly 'Npgsql, Version=4.1.13.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7'. Assembly with same name is already loaded"
+"2026-04-27 21:43:20","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 21:43:20","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 23:12:33","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Microsoft.Bcl.AsyncInterfaces.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 23:12:33","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for System.Text.Json.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 23:12:33","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Npgsql.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 23:12:33","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 23:12:34","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 23:15:30","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Microsoft.Bcl.AsyncInterfaces.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 23:15:30","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for System.Text.Json.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 23:15:30","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Npgsql.dll : Unable to load one or more of the requested types. Retrieve the LoaderExceptions property for more information."
+"2026-04-27 23:15:30","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 23:15:30","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 23:19:48","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Npgsql.dll : Could not load file or assembly 'Npgsql, Version=4.1.13.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7'. Assembly with same name is already loaded"
+"2026-04-27 23:19:48","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 23:19:48","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 23:49:02","KTMHOEPSAUDIT","appuser","Warning","General","","Assembly load failed for Npgsql.dll : Could not load file or assembly 'Npgsql, Version=4.1.13.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7'. Assembly with same name is already loaded"
+"2026-04-27 23:49:02","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 23:49:02","KTMHOEPSAUDIT","appuser","Info","General","","PostgreSQL connection initialized: localhost:5432/ems_production"
+"2026-04-27 23:51:24","KTMHOEPSAUDIT","appuser","Warning","General","","Get-ADUser fallback failed for snpl\000870 : The server has rejected the client credentials."

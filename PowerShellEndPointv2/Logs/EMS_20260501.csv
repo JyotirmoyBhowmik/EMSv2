@@ -1,0 +1,2363 @@
+"Timestamp","Severity","Category","User","Target","CorrelationId","Message"
+"2026-05-01 09:04:35","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 09:04:35","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 09:10:00","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 09:10:00","Info","Scan","kamelia","KTMMISDTKUMARAR","","Scan started"
+"2026-05-01 09:10:07","Success","Scan","kamelia","KTMMISDTKUMARAR","","Scan completed successfully"
+"2026-05-01 09:46:10","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 09:46:10","Info","Scan","kamelia","KTMMISDTKUMARAR","","Scan started"
+"2026-05-01 09:46:15","Success","Scan","kamelia","KTMMISDTKUMARAR","","Scan completed successfully"
+"2026-05-01 09:50:02","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 09:50:02","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 10:30:32","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 10:30:32","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 11:28:52","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 11:28:52","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 12:48:52","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 12:48:52","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 14:33:19","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 14:33:19","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 14:34:25","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 14:34:25","Info","Scan","kamelia","KTMMISDTKUMARAR","","Scan started"
+"2026-05-01 14:34:28","Success","Scan","kamelia","KTMMISDTKUMARAR","","Scan completed successfully"
+"2026-05-01 14:37:38","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 14:37:39","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 14:43:08","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 14:43:08","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 14:44:56","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 14:44:56","Info","Scan","kamelia","KTMMISDTKUMARAR","","Scan started"
+"2026-05-01 14:44:59","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 14:44:59","Error","Scan","kamelia","KTMMISDTKUMARAR","","Scan failed: The term 'healthScore' is not recognized as a name of a cmdlet, function, script file, or executable program.
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again."
+"2026-05-01 15:05:35","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 15:05:35","Info","Scan","kamelia","10.192.10.152","","Scan started"
+"2026-05-01 15:05:38","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 15:05:38","Error","Scan","kamelia","10.192.10.152","","Scan failed: The term 'healthScore' is not recognized as a name of a cmdlet, function, script file, or executable program.
+Check the spelling of the name, or if a path was included, verify that the path is correct and try again."
+"2026-05-01 16:39:03","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 16:39:03","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 16:41:16","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 16:41:16","Info","Scan","kamelia","KTMMISDTKUMARAR","","Scan started"
+"2026-05-01 16:41:19","Success","Scan","kamelia","KTMMISDTKUMARAR","","Scan completed successfully"
+"2026-05-01 19:28:02","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 19:28:02","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 19:28:49","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 19:28:49","Info","Scan","kamelia","ktmmisdtkumarar","","Scan started"
+"2026-05-01 19:28:55","Success","Scan","kamelia","ktmmisdtkumarar","","Scan completed successfully"
+"2026-05-01 20:37:18","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 20:37:18","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 20:37:36","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:37:36","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:38:05","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:38:05","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:38:35","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:38:35","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:39:05","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:39:05","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:39:35","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:39:35","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:40:05","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:40:05","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:40:35","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:40:35","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:41:05","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:41:05","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:42:36","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:42:36","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:43:06","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:43:06","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:43:36","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:43:36","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:44:06","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:44:06","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:44:36","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:44:36","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:45:05","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:45:05","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:45:36","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:45:36","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:54:38","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 20:54:38","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 20:55:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:55:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:55:25","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:55:25","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:55:30","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:55:30","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:55:56","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:55:56","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:56:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:56:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:56:26","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:56:26","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:56:30","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:56:30","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:56:56","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:56:56","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:57:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:57:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:57:26","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:57:26","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:57:30","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:57:30","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:57:56","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:57:56","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:58:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:58:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:58:26","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:58:26","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:58:30","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:58:30","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:58:56","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:58:56","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:59:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:59:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 20:59:30","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 20:59:30","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:00:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:00:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:00:08","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:00:08","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:00:30","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:00:30","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:01:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:01:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:01:08","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:01:08","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:01:30","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:01:30","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:02:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:02:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:02:08","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:02:08","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:02:30","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:02:30","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:03:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:03:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:03:08","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:03:08","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:03:30","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:03:30","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:04:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:04:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:04:08","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:04:08","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:04:30","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:04:30","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:05:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:05:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:05:08","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:05:08","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:05:30","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:05:30","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:06:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:06:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:06:08","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:06:08","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:06:30","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:06:30","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:07:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:07:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:07:08","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:07:08","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:07:30","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:07:30","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:08:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:08:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:08:08","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:08:08","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:08:30","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:08:30","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:09:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:09:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:09:08","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:09:08","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:09:30","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:09:30","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:10:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:10:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:10:08","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:10:08","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:10:30","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:10:30","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:11:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:11:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:11:08","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:11:08","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:11:30","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:11:30","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:12:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:12:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:12:08","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:12:08","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:12:30","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:12:30","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:13:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:13:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:13:08","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:13:08","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:13:30","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:13:30","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:14:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:14:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:14:08","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:14:08","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:14:30","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:14:30","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:15:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:15:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:15:08","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:15:08","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:15:30","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:15:30","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:16:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:16:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:16:08","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:16:08","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:16:30","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:16:30","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:16:39","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:16:39","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:17:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:17:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:17:40","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:17:40","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:18:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:18:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:18:30","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:18:30","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:19:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:19:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:19:30","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:19:30","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:20:00","Error","Database","kamelia","","","PG query error: Exception calling ""ExecuteReader"" with ""0"" argument(s): ""42703: column ""is_deleted"" does not exist"""
+"2026-05-01 21:20:00","Error","Database","kamelia","","","Query: SELECT
+    COUNT(*)::int AS total_scans,
+    COUNT(DISTINCT target)::int AS unique_endpoints,
+    COUNT(*) FILTER (WHERE status = 'completed')::int AS completed_scans,
+    COUNT(*) FILTER (WHERE status = 'failed')::int AS failed_scans,
+    COUNT(*) FILTER (WHERE status IN ('queued', 'running'))::int AS in_progress_scans,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS healthy_endpoints,
+    COALESCE(SUM(critical_alerts) FILTER (WHERE status = 'completed'), 0)::int AS critical_alerts,
+    ROUND(
+        COALESCE(
+            AVG(execution_time_sec) FILTER (
+                WHERE status = 'completed' AND execution_time_sec IS NOT NULL
+            ),
+            0
+        )::numeric,
+        2
+    ) AS average_scan_time,
+    MAX(completed_at) AS last_scan,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 90)::int AS excellent_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 70 AND health_score < 90)::int AS good_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score >= 50 AND health_score < 70)::int AS fair_count,
+    COUNT(*) FILTER (WHERE status = 'completed' AND health_score < 50)::int AS poor_count
+FROM scans
+WHERE COALESCE(is_deleted, false) = false;"
+"2026-05-01 21:21:05","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 21:21:05","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 21:30:26","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 21:30:26","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 21:43:55","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 21:43:55","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 22:30:16","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 22:30:16","Info","Scan","kamelia","KTMMISDTKUMARAR","","Scan started"
+"2026-05-01 22:30:22","Success","Scan","kamelia","KTMMISDTKUMARAR","","Scan completed successfully"
+"2026-05-01 22:43:42","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 22:43:42","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 23:55:51","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
+"2026-05-01 23:55:51","Info","Database","kamelia","","","PostgreSQL initialized (ems_production)"
