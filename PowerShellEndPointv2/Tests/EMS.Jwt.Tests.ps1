@@ -1,6 +1,7 @@
 Describe 'EMS.Jwt' {
     BeforeAll {
-        Import-Module "$PSScriptRoot\..\Modules\Security\EMS.Jwt.psm1" -Force
+        $modulePath = Resolve-Path "$PSScriptRoot/../Modules/Security/EMS.Jwt.psm1"
+        Import-Module $modulePath -Force
         $script:secret = 'a-very-long-test-secret-please-change-me'
     }
 
