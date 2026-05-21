@@ -234,5 +234,23 @@ Describe "Search-LDAPUser" {
             $result.Found | Should -Be $false
             $result.Error | Should -Be "Search failed"
         }
+
+        It "Should catch connection exceptions during search" {
+            $mockConfig = [PSCustomObject]@{
+                Server = "ldap.example.com"
+                BaseDN = "dc=example,dc=com"
+            }
+
+            Mock New-Object {
+                if ($TypeName -match "DirectoryEntry") {
+                    throw "LDAP server unreachable"
+                }
+            } -ModuleName LDAPAuth
+
+            $result = Search-LDAPUser -Username "testuser" -Config $mockConfig
+
+            $result.Found | Should -Be $false
+            $result.Error | Should -Match "LDAP server unreachable"
+        }
     }
 }
