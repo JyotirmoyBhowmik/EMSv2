@@ -11,6 +11,7 @@ Describe "EMS.API.Scan" {
         function global:Start-EMSScan { param($ScanId, $Target, $Protocol) }
         function global:Start-EMSBatchScan { param($Targets, $Protocol) return @{ targetCount = 1; targets = @('test'); scanIds = @([guid]::NewGuid()) } }
         function global:Read-EMSRequestBody { param($Request, $MaxBytes) return "{}" }
+        function global:Write-EMSLog {}
 
         # Load the module under test but removing strict typing from param block to allow mock objects
         $modulePath = Resolve-Path "$PSScriptRoot/../../Modules/API/EMS.API.Scan.psm1" -ErrorAction SilentlyContinue
@@ -197,6 +198,55 @@ Describe "EMS.API.Scan" {
             $result = Invoke-ScanRoutes -Request $mockRequest -Response $mockResponse -Method 'GET' -Path '/unknown/route' -Config $mockConfig
 
             $result | Should -Be $false
+        }
+    }
+
+    Context "Test-FrontendErrorAllowed" {
+        BeforeAll {
+            Import-Module $modulePath -Force
+        }
+
+        It "allows requests under the limit" {
+            $ip = "127.0.0.1"
+            InModuleScope EMS.API.Scan {
+                $script:FrontendErrorBuckets.Clear()
+
+                for ($i = 0; $i -lt 5; $i++) {
+                    $result = Test-FrontendErrorAllowed -Ip $ip
+                    $result | Should -Be $true
+                }
+            }
+        }
+
+        It "blocks requests over the limit" {
+            $ip = "127.0.0.2"
+            InModuleScope EMS.API.Scan {
+                $script:FrontendErrorBuckets.Clear()
+
+                for ($i = 0; $i -lt 5; $i++) {
+                    $result = Test-FrontendErrorAllowed -Ip $ip
+                    $result | Should -Be $true
+                }
+
+                $result = Test-FrontendErrorAllowed -Ip $ip
+                $result | Should -Be $false
+            }
+        }
+
+        It "resets the limit after the window expires" {
+            $ip = "127.0.0.3"
+            InModuleScope EMS.API.Scan {
+                $script:FrontendErrorBuckets.Clear()
+
+                $oldTime = [DateTime]::Now.AddSeconds(-65)
+                $addValueFactory = [Func[string, object]] { param($k) return [pscustomobject]@{ Count=5; WindowStart=$oldTime } }
+                $updateValueFactory = [Func[string, object, object]] { param($k, $old) return [pscustomobject]@{ Count=5; WindowStart=$oldTime } }
+
+                $null = $script:FrontendErrorBuckets.AddOrUpdate($ip, $addValueFactory, $updateValueFactory)
+
+                $result = Test-FrontendErrorAllowed -Ip $ip
+                $result | Should -Be $true
+            }
         }
     }
 }

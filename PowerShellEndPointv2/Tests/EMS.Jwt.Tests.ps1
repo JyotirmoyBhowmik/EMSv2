@@ -1,13 +1,7 @@
 Describe 'EMS.Jwt' {
     BeforeAll {
-<<<<<<< HEAD
         Import-Module -Name (Resolve-Path "$PSScriptRoot/../Modules/Security/EMS.Jwt.psm1") -Force
         $global:secret = 'a-very-long-test-secret-please-change-me'
-=======
-        $modulePath = Resolve-Path "$PSScriptRoot/../Modules/Security/EMS.Jwt.psm1"
-        Import-Module $modulePath -Force
-        $script:secret = 'a-very-long-test-secret-please-change-me'
->>>>>>> origin/pr/59
     }
 
     It 'round-trips a valid token' {
