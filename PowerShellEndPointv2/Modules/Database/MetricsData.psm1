@@ -175,7 +175,7 @@ function Save-DiskMetrics {
         return
     }
 
-    $valuesStrList = [System.Collections.Generic.List[string]]::new($Disks.Count)
+    $valuesStrList = [System.Collections.Generic.List[string]]::new()
     $params = @{
         computer = $ComputerName
     }
