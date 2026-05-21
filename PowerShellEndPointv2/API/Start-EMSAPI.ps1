@@ -147,8 +147,8 @@ try {
         $now = Get-Date
         $entry = $Global:RateLimitCache.AddOrUpdate(
             $Key,
-            { @{ Count = 1; WindowStart = $now } },
-            { param($k,$old)
+            [Func[string, object]]{ @{ Count = 1; WindowStart = $now } },
+            [Func[string, object, object]]{ param($k,$old)
                 if (($now - $old.WindowStart).TotalSeconds -gt $WindowSec) {
                     @{ Count = 1; WindowStart = $now }
                 } else {
