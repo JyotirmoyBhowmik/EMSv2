@@ -23,28 +23,28 @@ function Write-MetricsToDatabase {
     
     foreach ($metric in $Metrics) {
         $props = $metric.PSObject.Properties
-        $cols = @()
-        $vals = @()
         $params = @{}
         
+        $cols = [System.Collections.Generic.List[string]]::new()
+        $vals = [System.Collections.Generic.List[string]]::new()
+        $updateSet = [System.Collections.Generic.List[string]]::new()
+
         foreach ($prop in $props) {
-            $cols += $prop.Name
-            $vals += "@$($prop.Name)"
+            $cols.Add($prop.Name)
+            $vals.Add("@$($prop.Name)")
             $params[$prop.Name] = $prop.Value
+
+            if ($isUpsert -and $prop.Name -ne 'computer_name') {
+                $updateSet.Add("$($prop.Name) = EXCLUDED.$($prop.Name)")
+            }
         }
         
-        $colStr = $cols -join ', '
-        $valStr = $vals -join ', '
+        $colStr = [string]::Join(', ', $cols)
+        $valStr = [string]::Join(', ', $vals)
         
         $query = ""
         if ($isUpsert) {
-            $updateSet = @()
-            foreach ($col in $cols) {
-                if ($col -ne 'computer_name') {
-                    $updateSet += "$col = EXCLUDED.$col"
-                }
-            }
-            $updateStr = $updateSet -join ', '
+            $updateStr = [string]::Join(', ', $updateSet)
             
             $query = @"
 INSERT INTO $TableName ($colStr) 
