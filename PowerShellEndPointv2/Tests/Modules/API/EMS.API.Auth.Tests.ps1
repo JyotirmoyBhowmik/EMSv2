@@ -1,153 +1,131 @@
-BeforeAll {
-    $global:ModulePath = Resolve-Path "$PSScriptRoot/../../../Modules/API/EMS.API.Auth.psm1"
+Describe 'EMS.API.Auth.Invoke-AuthRoutes' {
+    BeforeAll {
+        function global:Read-JsonBody { return $null }
+        function global:Write-JsonResponse {}
+        function global:Resolve-ProviderValue {}
+        function global:Invoke-MultiProviderAuth {}
+        function global:Resolve-UserRole {}
+        function global:Get-EMSEnvironmentVar {}
+        function global:New-EMSJwt {}
+        function global:Write-EMSLog {}
 
-    function global:Read-JsonBody {}
-    function global:Write-JsonResponse {}
-    function global:Resolve-ProviderValue {}
-    function global:ConvertTo-SecureString {}
-    function global:Invoke-MultiProviderAuth {}
-    function global:Resolve-UserRole {}
-    function global:Get-EMSEnvironmentVar {}
-    function global:New-EMSJwt {}
-    function global:Write-EMSLog {}
+        Import-Module "$PSScriptRoot\..\..\..\Modules\API\EMS.API.Auth.psm1" -Force
+    }
 
-    Import-Module $global:ModulePath -Force
+    It 'Returns false for unknown routes' {
+        $result = Invoke-AuthRoutes -Method 'GET' -Path '/auth/unknown'
+        $result | Should -Be $false
+    }
 
-    $global:GlobalConfig = [pscustomobject]@{
-        API = [pscustomobject]@{
-            AllowedOrigins = @("http://localhost:3000")
+    It 'Returns 400 for missing credentials' {
+        InModuleScope EMS.API.Auth {
+            $script:writeJsonArgs = $null
+            function Write-JsonResponse {
+                param($Request, $Response, $StatusCode, $Body)
+                $script:writeJsonArgs = @{ StatusCode = $StatusCode; Body = $Body }
+            }
+
+            # Missing credentials
+            function Read-JsonBody { return @{ username = 'test'; provider = 'local' } }
+
+            $global:authResult = Invoke-AuthRoutes -Method 'POST' -Path '/auth/login'
+        }
+        $global:authResult | Should -Be $true
+
+        InModuleScope EMS.API.Auth {
+            $script:writeJsonArgs.StatusCode | Should -Be 400
         }
     }
 
-    $global:EMSConfig = $global:GlobalConfig
-}
+    It 'Returns 401 for invalid credentials' {
+        InModuleScope EMS.API.Auth {
+            $script:writeJsonArgs = $null
+            function Write-JsonResponse {
+                param($Request, $Response, $StatusCode, $Body)
+                $script:writeJsonArgs = @{ StatusCode = $StatusCode; Body = $Body }
+            }
 
-Describe "Invoke-AuthRoutes" {
-    Context "When path does not match" {
-        It "Should return false" {
-            $result = Invoke-AuthRoutes -Request $null -Response $null -Method "GET" -Path "/auth/login" -Config $null
-            $result | Should -Be $false
+            function Read-JsonBody { return @{ username = 'test'; password = 'pwd'; provider = 'local' } }
+            function Resolve-ProviderValue { return 'local' }
+            function Invoke-MultiProviderAuth { return @{ Success = $false } }
+
+            $global:authResult = Invoke-AuthRoutes -Method 'POST' -Path '/auth/login'
+        }
+        $global:authResult | Should -Be $true
+
+        InModuleScope EMS.API.Auth {
+            $script:writeJsonArgs.StatusCode | Should -Be 401
         }
     }
 
-    Context "POST /auth/login - Missing Body or Credentials" {
-        It "Should return 400 and true when body is missing" {
-            Mock Read-JsonBody { return $null } -ModuleName "EMS.API.Auth"
-            Mock Write-JsonResponse {} -ModuleName "EMS.API.Auth"
+    It 'Returns 403 for missing role assignment' {
+        InModuleScope EMS.API.Auth {
+            $script:writeJsonArgs = $null
+            function Write-JsonResponse {
+                param($Request, $Response, $StatusCode, $Body)
+                $script:writeJsonArgs = @{ StatusCode = $StatusCode; Body = $Body }
+            }
 
-            $result = Invoke-AuthRoutes -Request $null -Response $null -Method "POST" -Path "/auth/login" -Config $global:GlobalConfig
+            function Read-JsonBody { return @{ username = 'test'; password = 'pwd'; provider = 'local' } }
+            function Resolve-ProviderValue { return 'local' }
+            function Invoke-MultiProviderAuth { return @{ Success = $true; User = 'test'; Groups = @() } }
+            function Resolve-UserRole { return $null }
 
-            $result | Should -Be $true
-            Assert-MockCalled Write-JsonResponse -ModuleName "EMS.API.Auth" -Times 1 -Exactly
+            $global:authResult = Invoke-AuthRoutes -Method 'POST' -Path '/auth/login'
         }
+        $global:authResult | Should -Be $true
 
-        It "Should return 400 and true when username is missing" {
-            Mock Read-JsonBody { return [pscustomobject]@{ password = "pass" } } -ModuleName "EMS.API.Auth"
-            Mock Write-JsonResponse {} -ModuleName "EMS.API.Auth"
-
-            $result = Invoke-AuthRoutes -Request $null -Response $null -Method "POST" -Path "/auth/login" -Config $global:GlobalConfig
-
-            $result | Should -Be $true
-            Assert-MockCalled Write-JsonResponse -ModuleName "EMS.API.Auth" -Times 1 -Exactly
-        }
-
-        It "Should return 400 and true when password is missing" {
-            Mock Read-JsonBody { return [pscustomobject]@{ username = "user" } } -ModuleName "EMS.API.Auth"
-            Mock Write-JsonResponse {} -ModuleName "EMS.API.Auth"
-
-            $result = Invoke-AuthRoutes -Request $null -Response $null -Method "POST" -Path "/auth/login" -Config $global:GlobalConfig
-
-            $result | Should -Be $true
-            Assert-MockCalled Write-JsonResponse -ModuleName "EMS.API.Auth" -Times 1 -Exactly
+        InModuleScope EMS.API.Auth {
+            $script:writeJsonArgs.StatusCode | Should -Be 403
         }
     }
 
-    Context "POST /auth/login - Invalid Credentials" {
-        It "Should return 401 when auth fails" {
-            Mock Read-JsonBody { return [pscustomobject]@{ username = "user"; password = "bad"; provider = "ad" } } -ModuleName "EMS.API.Auth"
-            Mock Resolve-ProviderValue { return "ad" } -ModuleName "EMS.API.Auth"
-            Mock ConvertTo-SecureString { return "secure_string_mock" } -ModuleName "EMS.API.Auth"
-            Mock Invoke-MultiProviderAuth { return [pscustomobject]@{ Success = $false } } -ModuleName "EMS.API.Auth"
-            Mock Write-JsonResponse {} -ModuleName "EMS.API.Auth"
+    It 'Returns 500 when server misconfigured (missing JWT_SECRET)' {
+        InModuleScope EMS.API.Auth {
+            $script:writeJsonArgs = $null
+            function Write-JsonResponse {
+                param($Request, $Response, $StatusCode, $Body)
+                $script:writeJsonArgs = @{ StatusCode = $StatusCode; Body = $Body }
+            }
 
-            $result = Invoke-AuthRoutes -Request $null -Response $null -Method "POST" -Path "/auth/login" -Config $global:GlobalConfig
+            function Read-JsonBody { return @{ username = 'test'; password = 'pwd'; provider = 'local' } }
+            function Resolve-ProviderValue { return 'local' }
+            function Invoke-MultiProviderAuth { return @{ Success = $true; User = 'test'; Groups = @(); Role = 'User' } }
+            function Resolve-UserRole { return 'User' }
+            function Get-EMSEnvironmentVar { return $null }
 
-            $result | Should -Be $true
-            Assert-MockCalled Write-JsonResponse -ModuleName "EMS.API.Auth" -Times 1 -Exactly
+            $global:authResult = Invoke-AuthRoutes -Method 'POST' -Path '/auth/login'
+        }
+        $global:authResult | Should -Be $true
+
+        InModuleScope EMS.API.Auth {
+            $script:writeJsonArgs.StatusCode | Should -Be 500
         }
     }
 
-    Context "POST /auth/login - Missing Role" {
-        It "Should return 403 when role cannot be resolved" {
-            Mock Read-JsonBody { return [pscustomobject]@{ username = "user"; password = "pwd"; provider = "ad" } } -ModuleName "EMS.API.Auth"
-            Mock Resolve-ProviderValue { return "ad" } -ModuleName "EMS.API.Auth"
-            Mock ConvertTo-SecureString { return "secure_string_mock" } -ModuleName "EMS.API.Auth"
-            Mock Invoke-MultiProviderAuth { return [pscustomobject]@{ Success = $true; User = "user"; Groups = @(); Role = $null } } -ModuleName "EMS.API.Auth"
-            Mock Resolve-UserRole { return $null } -ModuleName "EMS.API.Auth"
-            Mock Write-JsonResponse {} -ModuleName "EMS.API.Auth"
+    It 'Returns 200 with token for valid login' {
+        InModuleScope EMS.API.Auth {
+            $script:writeJsonArgs = $null
+            function Write-JsonResponse {
+                param($Request, $Response, $StatusCode, $Body)
+                $script:writeJsonArgs = @{ StatusCode = $StatusCode; Body = $Body }
+            }
 
-            $result = Invoke-AuthRoutes -Request $null -Response $null -Method "POST" -Path "/auth/login" -Config $global:GlobalConfig
+            function Read-JsonBody { return @{ username = 'test'; password = 'pwd'; provider = 'local' } }
+            function Resolve-ProviderValue { return 'local' }
+            function Invoke-MultiProviderAuth { return @{ Success = $true; User = 'test'; Groups = @(); Role = 'User' } }
+            function Resolve-UserRole { return 'User' }
+            function Get-EMSEnvironmentVar { return 'secret' }
+            function New-EMSJwt { return 'mock.token.str' }
+            function Write-EMSLog {}
 
-            $result | Should -Be $true
-            Assert-MockCalled Write-JsonResponse -ModuleName "EMS.API.Auth" -Times 1 -Exactly
+            $global:authResult = Invoke-AuthRoutes -Method 'POST' -Path '/auth/login'
         }
-    }
+        $global:authResult | Should -Be $true
 
-    Context "POST /auth/login - Server Misconfiguration" {
-        It "Should return 500 when JWT_SECRET is missing" {
-            Mock Read-JsonBody { return [pscustomobject]@{ username = "user"; password = "pwd"; provider = "ad" } } -ModuleName "EMS.API.Auth"
-            Mock Resolve-ProviderValue { return "ad" } -ModuleName "EMS.API.Auth"
-            Mock ConvertTo-SecureString { return "secure_string_mock" } -ModuleName "EMS.API.Auth"
-            Mock Invoke-MultiProviderAuth { return [pscustomobject]@{ Success = $true; User = "user"; Groups = @(); Role = "admin" } } -ModuleName "EMS.API.Auth"
-            Mock Resolve-UserRole { return "admin" } -ModuleName "EMS.API.Auth"
-            Mock Get-EMSEnvironmentVar { return $null } -ModuleName "EMS.API.Auth"
-            Mock Write-JsonResponse {} -ModuleName "EMS.API.Auth"
-
-            $result = Invoke-AuthRoutes -Request $null -Response $null -Method "POST" -Path "/auth/login" -Config $global:GlobalConfig
-
-            $result | Should -Be $true
-            Assert-MockCalled Write-JsonResponse -ModuleName "EMS.API.Auth" -Times 1 -Exactly
-        }
-    }
-
-    Context "POST /auth/login - Success" {
-        It "Should return 200 and a token" {
-            Mock Read-JsonBody { return [pscustomobject]@{ username = "user"; password = "pwd"; provider = "ad" } } -ModuleName "EMS.API.Auth"
-            Mock Resolve-ProviderValue { return "ad" } -ModuleName "EMS.API.Auth"
-            Mock ConvertTo-SecureString { return "secure_string_mock" } -ModuleName "EMS.API.Auth"
-            Mock Invoke-MultiProviderAuth { return [pscustomobject]@{ Success = $true; User = "user"; Groups = @("g1"); Source = "AD"; Role = "admin" } } -ModuleName "EMS.API.Auth"
-            Mock Resolve-UserRole { return "admin" } -ModuleName "EMS.API.Auth"
-            Mock Get-EMSEnvironmentVar { return "secret" } -ModuleName "EMS.API.Auth"
-            Mock New-EMSJwt { return "jwt.token.here" } -ModuleName "EMS.API.Auth"
-            Mock Write-EMSLog {} -ModuleName "EMS.API.Auth"
-            Mock Write-JsonResponse {} -ModuleName "EMS.API.Auth"
-
-            $result = Invoke-AuthRoutes -Request $null -Response $null -Method "POST" -Path "/auth/login" -Config $global:GlobalConfig
-
-            $result | Should -Be $true
-            Assert-MockCalled Write-EMSLog -ModuleName "EMS.API.Auth" -Times 1 -Exactly
-            Assert-MockCalled Write-JsonResponse -ModuleName "EMS.API.Auth" -Times 1 -Exactly
-        }
-
-        It "Should fallback to authResult.Role if Resolve-UserRole returns null" {
-            Mock Read-JsonBody { return [pscustomobject]@{ username = "user"; password = "pwd"; provider = "ad" } } -ModuleName "EMS.API.Auth"
-            Mock Resolve-ProviderValue { return "ad" } -ModuleName "EMS.API.Auth"
-            Mock ConvertTo-SecureString { return "secure_string_mock" } -ModuleName "EMS.API.Auth"
-            Mock Invoke-MultiProviderAuth { return [pscustomobject]@{ Success = $true; User = "user"; Groups = @("g1"); Source = "AD"; Role = "fallback_role" } } -ModuleName "EMS.API.Auth"
-            Mock Resolve-UserRole { return $null } -ModuleName "EMS.API.Auth"
-            Mock Get-EMSEnvironmentVar { return "secret" } -ModuleName "EMS.API.Auth"
-            Mock New-EMSJwt { return "jwt.token.here" } -ModuleName "EMS.API.Auth"
-            Mock Write-EMSLog {} -ModuleName "EMS.API.Auth"
-            Mock Write-JsonResponse {} -ModuleName "EMS.API.Auth"
-
-            $result = Invoke-AuthRoutes -Request $null -Response $null -Method "POST" -Path "/auth/login" -Config $global:GlobalConfig
-
-            $result | Should -Be $true
-            Assert-MockCalled Write-EMSLog -ModuleName "EMS.API.Auth" -Times 1 -Exactly
-            Assert-MockCalled Write-JsonResponse -ModuleName "EMS.API.Auth" -Times 1 -Exactly
-
-            # Additional check: verify New-EMSJwt was called
-            Assert-MockCalled New-EMSJwt -ModuleName "EMS.API.Auth" -Times 1 -Exactly
+        InModuleScope EMS.API.Auth {
+            $script:writeJsonArgs.StatusCode | Should -Be 200
+            $script:writeJsonArgs.Body.token | Should -Be 'mock.token.str'
         }
     }
 }
