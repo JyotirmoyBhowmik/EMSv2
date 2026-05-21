@@ -27,17 +27,20 @@ const apiClient = ky.create({
         beforeRequest: [
             (request) => {
                 try {
-                    const user = JSON.parse(localStorage.getItem('user') || '{}');
-                    if (user?.username) request.headers.set('X-EMS-Username', user.username);
-                    if (user?.role)     request.headers.set('X-EMS-Role', user.role);
-                    if (Array.isArray(user?.groups)) {
-                        request.headers.set('X-EMS-Groups', user.groups.join(';'));
-                    }
-                    
-                    const token = localStorage.getItem('auth_token');
+                    // Check sessionStorage first, fallback to localStorage
+                    const token = sessionStorage.getItem('auth_token') || localStorage.getItem('auth_token');
                     if (token) {
                         request.headers.set('Authorization', `Bearer ${token}`);
                     }
+
+                    // Extract and set user metadata headers from sessionStorage or localStorage
+                    const username = sessionStorage.getItem('display_name') || JSON.parse(localStorage.getItem('user') || '{}')?.username;
+                    const role = sessionStorage.getItem('display_role') || JSON.parse(localStorage.getItem('user') || '{}')?.role;
+                    const groups = sessionStorage.getItem('display_groups') || (Array.isArray(JSON.parse(localStorage.getItem('user') || '{}')?.groups) ? JSON.parse(localStorage.getItem('user') || '{}')?.groups.join(';') : '');
+
+                    if (username) request.headers.set('X-EMS-Username', username);
+                    if (role)     request.headers.set('X-EMS-Role', role);
+                    if (groups)   request.headers.set('X-EMS-Groups', groups);
                 } catch { /* ignore */ }
             },
         ],
