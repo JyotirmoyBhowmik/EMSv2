@@ -1,44 +1,86 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $modulePath = "$here/../../Modules/Scan/Collectors/Connectivity.psm1"
 
-# Define dummy functions globally so Import-Module doesn't complain
-function global:Test-Connection { return $true }
-function global:New-CimSessionOption {}
-function global:New-CimSession {}
-function global:Get-WmiObject {}
-function global:Remove-CimSession {}
-
 Import-Module $modulePath -Force
 
-Describe "Connect-EMSEndpoint" {
+Describe "Connectivity Module" {
     BeforeAll {
-        $Global:TestComputerName = "TestComputer"
+        if (-not (Get-Command Test-Connection -ErrorAction SilentlyContinue)) {
+            function Global:Test-Connection { return $true }
+        }
+        if (-not (Get-Command New-CimSessionOption -ErrorAction SilentlyContinue)) {
+            function Global:New-CimSessionOption { return "MockOption" }
+        }
+        if (-not (Get-Command New-CimSession -ErrorAction SilentlyContinue)) {
+            function Global:New-CimSession { return "MockSession" }
+        }
+        if (-not (Get-Command Get-WmiObject -ErrorAction SilentlyContinue)) {
+            function Global:Get-WmiObject { return "MockWMI" }
+        }
+        if (-not (Get-Command Remove-CimSession -ErrorAction SilentlyContinue)) {
+            function Global:Remove-CimSession {}
+        }
     }
 
-    It "Should pass OperationTimeoutSec in seconds to New-CimSession" {
-        $global:NewCimSessionArgsArray = $null
+    Context "Connect-EMSEndpoint" {
+        It "Should pass TimeoutSeconds exactly to OperationTimeoutSec" {
+            InModuleScope Connectivity {
+                function Test-Connection { return $true }
+                function New-CimSessionOption { return "MockOption" }
+                $script:NewCimSessionCalled = $false
+                $script:PassedTimeout = $null
 
-        # We need to redefine it globally since the module calls the global one directly in Linux test environment
-        function global:New-CimSession {
-            $global:NewCimSessionArgsArray = $args
-            return "MockCimSession"
+                function New-CimSession {
+                    param(
+                        $ComputerName,
+                        $SessionOption,
+                        $OperationTimeoutSec,
+                        $ErrorAction,
+                        $Credential
+                    )
+                    $script:NewCimSessionCalled = $true
+                    $script:PassedTimeout = $OperationTimeoutSec
+
+                    if (-not $script:PassedTimeout) {
+                       $script:PassedTimeout = $PSBoundParameters['OperationTimeoutSec']
+                    }
+
+                    return "MockSession"
+                }
+
+                $result = Connect-EMSEndpoint -ComputerName "TestPC" -TimeoutSeconds 15
+
+                $result.Connected | Should -Be $true
+                $result.Protocol | Should -Be 'CIM-DCOM'
+
+                $script:NewCimSessionCalled | Should -Be $true
+                $script:PassedTimeout | Should -Be 15
+            }
         }
+    }
 
-        $result = Connect-EMSEndpoint -ComputerName $Global:TestComputerName -TimeoutSeconds 15
+    Context "Disconnect-EMSEndpoint" {
+        It "Should correctly identify and remove CIM-DCOM sessions" {
+            InModuleScope Connectivity {
+                $script:RemoveCimSessionCalled = $false
+                $script:RemovedSession = $null
 
-        $global:NewCimSessionArgsArray | Should -Not -BeNullOrEmpty
+                function Remove-CimSession {
+                    param($CimSession, $ErrorAction)
+                    $script:RemoveCimSessionCalled = $true
+                    $script:RemovedSession = $CimSession
+                }
 
-        # In PowerShell Linux, splatted dictionary parameters surface in $args like: "-OperationTimeoutSec:" followed by the value
-        $index = [Array]::IndexOf($global:NewCimSessionArgsArray, '-OperationTimeoutSec:')
-        if ($index -eq -1) {
-            # In some PowerShell versions / environments splatted keys might not have a trailing colon
-            $index = [Array]::IndexOf($global:NewCimSessionArgsArray, '-OperationTimeoutSec')
+                $mockSessionObj = [PSCustomObject]@{
+                    Protocol = 'CIM-DCOM'
+                    Session = 'ActualMockSessionData'
+                }
+
+                Disconnect-EMSEndpoint -Session $mockSessionObj
+
+                $script:RemoveCimSessionCalled | Should -Be $true
+                $script:RemovedSession | Should -Be 'ActualMockSessionData'
+            }
         }
-        $index | Should -BeGreaterThan -1
-        $global:NewCimSessionArgsArray[$index + 1] | Should -Be 15
-
-        $result.Protocol | Should -Be 'CIM-DCOM'
-        $result.Connected | Should -Be $true
-        $result.Session | Should -Be "MockCimSession"
     }
 }
