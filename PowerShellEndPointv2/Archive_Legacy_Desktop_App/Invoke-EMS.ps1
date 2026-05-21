@@ -317,7 +317,6 @@ function Register-LoginEventHandlers {
                 }
             }
         
-            # Poll for completion (this would be better with a timer)
             Start-Sleep -Milliseconds 500
         
             $result = Get-CompletedJobs
@@ -409,7 +408,6 @@ function Register-ScanEventHandlers {
                 modulePath = $ModulePath
             }
         
-            # Poll for results (in production, use a timer)
             Start-Sleep -Milliseconds 100
             $completedResults = Get-CompletedJobs
         
