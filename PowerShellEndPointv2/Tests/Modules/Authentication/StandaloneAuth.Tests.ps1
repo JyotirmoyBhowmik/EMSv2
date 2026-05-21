@@ -1,56 +1,87 @@
-BeforeAll {
-    $global:ModulePath = Resolve-Path "$PSScriptRoot/../../../Modules/Authentication/StandaloneAuth.psm1"
+Describe "StandaloneAuth - Test-PasswordHash" {
+    BeforeAll {
+        function global:Invoke-PGQuery {}
+        function global:Initialize-PostgreSQLConnection {}
+        function global:Write-EMSLog {}
 
-    # We need to mock Invoke-PGQuery, Get-EMSLocalCredential, New-PasswordHash, Write-EMSLog
-    function global:Invoke-PGQuery {}
-    function global:Write-EMSLog {}
+        Import-Module "$PSScriptRoot/../../../Modules/Authentication/StandaloneAuth.psm1" -Force
+    }
 
-    # Dummy DB and User functions since they are required by StandaloneAuth.psm1
-    function global:Get-EMSUser {}
-    function global:New-EMSUser {}
-    function global:Initialize-PostgreSQLConnection {}
+    Context "When testing a valid password against its hash" {
+        It "returns true for a correct password" {
+            $password = "MySecurePassword123!"
+            $hashData = New-PasswordHash -Password $password
 
-    Import-Module $global:ModulePath -Force
-}
+            $result = Test-PasswordHash -Password $password -Salt $hashData.Salt -StoredHash $hashData.Hash
 
-Describe "Set-StandalonePassword" {
-    Context "Happy Path" {
-        It "Should successfully update password for an existing user" {
-            # Arrange
-            $mockUser = [pscustomobject]@{
-                user_id = 999
-                username = "testuser"
-            }
+            $result | Should -Be $true
+        }
 
-            Mock Get-EMSLocalCredential { return $mockUser } -ModuleName "StandaloneAuth"
-            Mock New-PasswordHash { return @{ Hash = "newhash"; Salt = "newsalt" } } -ModuleName "StandaloneAuth"
-            Mock Invoke-PGQuery {} -ModuleName "StandaloneAuth"
-            Mock Write-EMSLog {} -ModuleName "StandaloneAuth"
+        It "handles very long passwords" {
+            $password = "A" * 1000
+            $hashData = New-PasswordHash -Password $password
 
-            $securePassword = ConvertTo-SecureString "NewSecurePass123!" -AsPlainText -Force
+            $result = Test-PasswordHash -Password $password -Salt $hashData.Salt -StoredHash $hashData.Hash
 
-            # Act
-            Set-StandalonePassword -Username "testuser" -NewSecurePassword $securePassword
+            $result | Should -Be $true
+        }
 
-            # Assert
-            Assert-MockCalled Get-EMSLocalCredential -ModuleName "StandaloneAuth" -Times 1 -Exactly
-            Assert-MockCalled New-PasswordHash -ModuleName "StandaloneAuth" -Times 1 -Exactly
-            Assert-MockCalled Invoke-PGQuery -ModuleName "StandaloneAuth" -Times 1 -Exactly
-            Assert-MockCalled Write-EMSLog -ModuleName "StandaloneAuth" -Times 1 -Exactly
+        It "handles passwords with special characters" {
+            $password = "!@#$%^&*()_+{}|[]\:`~<>?,./"
+            $hashData = New-PasswordHash -Password $password
+
+            $result = Test-PasswordHash -Password $password -Salt $hashData.Salt -StoredHash $hashData.Hash
+
+            $result | Should -Be $true
         }
     }
 
-    Context "Error Handling" {
-        It "Should throw an error if the user is not found" {
-            # Arrange
-            Mock Get-EMSLocalCredential { return $null } -ModuleName "StandaloneAuth"
+    Context "When testing an invalid password against a hash" {
+        It "returns false for an incorrect password" {
+            $password = "MySecurePassword123!"
+            $wrongPassword = "WrongPassword456"
+            $hashData = New-PasswordHash -Password $password
 
-            $securePassword = ConvertTo-SecureString "NewSecurePass123!" -AsPlainText -Force
+            $result = Test-PasswordHash -Password $wrongPassword -Salt $hashData.Salt -StoredHash $hashData.Hash
 
-            # Act & Assert
-            { Set-StandalonePassword -Username "nonexistentuser" -NewSecurePassword $securePassword } | Should -Throw "User 'nonexistentuser' not found."
+            $result | Should -Be $false
+        }
 
-            Assert-MockCalled Get-EMSLocalCredential -ModuleName "StandaloneAuth" -Times 1 -Exactly
+        It "returns false when given a different salt" {
+            $password = "MySecurePassword123!"
+            $hashData = New-PasswordHash -Password $password
+            $otherHashData = New-PasswordHash -Password "OtherPassword"
+
+            $result = Test-PasswordHash -Password $password -Salt $otherHashData.Salt -StoredHash $hashData.Hash
+
+            $result | Should -Be $false
+        }
+
+        It "returns false when given a different stored hash" {
+            $password = "MySecurePassword123!"
+            $hashData = New-PasswordHash -Password $password
+            $otherHashData = New-PasswordHash -Password "OtherPassword"
+
+            $result = Test-PasswordHash -Password $password -Salt $hashData.Salt -StoredHash $otherHashData.Hash
+
+            $result | Should -Be $false
+        }
+    }
+
+    Context "When given missing parameters" {
+        It "throws an error if password is empty string or null" {
+            $password = ""
+            { Test-PasswordHash -Password $password -Salt "test_salt" -StoredHash "test_hash" } | Should -Throw -ErrorId "ParameterArgumentValidationErrorEmptyStringNotAllowed,Test-PasswordHash"
+        }
+
+        It "throws an error if salt is missing" {
+            $password = "password123"
+            { Test-PasswordHash -Password $password -StoredHash "test_hash" } | Should -Throw -ErrorId "MissingMandatoryParameter,Test-PasswordHash"
+        }
+
+        It "throws an error if stored hash is missing" {
+            $password = "password123"
+            { Test-PasswordHash -Password $password -Salt "test_salt" } | Should -Throw -ErrorId "MissingMandatoryParameter,Test-PasswordHash"
         }
     }
 }
