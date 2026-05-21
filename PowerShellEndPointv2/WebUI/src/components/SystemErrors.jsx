@@ -1,6 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { adminService, errorLogService } from '../services/api';
 
+import InfoIcon from './system-errors/InfoIcon';
+import ErrorDetailModal from './system-errors/ErrorDetailModal';
+import ErrorList from './system-errors/ErrorList';
+
+import { formatTime } from "./system-errors/utils";
+
 function SystemErrors() {
     const [errors,   setErrors]   = useState([]);
     const [loading,  setLoading]  = useState(true);
@@ -28,6 +34,12 @@ function SystemErrors() {
         return () => clearInterval(t);
     }, [fetchErrors]);
 
+    const filtered = errors.filter(e =>
+        [e.error_message, e.path, e.username].some(v =>
+            (v || '').toLowerCase().includes(search.toLowerCase())
+        )
+    );
+
     const handleExport = () => {
         const rows = [
             ['Timestamp', 'User', 'IP Address', 'Error Message'].join(','),
@@ -46,27 +58,6 @@ function SystemErrors() {
         a.click();
         URL.revokeObjectURL(url);
     };
-
-    const filtered = errors.filter(e =>
-        [e.error_message, e.path, e.username].some(v =>
-            (v || '').toLowerCase().includes(search.toLowerCase())
-        )
-    );
-
-    const formatTime = (ts) => {
-        try { return new Date(ts).toLocaleString(); } catch { return ts || '—'; }
-    };
-
-    const InfoIcon = ({ text }) => (
-        <span className="tooltip-container" style={{ marginLeft: '6px', cursor: 'help', verticalAlign: 'middle', display: 'inline-flex' }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.6 }}>
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="16" x2="12" y2="12"></line>
-                <line x1="12" y1="8" x2="12.01" y2="8"></line>
-            </svg>
-            <span className="tooltip-text">{text}</span>
-        </span>
-    );
 
     return (
         <div>
@@ -134,163 +125,18 @@ function SystemErrors() {
                 </div>
             )}
 
-            {/* Search */}
-            <div style={{ marginBottom: 20 }}>
-                <input
-                    type="text"
-                    placeholder="🔍 Search by error message, path, or user…"
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                    style={{
-                        width: '100%', padding: '10px 14px', border: '1px solid #e2e8f0',
-                        borderRadius: 8, fontSize: '0.875rem', outline: 'none',
-                        background: '#f8fafc', boxSizing: 'border-box'
-                    }}
-                />
-            </div>
+            <ErrorList
+                search={search}
+                setSearch={setSearch}
+                loading={loading}
+                filtered={filtered}
+                setSelected={setSelected}
+            />
 
-            {/* Table */}
-            <div style={{
-                background: '#fff', borderRadius: 12, border: '1px solid #e2e8f0',
-                boxShadow: '0 1px 4px rgba(0,0,0,0.04)', overflow: 'hidden'
-            }}>
-                {loading && (
-                    <div style={{ height: 3, background: 'linear-gradient(90deg,#2563eb,#7c3aed)', animation: 'none' }} />
-                )}
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead>
-                        <tr style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0' }}>
-                            {['Timestamp', 'User', 'IP Address', 'Error Message', 'Details'].map(h => (
-                                <th key={h} style={{
-                                    padding: '12px 16px', textAlign: 'left', fontSize: '0.75rem',
-                                    fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px'
-                                }}>
-                                    {h}
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filtered.length === 0 ? (
-                            <tr>
-                                <td colSpan={5} style={{ textAlign: 'center', padding: 48, color: '#94a3b8' }}>
-                                    {loading ? 'Loading…' : '✅ No errors found. Everything looks healthy!'}
-                                </td>
-                            </tr>
-                        ) : (
-                            filtered.map((err, i) => (
-                                <tr key={err.request_id || i} style={{
-                                    borderBottom: '1px solid #f1f5f9',
-                                    cursor: 'pointer'
-                                }}
-                                    onMouseOver={e => e.currentTarget.style.background = '#fef2f2'}
-                                    onMouseOut={e => e.currentTarget.style.background = 'transparent'}
-                                >
-                                    <td style={{ padding: '12px 16px', fontSize: '0.8rem', color: '#64748b', whiteSpace: 'nowrap' }}>
-                                        {formatTime(err.timestamp)}
-                                    </td>
-                                    <td style={{ padding: '12px 16px' }}>
-                                        <span style={{
-                                            background: '#eff6ff', color: '#2563eb',
-                                            padding: '3px 8px', borderRadius: 6,
-                                            fontSize: '0.78rem', fontWeight: 600
-                                        }}>
-                                            {err.username || 'anonymous'}
-                                        </span>
-                                    </td>
-                                    <td style={{ padding: '12px 16px', fontSize: '0.8rem', color: '#64748b' }}>
-                                        {err.ip_address || '—'}
-                                    </td>
-                                    <td style={{ padding: '12px 16px', maxWidth: 400 }}>
-                                        <div style={{
-                                            fontFamily: 'monospace', fontSize: '0.78rem', color: '#dc2626',
-                                            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
-                                        }}>
-                                            {err.error_message || err.path || '—'}
-                                        </div>
-                                    </td>
-                                    <td style={{ padding: '12px 16px', textAlign: 'center' }}>
-                                        <button
-                                            onClick={() => setSelected(err)}
-                                            style={{
-                                                padding: '5px 12px', background: '#eff6ff',
-                                                border: '1px solid #bfdbfe', borderRadius: 6,
-                                                cursor: 'pointer', fontSize: '0.78rem', color: '#2563eb', fontWeight: 600
-                                            }}
-                                        >
-                                            View
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))
-                        )}
-                    </tbody>
-                </table>
-            </div>
-
-            {/* Detail Modal */}
-            {selected && (
-                <div
-                    onClick={() => setSelected(null)}
-                    style={{
-                        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
-                    }}
-                >
-                    <div
-                        onClick={e => e.stopPropagation()}
-                        style={{
-                            background: '#fff', borderRadius: 16, width: '90%', maxWidth: 720,
-                            maxHeight: '80vh', display: 'flex', flexDirection: 'column',
-                            boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
-                        }}
-                    >
-                        <div style={{
-                            padding: '16px 20px', borderBottom: '1px solid #e2e8f0',
-                            display: 'flex', justifyContent: 'space-between', alignItems: 'center'
-                        }}>
-                            <div style={{ fontWeight: 700, color: '#dc2626', fontSize: '1rem' }}>
-                                🐛 Error Details
-                            </div>
-                            <button
-                                onClick={() => setSelected(null)}
-                                style={{
-                                    border: 'none', background: '#f1f5f9', borderRadius: 6,
-                                    padding: '5px 10px', cursor: 'pointer', color: '#64748b', fontWeight: 700
-                                }}
-                            >
-                                ✕
-                            </button>
-                        </div>
-                        <div style={{ padding: '20px', overflowY: 'auto', flex: 1 }}>
-                            <div style={{ marginBottom: 16 }}>
-                                <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', marginBottom: 4 }}>Time</div>
-                                <div style={{ color: '#1e293b' }}>{formatTime(selected.timestamp)}</div>
-                            </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
-                                <div>
-                                    <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', marginBottom: 4 }}>User</div>
-                                    <div style={{ color: '#1e293b', fontWeight: 600 }}>{selected.username || '—'}</div>
-                                </div>
-                                <div>
-                                    <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', marginBottom: 4 }}>IP Address</div>
-                                    <div style={{ color: '#1e293b' }}>{selected.ip_address || '—'}</div>
-                                </div>
-                            </div>
-                            <div>
-                                <div style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', marginBottom: 8 }}>Error / Stack Trace</div>
-                                <pre style={{
-                                    background: '#1e293b', color: '#f87171', padding: 16,
-                                    borderRadius: 8, fontSize: '0.78rem', overflowX: 'auto',
-                                    whiteSpace: 'pre-wrap', wordBreak: 'break-word', margin: 0
-                                }}>
-                                    {selected.error_message || selected.path || 'No details available'}
-                                </pre>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <ErrorDetailModal
+                selected={selected}
+                setSelected={setSelected}
+            />
         </div>
     );
 }

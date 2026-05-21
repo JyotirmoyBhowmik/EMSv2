@@ -44,8 +44,6 @@ function Connect-EMSEndpoint {
         $cimParams = @{
             ComputerName       = $ComputerName
             SessionOption      = $option
-            # BUG FIX: OperationTimeoutSec is in SECONDS, not milliseconds.
-            # Was: ($TimeoutSeconds * 1000) which produced 15000s (4+ hours)
             OperationTimeoutSec = $TimeoutSeconds
             ErrorAction        = 'Stop'
         }
@@ -95,7 +93,7 @@ function Connect-EMSEndpoint {
 function Disconnect-EMSEndpoint {
     param($Session)
     
-    if ($Session -and $Session.Protocol -match 'CIM' -and $Session.Session) {
+    if ($Session -and $Session.Protocol -eq 'CIM-DCOM' -and $Session.Session) {
         try {
             Remove-CimSession -CimSession $Session.Session -ErrorAction SilentlyContinue
         } catch {}
