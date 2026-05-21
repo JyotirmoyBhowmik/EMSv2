@@ -175,14 +175,14 @@ function Save-DiskMetrics {
         return
     }
 
-    $valuesStrList = @()
+    $valuesStrList = [System.Collections.Generic.List[string]]::new()
     $params = @{
         computer = $ComputerName
     }
 
     $i = 0
     foreach ($disk in $Disks) {
-        $valuesStrList += "(@computer, @letter_$i, @volume_$i, @total_$i, @free_$i, @used_$i, @percent_$i, @fs_$i, @system_$i)"
+        $valuesStrList.Add("(@computer, @letter_$i, @volume_$i, @total_$i, @free_$i, @used_$i, @percent_$i, @fs_$i, @system_$i)")
         
         $params["letter_$i"]  = $disk.DriveLetter
         $params["volume_$i"]  = $disk.VolumeName
