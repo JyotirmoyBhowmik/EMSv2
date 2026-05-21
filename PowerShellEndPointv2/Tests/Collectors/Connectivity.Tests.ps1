@@ -82,5 +82,48 @@ Describe "Connectivity Module" {
                 $script:RemovedSession | Should -Be 'ActualMockSessionData'
             }
         }
+
+        It "Should correctly identify and remove other CIM sessions" {
+            InModuleScope Connectivity {
+                $script:RemoveCimSessionCalled = $false
+                $script:RemovedSession = $null
+
+                function Remove-CimSession {
+                    param($CimSession, $ErrorAction)
+                    $script:RemoveCimSessionCalled = $true
+                    $script:RemovedSession = $CimSession
+                }
+
+                $mockSessionObj = [PSCustomObject]@{
+                    Protocol = 'CIM-WSMAN'
+                    Session = 'ActualMockSessionData'
+                }
+
+                Disconnect-EMSEndpoint -Session $mockSessionObj
+
+                $script:RemoveCimSessionCalled | Should -Be $true
+                $script:RemovedSession | Should -Be 'ActualMockSessionData'
+            }
+        }
+
+        It "Should not remove non-CIM sessions" {
+            InModuleScope Connectivity {
+                $script:RemoveCimSessionCalled = $false
+
+                function Remove-CimSession {
+                    param($CimSession, $ErrorAction)
+                    $script:RemoveCimSessionCalled = $true
+                }
+
+                $mockSessionObj = [PSCustomObject]@{
+                    Protocol = 'Legacy-DCOM'
+                    Session = 'SomeSessionData'
+                }
+
+                Disconnect-EMSEndpoint -Session $mockSessionObj
+
+                $script:RemoveCimSessionCalled | Should -Be $false
+            }
+        }
     }
 }
