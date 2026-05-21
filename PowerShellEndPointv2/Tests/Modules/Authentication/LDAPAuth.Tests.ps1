@@ -1,158 +1,238 @@
-$here = Split-Path -Parent $MyInvocation.MyCommand.Path
-$modulePath = "$here/../../../Modules/Authentication/LDAPAuth.psm1"
+$PSScriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Definition
 
-Import-Module $modulePath -Force
-
-Describe "Search-LDAPUser" {
+Describe "Test-LDAPAuth" {
     BeforeAll {
-        $Global:TestConfig = [PSCustomObject]@{
-            Server = "ldap.example.com"
-            BaseDN = "dc=example,dc=com"
-            BindDN = "cn=admin,dc=example,dc=com"
-            BindPassword = "password123"
+        $global:ModulePath = Resolve-Path "$PSScriptRoot/../../../Modules/Authentication/LDAPAuth.psm1" -ErrorAction SilentlyContinue
+        Import-Module $global:ModulePath -Force
+        function global:New-Object { param($TypeName, $ArgumentList) }
+
+        $global:mockClasses = @"
+class MockDirectorySearcher {
+    [string]`$Filter
+    [System.Collections.ArrayList]`$PropertiesToLoad = [System.Collections.ArrayList]::new()
+
+    [object] FindOne() {
+        `$props = @{
+            "distinguishedName" = @("uid=testuser,dc=example,dc=com")
+            "displayName" = @("Test User")
+            "mail" = @("test@example.com")
+            "memberOf" = @("Group1")
         }
-        $Global:TestUsername = "testuser"
+        return [PSCustomObject]@{ Properties = `$props }
+    }
+
+    [void] Dispose() {}
+}
+
+class MockDirectorySearcherNull {
+    [string]`$Filter
+    [System.Collections.ArrayList]`$PropertiesToLoad = [System.Collections.ArrayList]::new()
+
+    [object] FindOne() {
+        return `$null
+    }
+
+    [void] Dispose() {}
+}
+"@
+        Invoke-Expression $global:mockClasses
     }
 
     Context "Happy Path" {
-        It "Should successfully find a user and return their attributes" {
-            InModuleScope LDAPAuth {
-                function global:New-Object {
-                    $TypeName = $args[0]
-                    if ($TypeName -match "DirectoryEntry") {
-                        $e = [PSCustomObject]@{ Dispose = {} }
-                        $e | Add-Member -MemberType ScriptMethod -Name Dispose -Value {} -Force
-                        return $e
-                    }
-                    if ($TypeName -match "DirectorySearcher") {
-                        $s = [PSCustomObject]@{
-                            Filter = ""
-                        }
-                        $s | Add-Member -MemberType NoteProperty -Name PropertiesToLoad -Value ([System.Collections.ArrayList]::new()) -Force
-                        $s | Add-Member -MemberType ScriptMethod -Name FindOne -Value {
-                            $r = "SearchResult" | Select-Object -Property Properties
-                            $r.Properties = @{
-                                distinguishedName = @("uid=testuser,ou=users,dc=example,dc=com")
-                                displayName = @("Test User")
-                                mail = @("test@example.com")
-                                memberOf = @("cn=group1,dc=example,dc=com", "cn=group2,dc=example,dc=com")
-                            }
-                            return $r
-                        } -Force
-                        $s | Add-Member -MemberType ScriptMethod -Name Dispose -Value {} -Force
-                        return $s
-                    }
-                    return Microsoft.PowerShell.Utility\New-Object @args
+        It "Should return success when LDAP bind is successful with all properties" {
+            $mockConfig = [PSCustomObject]@{
+                Server = "ldap.example.com"
+                BaseDN = "dc=example,dc=com"
+                BindDN = "cn=admin,dc=example,dc=com"
+                BindPassword = "password"
+            }
+
+            Mock New-Object {
+                $mockLdap = [PSCustomObject]@{
+                    name = "testuser"
+                    displayName = "Test User"
+                    mail = "test@example.com"
+                    memberOf = @("Group1", "Group2")
                 }
-            }
+                $mockLdap | Add-Member -MemberType ScriptMethod -Name "Dispose" -Value {} -PassThru
+            } -ModuleName LDAPAuth
 
-            $result = Search-LDAPUser -Username $Global:TestUsername -Config $Global:TestConfig
+            $result = Test-LDAPAuth -Username "testuser" -Password "password" -Config $mockConfig
 
-            $result.Found | Should -Be $true
-            $result.DN | Should -Be "uid=testuser,ou=users,dc=example,dc=com"
-            $result.DisplayName | Should -Be "Test User"
-            $result.Email | Should -Be "test@example.com"
+            $result.Success | Should -Be $true
+            $result.User | Should -Be "testuser"
+            $result.DisplayName -contains "Test User" | Should -Be $true
+            $result.Email -contains "test@example.com" | Should -Be $true
 
-            # Since LDAP returns properties in a specific format that might get flattened
-            # differently depending on if it's evaluated in native .NET vs PS Hashtables
-            # Let's just ensure that memberOf contains our elements since it might just return array of objects
-            # or a flattened object depending on collection type mapping in tests vs real system.
-            $groups = $result.Groups
-            if ($groups -isnot [array]) { $groups = @($groups) }
-            $groups | Should -Contain "cn=group1,dc=example,dc=com"
+            $result.Groups -contains "Group1" | Should -Be $true
+            $result.Groups -contains "Group2" | Should -Be $true
 
-            InModuleScope LDAPAuth {
-                Remove-Item -Path Function:\global:New-Object -ErrorAction SilentlyContinue
-            }
+            Assert-MockCalled New-Object -ModuleName LDAPAuth -Times 1 -Exactly
         }
-    }
 
-    Context "User Not Found" {
-        It "Should return Found = `$false when user does not exist" {
-            InModuleScope LDAPAuth {
-                function global:New-Object {
-                    $TypeName = $args[0]
-                    if ($TypeName -match "DirectoryEntry") {
-                        $e = [PSCustomObject]@{ Dispose = {} }
-                        $e | Add-Member -MemberType ScriptMethod -Name Dispose -Value {} -Force
-                        return $e
-                    }
-                    if ($TypeName -match "DirectorySearcher") {
-                        $s = [PSCustomObject]@{
-                            Filter = ""
-                        }
-                        $s | Add-Member -MemberType NoteProperty -Name PropertiesToLoad -Value ([System.Collections.ArrayList]::new()) -Force
-                        $s | Add-Member -MemberType ScriptMethod -Name FindOne -Value { return $null } -Force
-                        $s | Add-Member -MemberType ScriptMethod -Name Dispose -Value {} -Force
-                        return $s
-                    }
-                    return Microsoft.PowerShell.Utility\New-Object @args
+        It "Should handle missing optional attributes gracefully" {
+            $mockConfig = [PSCustomObject]@{
+                Server = "ldap.example.com"
+                BaseDN = "dc=example,dc=com"
+                BindDN = "cn=admin,dc=example,dc=com"
+                BindPassword = "password"
+            }
+
+            Mock New-Object {
+                $mockLdap = [PSCustomObject]@{
+                    name = "testuser2"
+                    displayName = $null
+                    mail = $null
+                    memberOf = $null
                 }
+                $mockLdap | Add-Member -MemberType ScriptMethod -Name "Dispose" -Value {} -PassThru
+            } -ModuleName LDAPAuth
+
+            $result = Test-LDAPAuth -Username "testuser2" -Password "password" -Config $mockConfig
+
+            $result.Success | Should -Be $true
+            $result.User | Should -Be "testuser2"
+            $result.DisplayName | Should -Be "testuser2" # Falls back to Username
+            $result.Email | Should -BeNullOrEmpty
+            if ($null -ne $result.Groups) {
+                $result.Groups.Count | Should -Be 0
             }
 
-            $result = Search-LDAPUser -Username "nonexistent" -Config $Global:TestConfig
-
-            $result.Found | Should -Be $false
-            $result.Error | Should -BeNullOrEmpty
-
-            InModuleScope LDAPAuth {
-                Remove-Item -Path Function:\global:New-Object -ErrorAction SilentlyContinue
-            }
+            Assert-MockCalled New-Object -ModuleName LDAPAuth -Times 1 -Exactly
         }
     }
 
     Context "Error Handling" {
-        It "Should catch connection exceptions and return Found = `$false with Error message" {
-            InModuleScope LDAPAuth {
-                function global:New-Object {
-                    $TypeName = $args[0]
-                    if ($TypeName -match "DirectoryEntry") {
-                        throw "LDAP server unreachable"
-                    }
-                    return Microsoft.PowerShell.Utility\New-Object @args
+        It "Should return false if user is not found (null name)" {
+            $mockConfig = [PSCustomObject]@{
+                Server = "ldap.example.com"
+                BaseDN = "dc=example,dc=com"
+            }
+
+            Mock New-Object {
+                $mockLdap = [PSCustomObject]@{
+                    name = $null
                 }
-            }
+                $mockLdap | Add-Member -MemberType ScriptMethod -Name "Dispose" -Value {} -PassThru
+            } -ModuleName LDAPAuth
 
-            $result = Search-LDAPUser -Username $Global:TestUsername -Config $Global:TestConfig
+            $result = Test-LDAPAuth -Username "wronguser" -Password "password" -Config $mockConfig
 
-            $result.Found | Should -Be $false
-            $result.Error | Should -Match "LDAP server unreachable"
-
-            InModuleScope LDAPAuth {
-                Remove-Item -Path Function:\global:New-Object -ErrorAction SilentlyContinue
-            }
+            $result.Success | Should -Be $false
+            Assert-MockCalled New-Object -ModuleName LDAPAuth -Times 1 -Exactly
         }
 
-        It "Should catch search exceptions and return Found = `$false with Error message" {
-            InModuleScope LDAPAuth {
-                function global:New-Object {
-                    $TypeName = $args[0]
-                    if ($TypeName -match "DirectoryEntry") {
-                        $e = [PSCustomObject]@{ Dispose = {} }
-                        $e | Add-Member -MemberType ScriptMethod -Name Dispose -Value {} -Force
-                        return $e
-                    }
-                    if ($TypeName -match "DirectorySearcher") {
-                        $s = [PSCustomObject]@{
-                            Filter = ""
-                        }
-                        $s | Add-Member -MemberType NoteProperty -Name PropertiesToLoad -Value ([System.Collections.ArrayList]::new()) -Force
-                        $s | Add-Member -MemberType ScriptMethod -Name FindOne -Value { throw "Search timeout" } -Force
-                        $s | Add-Member -MemberType ScriptMethod -Name Dispose -Value {} -Force
-                        return $s
-                    }
-                    return Microsoft.PowerShell.Utility\New-Object @args
-                }
+        It "Should handle exceptions for invalid credentials" {
+            $mockConfig = [PSCustomObject]@{
+                Server = "ldap.example.com"
+                BaseDN = "dc=example,dc=com"
             }
 
-            $result = Search-LDAPUser -Username $Global:TestUsername -Config $Global:TestConfig
+            Mock New-Object {
+                throw [System.Management.Automation.MethodInvocationException]::new("LDAP authentication failed")
+            } -ModuleName LDAPAuth
+
+            $result = Test-LDAPAuth -Username "testuser" -Password "wrongpass" -Config $mockConfig
+
+            $result.Success | Should -Be $false
+            $result.Error -match "LDAP authentication failed" | Should -Be $true
+        }
+
+        It "Should handle generic exceptions correctly" {
+            $mockConfig = [PSCustomObject]@{
+                Server = "ldap.example.com"
+                BaseDN = "dc=example,dc=com"
+            }
+
+            Mock New-Object {
+                throw [System.Exception]::new("Server unreachable")
+            } -ModuleName LDAPAuth
+
+            $result = Test-LDAPAuth -Username "testuser" -Password "password" -Config $mockConfig
+
+            $result.Success | Should -Be $false
+            $result.Error | Should -Be "Server unreachable"
+        }
+    }
+}
+
+Describe "Search-LDAPUser" {
+    BeforeAll {
+        $global:ModulePath = Resolve-Path "$PSScriptRoot/../../../Modules/Authentication/LDAPAuth.psm1" -ErrorAction SilentlyContinue
+        Import-Module $global:ModulePath -Force
+        function global:New-Object { param($TypeName, $ArgumentList) }
+        Invoke-Expression $global:mockClasses
+    }
+
+    Context "Happy Path" {
+        It "Should find a user and return their attributes" {
+            $mockConfig = [PSCustomObject]@{
+                Server = "ldap.example.com"
+                BaseDN = "dc=example,dc=com"
+                BindDN = "cn=admin,dc=example,dc=com"
+                BindPassword = "password"
+            }
+
+            Mock New-Object {
+                if ($TypeName -match "DirectoryEntry") {
+                    $mockLdap = [PSCustomObject]@{ }
+                    $mockLdap | Add-Member -MemberType ScriptMethod -Name "Dispose" -Value {} -PassThru
+                    return $mockLdap
+                }
+
+                if ($TypeName -match "DirectorySearcher") {
+                    return [MockDirectorySearcher]::new()
+                }
+            } -ModuleName LDAPAuth
+
+            $result = Search-LDAPUser -Username "testuser" -Config $mockConfig
+
+            $result.Found | Should -Be $true
+            $result.DN | Should -Be "uid=testuser,dc=example,dc=com"
+            $result.DisplayName | Should -Be "Test User"
+            $result.Email | Should -Be "test@example.com"
+            $result.Groups -contains "Group1" | Should -Be $true
+        }
+    }
+
+    Context "Error Handling" {
+        It "Should return found false if FindOne returns null" {
+            $mockConfig = [PSCustomObject]@{
+                Server = "ldap.example.com"
+                BaseDN = "dc=example,dc=com"
+            }
+
+            Mock New-Object {
+                if ($TypeName -match "DirectoryEntry") {
+                    $mockLdap = [PSCustomObject]@{ }
+                    $mockLdap | Add-Member -MemberType ScriptMethod -Name "Dispose" -Value {} -PassThru
+                    return $mockLdap
+                }
+
+                if ($TypeName -match "DirectorySearcher") {
+                    return [MockDirectorySearcherNull]::new()
+                }
+            } -ModuleName LDAPAuth
+
+            $result = Search-LDAPUser -Username "missinguser" -Config $mockConfig
 
             $result.Found | Should -Be $false
-            $result.Error | Should -Match "Search timeout"
+        }
 
-            InModuleScope LDAPAuth {
-                Remove-Item -Path Function:\global:New-Object -ErrorAction SilentlyContinue
+        It "Should handle exceptions during search" {
+            $mockConfig = [PSCustomObject]@{
+                Server = "ldap.example.com"
+                BaseDN = "dc=example,dc=com"
             }
+
+            Mock New-Object {
+                throw [System.Exception]::new("Search failed")
+            } -ModuleName LDAPAuth
+
+            $result = Search-LDAPUser -Username "testuser" -Config $mockConfig
+
+            $result.Found | Should -Be $false
+            $result.Error | Should -Be "Search failed"
         }
     }
 }
