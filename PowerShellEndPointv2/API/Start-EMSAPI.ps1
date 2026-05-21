@@ -145,15 +145,15 @@ try {
             [int]$WindowSec   = $RateLimitWindowSeconds
         )
         $now = Get-Date
-        $entry = $Global:RateLimitCache.AddOrUpdate(
-            $Key,
-            { @{ Count = 1; WindowStart = $now } },
-            { param($k,$old)
-                if (($now - $old.WindowStart).TotalSeconds -gt $WindowSec) {
-                    @{ Count = 1; WindowStart = $now }
-                } else {
-                    @{ Count = $old.Count + 1; WindowStart = $old.WindowStart }
-                } })
+        $addFactory = [Func[string, object]]{ param($k) @{ Count = 1; WindowStart = $now } }
+        $updateFactory = [Func[string, object, object]]{ param($k,$old)
+            if (($now - $old.WindowStart).TotalSeconds -gt $WindowSec) {
+                @{ Count = 1; WindowStart = $now }
+            } else {
+                @{ Count = $old.Count + 1; WindowStart = $old.WindowStart }
+            }
+        }
+        $entry = $Global:RateLimitCache.AddOrUpdate($Key, $addFactory, $updateFactory)
         return $entry.Count -le $Max
     }
 

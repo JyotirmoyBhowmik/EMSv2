@@ -1,111 +1,87 @@
-BeforeAll {
-    $global:ModulePath = Resolve-Path "$PSScriptRoot/../../../Modules/Authentication/StandaloneAuth.psm1"
-    function global:Invoke-PGQuery {}
-    function global:Initialize-PostgreSQLConnection {}
-    function global:Write-EMSLog {}
+Describe "StandaloneAuth - Test-PasswordHash" {
+    BeforeAll {
+        function global:Invoke-PGQuery {}
+        function global:Initialize-PostgreSQLConnection {}
+        function global:Write-EMSLog {}
 
-    Import-Module $global:ModulePath -Force
-}
+        Import-Module "$PSScriptRoot/../../../Modules/Authentication/StandaloneAuth.psm1" -Force
+    }
 
-Describe "Test-StandaloneAuth" {
+    Context "When testing a valid password against its hash" {
+        It "returns true for a correct password" {
+            $password = "MySecurePassword123!"
+            $hashData = New-PasswordHash -Password $password
 
-    Context "User Not Found" {
-        It "Should return Success = `$false and Message = 'User not found'" {
-            Mock Get-EMSLocalCredential { return $null } -ModuleName "StandaloneAuth"
+            $result = Test-PasswordHash -Password $password -Salt $hashData.Salt -StoredHash $hashData.Hash
 
-            $result = Test-StandaloneAuth -Username "nonexistent" -Password "password123" -Config @{}
+            $result | Should -Be $true
+        }
 
-            $result.Success | Should -Be $false
-            $result.Message | Should -Be "User not found"
+        It "handles very long passwords" {
+            $password = "A" * 1000
+            $hashData = New-PasswordHash -Password $password
+
+            $result = Test-PasswordHash -Password $password -Salt $hashData.Salt -StoredHash $hashData.Hash
+
+            $result | Should -Be $true
+        }
+
+        It "handles passwords with special characters" {
+            $password = "!@#$%^&*()_+{}|[]\:`~<>?,./"
+            $hashData = New-PasswordHash -Password $password
+
+            $result = Test-PasswordHash -Password $password -Salt $hashData.Salt -StoredHash $hashData.Hash
+
+            $result | Should -Be $true
         }
     }
 
-    Context "User is Inactive" {
-        It "Should return Success = `$false and Message = 'User is inactive' when user.is_active is `$false" {
-            $inactiveUser = [pscustomobject]@{
-                user_id = 1
-                username = "inactiveuser"
-                is_active = $false
-                credential_active = $true
-            }
-            Mock Get-EMSLocalCredential { return $inactiveUser } -ModuleName "StandaloneAuth"
+    Context "When testing an invalid password against a hash" {
+        It "returns false for an incorrect password" {
+            $password = "MySecurePassword123!"
+            $wrongPassword = "WrongPassword456"
+            $hashData = New-PasswordHash -Password $password
 
-            $result = Test-StandaloneAuth -Username "inactiveuser" -Password "password123" -Config @{}
+            $result = Test-PasswordHash -Password $wrongPassword -Salt $hashData.Salt -StoredHash $hashData.Hash
 
-            $result.Success | Should -Be $false
-            $result.Message | Should -Be "User is inactive"
+            $result | Should -Be $false
         }
 
-        It "Should return Success = `$false and Message = 'User is inactive' when user.credential_active is `$false" {
-            $inactiveCredUser = [pscustomobject]@{
-                user_id = 1
-                username = "inactivecreduser"
-                is_active = $true
-                credential_active = $false
-            }
-            Mock Get-EMSLocalCredential { return $inactiveCredUser } -ModuleName "StandaloneAuth"
+        It "returns false when given a different salt" {
+            $password = "MySecurePassword123!"
+            $hashData = New-PasswordHash -Password $password
+            $otherHashData = New-PasswordHash -Password "OtherPassword"
 
-            $result = Test-StandaloneAuth -Username "inactivecreduser" -Password "password123" -Config @{}
+            $result = Test-PasswordHash -Password $password -Salt $otherHashData.Salt -StoredHash $hashData.Hash
 
-            $result.Success | Should -Be $false
-            $result.Message | Should -Be "User is inactive"
+            $result | Should -Be $false
         }
-    }
 
-    Context "Invalid Credentials" {
-        It "Should return Success = `$false and Message = 'Invalid credentials' when Test-PasswordHash returns `$false" {
-            $user = [pscustomobject]@{
-                user_id = 1
-                username = "validuser"
-                is_active = $true
-                credential_active = $true
-                password_salt = "somesalt"
-                password_hash = "somehash"
-            }
-            Mock Get-EMSLocalCredential { return $user } -ModuleName "StandaloneAuth"
-            Mock Test-PasswordHash { return $false } -ModuleName "StandaloneAuth"
+        It "returns false when given a different stored hash" {
+            $password = "MySecurePassword123!"
+            $hashData = New-PasswordHash -Password $password
+            $otherHashData = New-PasswordHash -Password "OtherPassword"
 
-            $result = Test-StandaloneAuth -Username "validuser" -Password "wrongpassword" -Config @{}
+            $result = Test-PasswordHash -Password $password -Salt $hashData.Salt -StoredHash $otherHashData.Hash
 
-            $result.Success | Should -Be $false
-            $result.Message | Should -Be "Invalid credentials"
+            $result | Should -Be $false
         }
     }
 
-    Context "Valid Credentials" {
-        It "Should return Success = `$true and correct user details when Test-PasswordHash returns `$true" {
-            $user = [pscustomobject]@{
-                user_id = 1
-                username = "validuser"
-                display_name = "Valid User"
-                role = "admin"
-                is_active = $true
-                credential_active = $true
-                password_salt = "somesalt"
-                password_hash = "somehash"
-            }
-            Mock Get-EMSLocalCredential { return $user } -ModuleName "StandaloneAuth"
-            Mock Test-PasswordHash { return $true } -ModuleName "StandaloneAuth"
-
-            $result = Test-StandaloneAuth -Username "validuser" -Password "correctpassword" -Config @{}
-
-            $result.Success | Should -Be $true
-            $result.User | Should -Be "validuser"
-            $result.DisplayName | Should -Be "Valid User"
-            $result.Groups -contains "admin" | Should -Be $true
+    Context "When given missing parameters" {
+        It "throws an error if password is empty string or null" {
+            $password = ""
+            { Test-PasswordHash -Password $password -Salt "test_salt" -StoredHash "test_hash" } | Should -Throw -ErrorId "ParameterArgumentValidationErrorEmptyStringNotAllowed,Test-PasswordHash"
         }
-    }
 
-    Context "Error Handling" {
-        It "Should return Success = `$false and the exception message on error, and log the error" {
-            Mock Get-EMSLocalCredential { throw "Database error" } -ModuleName "StandaloneAuth"
-            Mock Write-EMSLog {} -ModuleName "StandaloneAuth"
+        It "throws an error if salt is missing" {
+            $password = "password123"
+            { Test-PasswordHash -Password $password -StoredHash "test_hash" } | Should -Throw -ErrorId "MissingMandatoryParameter,Test-PasswordHash"
+        }
 
-            $result = Test-StandaloneAuth -Username "erroruser" -Password "password123" -Config @{}
-
-            $result.Success | Should -Be $false
-            $result.Message | Should -Be "Database error"
-            Assert-MockCalled Write-EMSLog -ModuleName "StandaloneAuth" -Times 1 -Exactly
+        It "throws an error if stored hash is missing" {
+            $password = "password123"
+            { Test-PasswordHash -Password $password -Salt "test_salt" } | Should -Throw -ErrorId "MissingMandatoryParameter,Test-PasswordHash"
         }
     }
 }

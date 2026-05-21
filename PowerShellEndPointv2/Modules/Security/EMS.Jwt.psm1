@@ -1,3 +1,8 @@
+<#
+    EMS.Jwt.psm1
+    JWT Token Management
+#>
+
 $script:Base64UrlEncode = {
     param([byte[]]$bytes)
     [Convert]::ToBase64String($bytes).TrimEnd('=').Replace('+','-').Replace('/','_')
