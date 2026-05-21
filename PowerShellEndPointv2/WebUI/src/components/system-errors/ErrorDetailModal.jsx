@@ -29,6 +29,7 @@ const ErrorDetailModal = ({ selected, setSelected }) => {
                         🐛 Error Details
                     </div>
                     <button
+                        aria-label="Close error details"
                         onClick={() => setSelected(null)}
                         style={{
                             border: 'none', background: '#f1f5f9', borderRadius: 6,
