@@ -50,7 +50,7 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
             <div className="modal-content" style={{ maxWidth: '400px' }}>
                 <div className="modal-header">
                     <h2>Change Password</h2>
-                    <button className="close-btn" onClick={onClose}>&times;</button>
+                    <button className="close-btn" aria-label="Close change password modal" onClick={onClose}>&times;</button>
                 </div>
                 
                 <form onSubmit={handleSubmit} className="modal-body">
