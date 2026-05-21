@@ -93,7 +93,7 @@ function Connect-EMSEndpoint {
 function Disconnect-EMSEndpoint {
     param($Session)
     
-    if ($Session -and $Session.Protocol -eq 'CIM-DCOM' -and $Session.Session) {
+    if ($Session -and $Session.Protocol -match 'CIM' -and $Session.Session) {
         try {
             Remove-CimSession -CimSession $Session.Session -ErrorAction SilentlyContinue
         } catch {}
