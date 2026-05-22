@@ -90,8 +90,10 @@ function Login({ onLogin }) {
                                 const selected = provider === p.Name;
 
                                 return (
-                                    <div
+                                    <button
                                         key={p.Name}
+                                        type="button"
+                                        aria-pressed={selected}
                                         onClick={() => setProvider(p.Name)}
                                         style={{
                                             flex: 1,
@@ -105,7 +107,7 @@ function Login({ onLogin }) {
                                     >
                                         <div style={{ marginBottom: '6px' }}>{meta?.icon}</div>
                                         <div style={{ fontWeight: 600 }}>{meta?.label || p.Name}</div>
-                                    </div>
+                                    </button>
                                 );
                             })}
                         </div>
@@ -114,8 +116,9 @@ function Login({ onLogin }) {
 
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label>Username</label>
+                        <label htmlFor="login-username">Username</label>
                         <input
+                            id="login-username"
                             type="text"
                             className="form-control"
                             placeholder={usernamePlaceholder()}
@@ -127,8 +130,9 @@ function Login({ onLogin }) {
                     </div>
 
                     <div className="form-group">
-                        <label>Password</label>
+                        <label htmlFor="login-password">Password</label>
                         <input
+                            id="login-password"
                             type="password"
                             className="form-control"
                             value={password}
