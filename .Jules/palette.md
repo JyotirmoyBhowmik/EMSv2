@@ -1,0 +1,3 @@
+## 2024-05-18 - Auth Provider Card Accessibility
+**Learning:** Custom interactive elements (like auth provider cards) in the WebUI are occasionally built using non-semantic `<div>` elements without `role="button"` or keyboard event handlers. Additionally, form `<label>` and `<input>` pairs frequently lack linking via `htmlFor` and `id` attributes.
+**Action:** When working on UI components, ensure that clickable custom elements use semantic `<button>` tags (or appropriately implement `role="button"`, `tabIndex`, and keyboard event listeners) and that forms properly link labels to inputs for screen reader support.
