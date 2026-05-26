@@ -82,17 +82,19 @@ function Login({ onLogin }) {
                 )}
 
                 {providers.length > 1 && (
-                    <div style={{ marginBottom: '20px' }}>
-                        <label style={{ fontWeight: 600 }}>Authentication Method</label>
+                    <fieldset style={{ marginBottom: '20px', border: 'none', padding: 0 }}>
+                        <legend style={{ fontWeight: 600, padding: 0, marginBottom: '10px' }}>Authentication Method</legend>
                         <div style={{ display: 'flex', gap: '12px', marginTop: '10px' }}>
                             {providers.map((p) => {
                                 const meta = providerMeta[p.Name];
                                 const selected = provider === p.Name;
 
                                 return (
-                                    <div
+                                    <button
                                         key={p.Name}
+                                        type="button"
                                         onClick={() => setProvider(p.Name)}
+                                        aria-pressed={selected}
                                         style={{
                                             flex: 1,
                                             cursor: 'pointer',
@@ -100,22 +102,24 @@ function Login({ onLogin }) {
                                             borderRadius: '8px',
                                             textAlign: 'center',
                                             border: selected ? '2px solid #1a237e' : '1px solid #ccc',
-                                            background: selected ? '#eef2ff' : '#fff'
+                                            background: selected ? '#eef2ff' : '#fff',
+                                            color: 'inherit'
                                         }}
                                     >
                                         <div style={{ marginBottom: '6px' }}>{meta?.icon}</div>
                                         <div style={{ fontWeight: 600 }}>{meta?.label || p.Name}</div>
-                                    </div>
+                                    </button>
                                 );
                             })}
                         </div>
-                    </div>
+                    </fieldset>
                 )}
 
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label>Username</label>
+                        <label htmlFor="login-username">Username</label>
                         <input
+                            id="login-username"
                             type="text"
                             className="form-control"
                             placeholder={usernamePlaceholder()}
@@ -127,8 +131,9 @@ function Login({ onLogin }) {
                     </div>
 
                     <div className="form-group">
-                        <label>Password</label>
+                        <label htmlFor="login-password">Password</label>
                         <input
+                            id="login-password"
                             type="password"
                             className="form-control"
                             value={password}
