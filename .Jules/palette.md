@@ -1,0 +1,3 @@
+## 2024-03-01 - Interactive Custom Elements in EMS WebUI
+**Learning:** Custom interactive elements (like the auth provider cards in Login.jsx) are occasionally built using non-semantic `<div>` elements without `role="button"` or keyboard event handlers, lacking basic accessibility support. Additionally, form `<label>` elements and `<input>` pairs frequently lack linking via `htmlFor` and `id` attributes.
+**Action:** Always verify that interactive elements use native semantic HTML tags like `<button>` when possible, or properly implement `role="button"` and keyboard support. Link labels and inputs correctly across the application when identified.
