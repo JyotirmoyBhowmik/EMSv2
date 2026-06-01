@@ -1,0 +1,3 @@
+## 2024-05-15 - Interactive Elements Accessibility Pattern
+**Learning:** Custom interactive elements (like auth provider selection cards in `Login.jsx`) are sometimes built using non-semantic `<div>` elements without accessibility roles or attributes, causing them to be ignored or poorly handled by screen readers. Furthermore, standard form pairs (`<label>` and `<input>`) often lack linking via `htmlFor` and `id` attributes.
+**Action:** When working on UI components, convert interactive `<div>` blocks acting as buttons into semantic `<button type="button">` tags (maintaining visual styling via `color: inherit`, `font-family: inherit`, etc.) and add appropriate attributes like `aria-pressed`. Always ensure form labels are explicitly linked to inputs.
