@@ -1,0 +1,3 @@
+## 2024-05-24 - Interactive Elements as Divs & Unlinked Forms
+**Learning:** Found a recurring accessibility issue pattern where custom interactive elements (like the auth provider cards) are built using non-semantic `<div>` elements without appropriate ARIA roles or keyboard event handlers, rather than using `<button>` elements. Additionally, forms frequently lack proper linkage between `<label>` and `<input>` components via `htmlFor` and `id`.
+**Action:** When working on interactive UI components, ensure that clickable elements use semantic `<button>` tags (or appropriately role-mapped elements with keyboard support) and that form inputs are correctly associated with their labels to support screen readers and improved accessibility.
