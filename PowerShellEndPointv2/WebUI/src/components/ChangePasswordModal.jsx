@@ -58,8 +58,9 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                     {success && <div className="alert alert-success">Password updated successfully!</div>}
                     
                     <div className="form-group">
-                        <label>Current Password</label>
+                        <label htmlFor="oldPassword">Current Password</label>
                         <input 
+                            id="oldPassword"
                             type="password" 
                             className="form-control" 
                             value={oldPassword}
@@ -70,8 +71,9 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                     </div>
                     
                     <div className="form-group">
-                        <label>New Password</label>
+                        <label htmlFor="newPassword">New Password</label>
                         <input 
+                            id="newPassword"
                             type="password" 
                             className="form-control" 
                             value={newPassword}
@@ -82,8 +84,9 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                     </div>
                     
                     <div className="form-group">
-                        <label>Confirm New Password</label>
+                        <label htmlFor="confirmPassword">Confirm New Password</label>
                         <input 
+                            id="confirmPassword"
                             type="password" 
                             className="form-control" 
                             value={confirmPassword}
