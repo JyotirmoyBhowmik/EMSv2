@@ -134,8 +134,9 @@ const ScanEndpoint = () => {
                     <InfoIcon text="Force a specific communication protocol. Use 'Auto' for default discovery logic." />
                 </h3>
                 <div className="form-group">
-                    <label className="form-label">Connection Protocol</label>
+                    <label htmlFor="protocol" className="form-label">Connection Protocol</label>
                     <select 
+                        id="protocol"
                         className="form-control" 
                         value={protocol} 
                         onChange={(e) => setProtocol(e.target.value)}
@@ -157,8 +158,9 @@ const ScanEndpoint = () => {
                     <InfoIcon text="Submit a specific computer for immediate inventory and compliance verification." />
                 </h3>
                 <div className="form-group">
-                    <label className="form-label">Hostname / IP Address</label>
+                    <label htmlFor="singleTarget" className="form-label">Hostname / IP Address</label>
                     <input
+                        id="singleTarget"
                         className="form-control"
                         placeholder="Example: KTMMISLPJYOTIBH or 10.192.x.x"
                         value={singleTarget}
@@ -176,8 +178,9 @@ const ScanEndpoint = () => {
                     <InfoIcon text="Process multiple endpoints simultaneously. Supports file upload or manual list entry." />
                 </h3>
                 <div className="form-group">
-                    <label className="form-label">Upload TXT File</label>
+                    <label htmlFor="bulkFile" className="form-label">Upload TXT File</label>
                     <input
+                        id="bulkFile"
                         className="form-control"
                         type="file"
                         accept=".txt,text/plain"
@@ -187,8 +190,9 @@ const ScanEndpoint = () => {
                 </div>
 
                 <div className="form-group">
-                    <label className="form-label">Hosts</label>
+                    <label htmlFor="bulkHosts" className="form-label">Hosts</label>
                     <textarea
+                        id="bulkHosts"
                         className="form-control"
                         rows="8"
                         placeholder="Paste one hostname/IP per line, or comma/space separated."
