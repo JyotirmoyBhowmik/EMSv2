@@ -74,6 +74,8 @@ function ComputerManagement() {
                 <button
                     className="btn btn-primary"
                     onClick={() => setShowAddForm(!showAddForm)}
+                    aria-expanded={showAddForm}
+                    aria-controls="add-computer-form"
                 >
                     {showAddForm ? 'Cancel' : '+ Add Computer'}
                 </button>
@@ -84,13 +86,14 @@ function ComputerManagement() {
             )}
 
             {showAddForm && (
-                <div className="card" style={{ marginBottom: '20px' }}>
+                <div id="add-computer-form" className="card" style={{ marginBottom: '20px' }}>
                     <h3>Register New Computer</h3>
                     <form onSubmit={handleAddComputer} className="form-horizontal">
                         <div className="form-row">
                             <div className="form-group">
-                                <label>Computer Name</label>
+                                <label htmlFor="computer-name">Computer Name</label>
                                 <input
+                                    id="computer-name"
                                     type="text"
                                     value={newComputer.name}
                                     onChange={(e) => setNewComputer({ ...newComputer, name: e.target.value })}
@@ -99,8 +102,9 @@ function ComputerManagement() {
                                 />
                             </div>
                             <div className="form-group">
-                                <label>IP Address</label>
+                                <label htmlFor="ip-address">IP Address</label>
                                 <input
+                                    id="ip-address"
                                     type="text"
                                     value={newComputer.ip}
                                     onChange={(e) => setNewComputer({ ...newComputer, ip: e.target.value })}
@@ -109,8 +113,9 @@ function ComputerManagement() {
                                 />
                             </div>
                             <div className="form-group">
-                                <label>Type</label>
+                                <label htmlFor="computer-type">Type</label>
                                 <select
+                                    id="computer-type"
                                     value={newComputer.type}
                                     onChange={(e) => setNewComputer({ ...newComputer, type: e.target.value })}
                                 >
