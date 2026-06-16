@@ -9,12 +9,13 @@ const categoryColors = {
     Administration: { bg: '#fef2f2', border: '#fecaca', badge: '#dc2626' }
 };
 
-function ToggleSwitch({ enabled, onChange, disabled }) {
+function ToggleSwitch({ enabled, onChange, disabled, ariaLabel }) {
     return (
         <button
             onClick={onChange}
             disabled={disabled}
             aria-pressed={enabled}
+            aria-label={ariaLabel}
             style={{
                 position: 'relative', width: 48, height: 26, borderRadius: 13,
                 border: 'none', cursor: disabled ? 'not-allowed' : 'pointer',
@@ -245,6 +246,7 @@ function FeatureCard({ category, features, saving, onToggle }) {
                             enabled={f.enabled}
                             disabled={saving === f.feature_key}
                             onChange={() => onToggle(f.feature_key, f.enabled)}
+                            ariaLabel={`Toggle ${f.feature_name}`}
                         />
                     </div>
                 </div>
@@ -311,12 +313,12 @@ function CredentialManager() {
                 )}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Service Username</label>
-                        <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="DOMAIN\svc_ems_scan" style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', boxSizing: 'border-box' }} />
+                        <label htmlFor="scan-username" style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Service Username</label>
+                        <input id="scan-username" type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="DOMAIN\svc_ems_scan" style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', boxSizing: 'border-box' }} />
                     </div>
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Service Password</label>
-                        <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', boxSizing: 'border-box' }} />
+                        <label htmlFor="scan-password" style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Service Password</label>
+                        <input id="scan-password" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', boxSizing: 'border-box' }} />
                     </div>
                 </div>
                 <div style={{ display: 'flex', gap: 10 }}>
@@ -410,19 +412,19 @@ function EnvironmentManager() {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 12 }}>
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Variable Name</label>
-                        <select value={newKey} onChange={e => setNewKey(e.target.value)} style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', background: '#fff' }}>
+                        <label htmlFor="env-key" style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Variable Name</label>
+                        <select id="env-key" value={newKey} onChange={e => setNewKey(e.target.value)} style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', background: '#fff' }}>
                             <option value="">Select or type...</option>
                             {presets.map(p => <option key={p} value={p}>{p}</option>)}
                         </select>
                     </div>
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Value</label>
-                        <input type={newKey.match(/password|secret|key|token/i) ? 'password' : 'text'} value={newValue} onChange={e => setNewValue(e.target.value)} placeholder="Enter value..." style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', boxSizing: 'border-box' }} />
+                        <label htmlFor="env-value" style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Value</label>
+                        <input id="env-value" type={newKey.match(/password|secret|key|token/i) ? 'password' : 'text'} value={newValue} onChange={e => setNewValue(e.target.value)} placeholder="Enter value..." style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', boxSizing: 'border-box' }} />
                     </div>
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Description</label>
-                        <input type="text" value={newDesc} onChange={e => setNewDesc(e.target.value)} placeholder="Optional description..." style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', boxSizing: 'border-box' }} />
+                        <label htmlFor="env-desc" style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Description</label>
+                        <input id="env-desc" type="text" value={newDesc} onChange={e => setNewDesc(e.target.value)} placeholder="Optional description..." style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', boxSizing: 'border-box' }} />
                     </div>
                 </div>
                 <button onClick={handleSave} disabled={saving} style={{ padding: '10px 20px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}>
