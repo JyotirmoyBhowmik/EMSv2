@@ -8,3 +8,6 @@
 ## 2024-05-19 - Accessible Form Inputs
 **Learning:** Found that custom form fields in `ComputerManagement.jsx` lacked standard `htmlFor` and `id` linking, and toggle buttons did not have ARIA properties communicating their expanded state.
 **Action:** Always ensure toggle buttons use `aria-expanded` and `aria-controls` for accessibility, and standard form inputs and selects use `htmlFor` matching their respective `id` properties.
+## 2024-06-05 - Linked form labels explicitly in modal
+**Learning:** In `UserManagement.jsx`, form fields generated dynamically inside a modal lacked the explicit linkage of `htmlFor` on the `<label>` matching the `id` of the `<input>` or `<select>`, which degrades screen reader navigation in dynamic contexts.
+**Action:** Always verify that dynamically generated form inputs in loops or conditionally rendered components explicitly connect `<label>` and `<input>` using matching `htmlFor` and `id` attributes.
