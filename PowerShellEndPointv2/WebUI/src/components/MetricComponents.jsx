@@ -63,20 +63,20 @@ function MetricDetail({ metricName, metricType, apiEndpoint }) {
                 <h3>Filters</h3>
                 <div className="form-row">
                     <div className="form-group">
-                        <label>Computer Name</label>
-                        <input type="text" value={filters.computerName} onChange={(e) => setFilters({ ...filters, computerName: e.target.value })} placeholder="Filter by computer name" />
+                        <label htmlFor={`filter-computerName-${metricType}`}>Computer Name</label>
+                        <input id={`filter-computerName-${metricType}`} type="text" value={filters.computerName} onChange={(e) => setFilters({ ...filters, computerName: e.target.value })} placeholder="Filter by computer name" />
                     </div>
                     <div className="form-group">
-                        <label>Start Date</label>
-                        <input type="date" value={filters.startDate} onChange={(e) => setFilters({ ...filters, startDate: e.target.value })} />
+                        <label htmlFor={`filter-startDate-${metricType}`}>Start Date</label>
+                        <input id={`filter-startDate-${metricType}`} type="date" value={filters.startDate} onChange={(e) => setFilters({ ...filters, startDate: e.target.value })} />
                     </div>
                     <div className="form-group">
-                        <label>End Date</label>
-                        <input type="date" value={filters.endDate} onChange={(e) => setFilters({ ...filters, endDate: e.target.value })} />
+                        <label htmlFor={`filter-endDate-${metricType}`}>End Date</label>
+                        <input id={`filter-endDate-${metricType}`} type="date" value={filters.endDate} onChange={(e) => setFilters({ ...filters, endDate: e.target.value })} />
                     </div>
                     <div className="form-group">
-                        <label>Limit</label>
-                        <select value={filters.limit} onChange={(e) => setFilters({ ...filters, limit: e.target.value })}>
+                        <label htmlFor={`filter-limit-${metricType}`}>Limit</label>
+                        <select id={`filter-limit-${metricType}`} value={filters.limit} onChange={(e) => setFilters({ ...filters, limit: e.target.value })}>
                             <option>50</option><option>100</option><option>500</option><option>1000</option>
                         </select>
                     </div>
