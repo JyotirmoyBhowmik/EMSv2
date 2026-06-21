@@ -8,3 +8,7 @@
 ## 2024-05-19 - Accessible Form Inputs
 **Learning:** Found that custom form fields in `ComputerManagement.jsx` lacked standard `htmlFor` and `id` linking, and toggle buttons did not have ARIA properties communicating their expanded state.
 **Action:** Always ensure toggle buttons use `aria-expanded` and `aria-controls` for accessibility, and standard form inputs and selects use `htmlFor` matching their respective `id` properties.
+
+## 2024-05-24 - [Unlinked Form Labels Pattern]
+**Learning:** We observed a pattern where form `<label>` and `<input>`/`<select>` pairs lack linking via `htmlFor` and `id` attributes across multiple components in the WebUI.
+**Action:** When working on UX/A11y improvements, ensure to add `htmlFor` attributes to `<label>` elements and corresponding `id` attributes to form fields to ensure compliance with accessibility standards, especially in filter and form components.
