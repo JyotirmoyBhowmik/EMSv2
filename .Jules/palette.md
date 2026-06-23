@@ -8,3 +8,7 @@
 ## 2024-05-19 - Accessible Form Inputs
 **Learning:** Found that custom form fields in `ComputerManagement.jsx` lacked standard `htmlFor` and `id` linking, and toggle buttons did not have ARIA properties communicating their expanded state.
 **Action:** Always ensure toggle buttons use `aria-expanded` and `aria-controls` for accessibility, and standard form inputs and selects use `htmlFor` matching their respective `id` properties.
+
+## 2024-06-23 - Explicit form label associations for better screen reader accessibility
+**Learning:** Found multiple instances where form labels were lacking the `htmlFor` attribute linking to input controls across various components like `MetricComponents.jsx`, `AuditLog.jsx`, and `HistoricalReports.jsx`. This is a common accessibility gap in the application that harms screen reader usability.
+**Action:** Continuously audit components containing inputs, selects, and textareas to ensure all have an explicit `<label htmlFor="id">` paired with an `<input id="id">` for proper semantics and screen reader compliance.
