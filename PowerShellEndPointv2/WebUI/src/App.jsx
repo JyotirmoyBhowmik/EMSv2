@@ -1,3 +1,4 @@
+import { CPUUsageMetric } from "./components/MetricComponents";
 import React, { useState } from 'react';
 import {
     BrowserRouter as Router,
@@ -331,6 +332,7 @@ function AppRoutes() {
                 <Route path="admin/health"    element={<ProtectedRoute requireAdmin><ConnectorHealth /></ProtectedRoute>} />
                 <Route path="admin/errors"    element={<ProtectedRoute requireAdmin><SystemErrors /></ProtectedRoute>} />
                 <Route path="admin/audit"     element={<ProtectedRoute requireAdmin><AuditLog /></ProtectedRoute>} />
+                <Route path="metrics/cpu"     element={<ProtectedRoute><CPUUsageMetric /></ProtectedRoute>} />
             </Route>
 
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
