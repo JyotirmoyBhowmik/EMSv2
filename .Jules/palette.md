@@ -8,3 +8,7 @@
 ## 2024-05-19 - Accessible Form Inputs
 **Learning:** Found that custom form fields in `ComputerManagement.jsx` lacked standard `htmlFor` and `id` linking, and toggle buttons did not have ARIA properties communicating their expanded state.
 **Action:** Always ensure toggle buttons use `aria-expanded` and `aria-controls` for accessibility, and standard form inputs and selects use `htmlFor` matching their respective `id` properties.
+
+## 2024-07-01 - Add loading state and explicitly link form labels in User Management
+**Learning:** Encountered a form in `UserManagement.jsx` lacking a disabled/loading state during save operations, causing potential multiple submissions, and inputs lacked proper `htmlFor`/`id` links for accessibility.
+**Action:** Implemented a 'saving' state that updates the Save button, disables it along with the Cancel button and all form inputs to give clear visual feedback. Linked form `<label>` to their respective inputs and selects using `htmlFor` attributes to improve accessibility across the modal.
