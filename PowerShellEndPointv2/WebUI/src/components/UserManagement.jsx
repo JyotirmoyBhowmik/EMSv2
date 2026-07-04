@@ -138,13 +138,13 @@ function UserManagement() {
                         <h2>{editUser ? 'Edit User' : 'Create User'}</h2>
                         {['username', 'display_name', 'email', 'domain'].map(field => (
                             <div key={field} style={{ marginBottom: '12px' }}>
-                                <label style={{ display: 'block', marginBottom: '4px', fontWeight: '600', textTransform: 'capitalize' }}>{field.replace('_', ' ')}</label>
-                                <input value={form[field] || ''} onChange={e => setForm({ ...form, [field]: e.target.value })}
+                                <label htmlFor={`user-${field}`} style={{ display: 'block', marginBottom: '4px', fontWeight: '600', textTransform: 'capitalize' }}>{field.replace('_', ' ')}</label>
+                                <input id={`user-${field}`} value={form[field] || ''} onChange={e => setForm({ ...form, [field]: e.target.value })}
                                     style={inputStyle} />
                             </div>
                         ))}
-                        <label style={{ display: 'block', marginBottom: '4px', fontWeight: '600' }}>Role</label>
-                        <select value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} style={inputStyle}>
+                        <label htmlFor="user-role" style={{ display: 'block', marginBottom: '4px', fontWeight: '600' }}>Role</label>
+                        <select id="user-role" value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} style={inputStyle}>
                             <option value="admin">Admin</option>
                             <option value="operator">Operator</option>
                             <option value="viewer">Viewer</option>
