@@ -311,12 +311,12 @@ function CredentialManager() {
                 )}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 16 }}>
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Service Username</label>
-                        <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="DOMAIN\svc_ems_scan" style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', boxSizing: 'border-box' }} />
+                        <label htmlFor="serviceUsername" style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Service Username</label>
+                        <input id="serviceUsername" type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="DOMAIN\svc_ems_scan" style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', boxSizing: 'border-box' }} />
                     </div>
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Service Password</label>
-                        <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', boxSizing: 'border-box' }} />
+                        <label htmlFor="servicePassword" style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Service Password</label>
+                        <input id="servicePassword" type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', boxSizing: 'border-box' }} />
                     </div>
                 </div>
                 <div style={{ display: 'flex', gap: 10 }}>
@@ -410,19 +410,19 @@ function EnvironmentManager() {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginBottom: 12 }}>
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Variable Name</label>
-                        <select value={newKey} onChange={e => setNewKey(e.target.value)} style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', background: '#fff' }}>
+                        <label htmlFor="envVarName" style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Variable Name</label>
+                        <select id="envVarName" value={newKey} onChange={e => setNewKey(e.target.value)} style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', background: '#fff' }}>
                             <option value="">Select or type...</option>
                             {presets.map(p => <option key={p} value={p}>{p}</option>)}
                         </select>
                     </div>
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Value</label>
-                        <input type={newKey.match(/password|secret|key|token/i) ? 'password' : 'text'} value={newValue} onChange={e => setNewValue(e.target.value)} placeholder="Enter value..." style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', boxSizing: 'border-box' }} />
+                        <label htmlFor="envVarValue" style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Value</label>
+                        <input id="envVarValue" type={newKey.match(/password|secret|key|token/i) ? 'password' : 'text'} value={newValue} onChange={e => setNewValue(e.target.value)} placeholder="Enter value..." style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', boxSizing: 'border-box' }} />
                     </div>
                     <div>
-                        <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Description</label>
-                        <input type="text" value={newDesc} onChange={e => setNewDesc(e.target.value)} placeholder="Optional description..." style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', boxSizing: 'border-box' }} />
+                        <label htmlFor="envVarDesc" style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748b', textTransform: 'uppercase', marginBottom: 4 }}>Description</label>
+                        <input id="envVarDesc" type="text" value={newDesc} onChange={e => setNewDesc(e.target.value)} placeholder="Optional description..." style={{ width: '100%', padding: '10px 12px', border: '1px solid #e2e8f0', borderRadius: 8, fontSize: '0.875rem', boxSizing: 'border-box' }} />
                     </div>
                 </div>
                 <button onClick={handleSave} disabled={saving} style={{ padding: '10px 20px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}>
