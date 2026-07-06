@@ -8,3 +8,6 @@
 ## 2024-05-19 - Accessible Form Inputs
 **Learning:** Found that custom form fields in `ComputerManagement.jsx` lacked standard `htmlFor` and `id` linking, and toggle buttons did not have ARIA properties communicating their expanded state.
 **Action:** Always ensure toggle buttons use `aria-expanded` and `aria-controls` for accessibility, and standard form inputs and selects use `htmlFor` matching their respective `id` properties.
+## 2024-07-06 - Linked Form Labels in User Management
+**Learning:** Found an accessibility issue where form labels in the `UserManagement.jsx` Create/Edit modal were not linked to their respective inputs using `htmlFor` and `id` attributes. This prevented users from clicking the labels to focus the inputs and hindered screen reader support.
+**Action:** Always verify that form labels are explicitly associated with their input and select controls using matching `htmlFor` and `id` attributes when building or updating forms in this application, specifically inside mapped array renders.
