@@ -8,3 +8,6 @@
 ## 2024-05-19 - Accessible Form Inputs
 **Learning:** Found that custom form fields in `ComputerManagement.jsx` lacked standard `htmlFor` and `id` linking, and toggle buttons did not have ARIA properties communicating their expanded state.
 **Action:** Always ensure toggle buttons use `aria-expanded` and `aria-controls` for accessibility, and standard form inputs and selects use `htmlFor` matching their respective `id` properties.
+## 2025-02-12 - Improved Loading UX and Accessibility in Metric Components
+**Learning:** Found that when loading states replace the entire component (e.g., `if (loading) return <div className="loading">...</div>`), it unmounts filter inputs on every keystroke/change, stealing user focus and creating a poor typing experience. In addition, form inputs were lacking proper `htmlFor` and `id` linkages for accessibility.
+**Action:** Implemented a non-disruptive overlay loading state for the table using `position: absolute` and `opacity: 0.6` while keeping the rest of the UI mounted. Disabled buttons appropriately, and securely linked all form labels to inputs using a unique `-...` prefix for the IDs.
