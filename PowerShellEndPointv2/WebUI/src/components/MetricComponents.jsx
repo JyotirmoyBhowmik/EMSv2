@@ -50,43 +50,50 @@ function MetricDetail({ metricName, metricType, apiEndpoint }) {
         a.click();
     };
 
-    if (loading) return <div className="loading">Loading {metricName}...</div>;
-
     return (
         <div className="page-container">
             <div className="page-header">
                 <h1>{metricName}</h1>
-                <button className="btn btn-primary" onClick={exportCSV}>📥 Export CSV</button>
+                <button className="btn btn-primary" onClick={exportCSV} disabled={loading || data.length === 0}>
+                    {loading ? '⏳ Loading...' : '📥 Export CSV'}
+                </button>
             </div>
 
             <div className="card" style={{ marginBottom: '20px' }}>
                 <h3>Filters</h3>
                 <div className="form-row">
                     <div className="form-group">
-                        <label>Computer Name</label>
-                        <input type="text" value={filters.computerName} onChange={(e) => setFilters({ ...filters, computerName: e.target.value })} placeholder="Filter by computer name" />
+                        <label htmlFor={`${metricType}-computer`}>Computer Name</label>
+                        <input id={`${metricType}-computer`} type="text" value={filters.computerName} onChange={(e) => setFilters({ ...filters, computerName: e.target.value })} placeholder="Filter by computer name" />
                     </div>
                     <div className="form-group">
-                        <label>Start Date</label>
-                        <input type="date" value={filters.startDate} onChange={(e) => setFilters({ ...filters, startDate: e.target.value })} />
+                        <label htmlFor={`${metricType}-start`}>Start Date</label>
+                        <input id={`${metricType}-start`} type="date" value={filters.startDate} onChange={(e) => setFilters({ ...filters, startDate: e.target.value })} />
                     </div>
                     <div className="form-group">
-                        <label>End Date</label>
-                        <input type="date" value={filters.endDate} onChange={(e) => setFilters({ ...filters, endDate: e.target.value })} />
+                        <label htmlFor={`${metricType}-end`}>End Date</label>
+                        <input id={`${metricType}-end`} type="date" value={filters.endDate} onChange={(e) => setFilters({ ...filters, endDate: e.target.value })} />
                     </div>
                     <div className="form-group">
-                        <label>Limit</label>
-                        <select value={filters.limit} onChange={(e) => setFilters({ ...filters, limit: e.target.value })}>
+                        <label htmlFor={`${metricType}-limit`}>Limit</label>
+                        <select id={`${metricType}-limit`} value={filters.limit} onChange={(e) => setFilters({ ...filters, limit: e.target.value })}>
                             <option>50</option><option>100</option><option>500</option><option>1000</option>
                         </select>
                     </div>
                 </div>
-                <button className="btn" onClick={fetchData}>Apply Filters</button>
+                <button className="btn" onClick={fetchData} disabled={loading}>
+                    {loading ? 'Applying...' : 'Apply Filters'}
+                </button>
             </div>
 
-            <div className="card">
+            <div className="card" style={{ position: 'relative' }}>
+                {loading && (
+                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.7)', zIndex: 10 }}>
+                        <div className="loading">Loading {metricName}...</div>
+                    </div>
+                )}
                 <p>Total Records: {data.length}</p>
-                <div className="table-responsive">
+                <div className="table-responsive" style={{ opacity: loading ? 0.6 : 1, transition: 'opacity 0.2s' }}>
                     <table className="data-table">
                         <thead>
                             <tr>{data.length > 0 && Object.keys(data[0]).map(key => (<th key={key}>{key.replace(/_/g, ' ').toUpperCase()}</th>))}</tr>
