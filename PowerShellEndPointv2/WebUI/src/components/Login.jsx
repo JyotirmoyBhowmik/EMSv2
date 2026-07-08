@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLogin } from '../hooks/useLogin';
-import { ShieldCheck, Network, Server } from 'lucide-react';
+import { ShieldCheck, Network, Server, Eye, EyeOff } from 'lucide-react';
 
 function Login({ onLogin }) {
+    const [showPassword, setShowPassword] = useState(false);
     const {
         username,
         setUsername,
@@ -131,15 +132,38 @@ function Login({ onLogin }) {
 
                     <div className="form-group">
                         <label htmlFor="password">Password</label>
-                        <input
-                            id="password"
-                            type="password"
-                            className="form-control"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            disabled={loading}
-                            required
-                        />
+                        <div style={{ position: 'relative' }}>
+                            <input
+                                id="password"
+                                type={showPassword ? 'text' : 'password'}
+                                className="form-control"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                disabled={loading}
+                                required
+                                style={{ paddingRight: '40px' }}
+                            />
+                            <button
+                                type="button"
+                                aria-label={showPassword ? "Hide password" : "Show password"}
+                                onClick={() => setShowPassword(!showPassword)}
+                                style={{
+                                    position: 'absolute',
+                                    right: '10px',
+                                    top: '50%',
+                                    transform: 'translateY(-50%)',
+                                    background: 'none',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    color: '#64748b',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    padding: '4px'
+                                }}
+                            >
+                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                            </button>
+                        </div>
                     </div>
 
                     <button
