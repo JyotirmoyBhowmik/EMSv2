@@ -8,3 +8,6 @@
 ## 2024-05-19 - Accessible Form Inputs
 **Learning:** Found that custom form fields in `ComputerManagement.jsx` lacked standard `htmlFor` and `id` linking, and toggle buttons did not have ARIA properties communicating their expanded state.
 **Action:** Always ensure toggle buttons use `aria-expanded` and `aria-controls` for accessibility, and standard form inputs and selects use `htmlFor` matching their respective `id` properties.
+## 2024-10-24 - Missing password visibility toggles in authentication forms
+**Learning:** Noticed that the main `Login.jsx` form lacked a way for users to toggle password visibility. This is a common point of friction during login, as users cannot verify mistyped passwords.
+**Action:** When working with password input fields in authentication flows, always implement an accessible "show/hide password" toggle button using semantic icons and dynamic `aria-label` attributes.
