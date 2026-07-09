@@ -11,3 +11,6 @@
 ## 2024-10-24 - Missing password visibility toggles in authentication forms
 **Learning:** Noticed that the main `Login.jsx` form lacked a way for users to toggle password visibility. This is a common point of friction during login, as users cannot verify mistyped passwords.
 **Action:** When working with password input fields in authentication flows, always implement an accessible "show/hide password" toggle button using semantic icons and dynamic `aria-label` attributes.
+## 2024-11-20 - Explicit Form Label Linking in Reusable Components
+**Learning:** When addressing accessibility by linking `<label>` elements to form controls (using `htmlFor` and `id`) inside reusable React components, static IDs will cause DOM ID collisions if the component is rendered multiple times on the same page. This breaks HTML validation and causes focus issues where clicking any label focuses only the first matching input.
+**Action:** Always generate unique, dynamic IDs for form controls in reusable components by leveraging unique component props (e.g., `id={\`filter-computer-${metricType}\`}`) or using `React.useId()`.
