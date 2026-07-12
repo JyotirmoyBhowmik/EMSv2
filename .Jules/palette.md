@@ -11,3 +11,6 @@
 ## 2024-10-24 - Missing password visibility toggles in authentication forms
 **Learning:** Noticed that the main `Login.jsx` form lacked a way for users to toggle password visibility. This is a common point of friction during login, as users cannot verify mistyped passwords.
 **Action:** When working with password input fields in authentication flows, always implement an accessible "show/hide password" toggle button using semantic icons and dynamic `aria-label` attributes.
+## 2024-07-12 - Explicit Label Linking in Forms
+**Learning:** Reusable React components or dynamically mapped fields (like those in UserManagement) often lack `htmlFor` and `id` linking. Screen readers and users who rely on clicking labels for focus benefit greatly from this simple HTML structural enhancement.
+**Action:** Always link form labels to their inputs using matching `id` and `htmlFor` attributes, especially when generating inputs dynamically or working with non-standard `<select>` and `<input>` mappings.
