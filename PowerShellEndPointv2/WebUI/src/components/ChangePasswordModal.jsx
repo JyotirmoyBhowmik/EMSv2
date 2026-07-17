@@ -1,5 +1,41 @@
 import React, { useState } from 'react';
 import { authService } from '../services/api';
+import { Eye, EyeOff } from 'lucide-react';
+
+
+const PasswordInput = ({ id, label, value, onChange, disabled }) => {
+    const [show, setShow] = useState(false);
+    return (
+        <div className="form-group">
+            <label htmlFor={id}>{label}</label>
+            <div style={{ position: 'relative' }}>
+                <input
+                    id={id}
+                    type={show ? 'text' : 'password'}
+                    className="form-control"
+                    value={value}
+                    onChange={onChange}
+                    required
+                    disabled={disabled}
+                    style={{ paddingRight: '40px', width: '100%', boxSizing: 'border-box' }}
+                />
+                <button
+                    type="button"
+                    aria-label={show ? `Hide ${label.toLowerCase()}` : `Show ${label.toLowerCase()}`}
+                    onClick={() => setShow(!show)}
+                    style={{
+                        position: 'absolute', right: '10px', top: '50%',
+                        transform: 'translateY(-50%)', background: 'none',
+                        border: 'none', cursor: 'pointer', color: '#64748b',
+                        display: 'flex', alignItems: 'center', padding: '4px'
+                    }}
+                >
+                    {show ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+            </div>
+        </div>
+    );
+};
 
 const ChangePasswordModal = ({ isOpen, onClose }) => {
     const [oldPassword, setOldPassword] = useState('');
@@ -57,44 +93,9 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                     {error && <div className="alert alert-danger">{error}</div>}
                     {success && <div className="alert alert-success">Password updated successfully!</div>}
                     
-                    <div className="form-group">
-                        <label htmlFor="oldPassword">Current Password</label>
-                        <input 
-                            id="oldPassword"
-                            type="password" 
-                            className="form-control" 
-                            value={oldPassword}
-                            onChange={(e) => setOldPassword(e.target.value)}
-                            required
-                            disabled={loading || success}
-                        />
-                    </div>
-                    
-                    <div className="form-group">
-                        <label htmlFor="newPassword">New Password</label>
-                        <input 
-                            id="newPassword"
-                            type="password" 
-                            className="form-control" 
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            required
-                            disabled={loading || success}
-                        />
-                    </div>
-                    
-                    <div className="form-group">
-                        <label htmlFor="confirmPassword">Confirm New Password</label>
-                        <input 
-                            id="confirmPassword"
-                            type="password" 
-                            className="form-control" 
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            required
-                            disabled={loading || success}
-                        />
-                    </div>
+                    <PasswordInput id="oldPassword" label="Current Password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} disabled={loading || success} />
+                    <PasswordInput id="newPassword" label="New Password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} disabled={loading || success} />
+                    <PasswordInput id="confirmPassword" label="Confirm New Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} disabled={loading || success} />
                     
                     <div className="modal-footer">
                         <button type="button" className="btn" onClick={onClose} disabled={loading}>
