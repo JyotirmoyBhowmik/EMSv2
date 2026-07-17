@@ -11,3 +11,6 @@
 ## 2024-10-24 - Missing password visibility toggles in authentication forms
 **Learning:** Noticed that the main `Login.jsx` form lacked a way for users to toggle password visibility. This is a common point of friction during login, as users cannot verify mistyped passwords.
 **Action:** When working with password input fields in authentication flows, always implement an accessible "show/hide password" toggle button using semantic icons and dynamic `aria-label` attributes.
+## 2024-10-24 - Missing password visibility toggles in authentication forms
+**Learning:** Extracting inline input elements into a reusable component (like `PasswordInput`) within the same file requires defining the new component *outside* the parent component. Defining it inside causes React to remount the component on every render, resulting in a loss of input focus after each keystroke.
+**Action:** When extracting reusable components like a toggleable password field, always ensure the new component is defined outside the parent component's scope.
