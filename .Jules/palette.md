@@ -11,3 +11,6 @@
 ## 2024-10-24 - Missing password visibility toggles in authentication forms
 **Learning:** Noticed that the main `Login.jsx` form lacked a way for users to toggle password visibility. This is a common point of friction during login, as users cannot verify mistyped passwords.
 **Action:** When working with password input fields in authentication flows, always implement an accessible "show/hide password" toggle button using semantic icons and dynamic `aria-label` attributes.
+## $(date +%Y-%m-%d) - WebUI accessibility pattern: Custom modal overlays
+**Learning:** Encountered an accessibility pattern where custom modal overlays built with `<div>` elements in `UserManagement.jsx` lacked proper ARIA roles.
+**Action:** Always ensure custom modals include `role="dialog"`, `aria-modal="true"`, and an `aria-labelledby` attribute pointing to the modal's title to guarantee correct screen reader behavior.
