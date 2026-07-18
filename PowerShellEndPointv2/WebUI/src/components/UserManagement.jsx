@@ -133,18 +133,18 @@ function UserManagement() {
 
             {/* Create/Edit Modal */}
             {showForm && (
-                <div style={modalOverlay}>
+                <div style={modalOverlay} role="dialog" aria-modal="true" aria-labelledby="user-modal-title">
                     <div style={modalBox}>
-                        <h2>{editUser ? 'Edit User' : 'Create User'}</h2>
+                        <h2 id="user-modal-title">{editUser ? 'Edit User' : 'Create User'}</h2>
                         {['username', 'display_name', 'email', 'domain'].map(field => (
                             <div key={field} style={{ marginBottom: '12px' }}>
-                                <label style={{ display: 'block', marginBottom: '4px', fontWeight: '600', textTransform: 'capitalize' }}>{field.replace('_', ' ')}</label>
-                                <input value={form[field] || ''} onChange={e => setForm({ ...form, [field]: e.target.value })}
+                                <label htmlFor={field} style={{ display: 'block', marginBottom: '4px', fontWeight: '600', textTransform: 'capitalize' }}>{field.replace('_', ' ')}</label>
+                                <input id={field} value={form[field] || ''} onChange={e => setForm({ ...form, [field]: e.target.value })}
                                     style={inputStyle} />
                             </div>
                         ))}
-                        <label style={{ display: 'block', marginBottom: '4px', fontWeight: '600' }}>Role</label>
-                        <select value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} style={inputStyle}>
+                        <label htmlFor="role" style={{ display: 'block', marginBottom: '4px', fontWeight: '600' }}>Role</label>
+                        <select id="role" value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} style={inputStyle}>
                             <option value="admin">Admin</option>
                             <option value="operator">Operator</option>
                             <option value="viewer">Viewer</option>
@@ -159,9 +159,9 @@ function UserManagement() {
 
             {/* Activity Modal */}
             {activityUser && (
-                <div style={modalOverlay}>
+                <div style={modalOverlay} role="dialog" aria-modal="true" aria-labelledby="activity-modal-title">
                     <div style={{ ...modalBox, maxWidth: '600px' }}>
-                        <h2>Activity: {activityUser.username}</h2>
+                        <h2 id="activity-modal-title">Activity: {activityUser.username}</h2>
                         {activities.length === 0 ? <p>No activity recorded.</p> :
                             activities.map((ev, i) => (
                                 <div key={i} style={{ padding: '10px 0', borderBottom: '1px solid var(--border-color)' }}>
