@@ -11,3 +11,7 @@
 ## 2024-10-24 - Missing password visibility toggles in authentication forms
 **Learning:** Noticed that the main `Login.jsx` form lacked a way for users to toggle password visibility. This is a common point of friction during login, as users cannot verify mistyped passwords.
 **Action:** When working with password input fields in authentication flows, always implement an accessible "show/hide password" toggle button using semantic icons and dynamic `aria-label` attributes.
+
+## 2024-11-20 - Adding dynamic IDs and htmlFor to reusable components
+**Learning:** Found an accessibility issue pattern specific to this app where reusable components (like `MetricDetail` in `MetricComponents.jsx`) had form filters without `htmlFor` and `id` linking. Since the component is rendered multiple times for different metrics, static IDs would cause DOM collisions.
+**Action:** When adding `id` and `htmlFor` attributes to explicitly link labels and inputs in reusable React components (e.g., `MetricDetail`), always generate dynamic IDs using unique component props (like `metricType`) to prevent DOM ID collisions when the component is rendered multiple times.
