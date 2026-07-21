@@ -1,5 +1,41 @@
 import React, { useState } from 'react';
 import { authService } from '../services/api';
+import { Eye, EyeOff } from 'lucide-react';
+
+const PasswordInput = ({ id, label, value, onChange, disabled }) => {
+    const [showPassword, setShowPassword] = useState(false);
+
+    return (
+        <div className="form-group">
+            <label htmlFor={id}>{label}</label>
+            <div style={{ position: 'relative' }}>
+                <input
+                    id={id}
+                    type={showPassword ? 'text' : 'password'}
+                    className="form-control"
+                    value={value}
+                    onChange={onChange}
+                    required
+                    disabled={disabled}
+                    style={{ paddingRight: '40px' }}
+                />
+                <button
+                    type="button"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{
+                        position: 'absolute', right: '10px', top: '50%',
+                        transform: 'translateY(-50%)', background: 'none',
+                        border: 'none', cursor: 'pointer', color: '#64748b',
+                        display: 'flex', alignItems: 'center', padding: '4px'
+                    }}
+                >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+            </div>
+        </div>
+    );
+};
 
 const ChangePasswordModal = ({ isOpen, onClose }) => {
     const [oldPassword, setOldPassword] = useState('');
@@ -47,9 +83,15 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
 
     return (
         <div className="modal-overlay">
-            <div className="modal-content" style={{ maxWidth: '400px' }}>
+            <div
+                className="modal-content"
+                style={{ maxWidth: '400px' }}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="change-password-title"
+            >
                 <div className="modal-header">
-                    <h2>Change Password</h2>
+                    <h2 id="change-password-title">Change Password</h2>
                     <button className="close-btn" aria-label="Close change password modal" onClick={onClose}>&times;</button>
                 </div>
                 
@@ -57,44 +99,29 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
                     {error && <div className="alert alert-danger">{error}</div>}
                     {success && <div className="alert alert-success">Password updated successfully!</div>}
                     
-                    <div className="form-group">
-                        <label htmlFor="oldPassword">Current Password</label>
-                        <input 
-                            id="oldPassword"
-                            type="password" 
-                            className="form-control" 
-                            value={oldPassword}
-                            onChange={(e) => setOldPassword(e.target.value)}
-                            required
-                            disabled={loading || success}
-                        />
-                    </div>
+                    <PasswordInput
+                        id="oldPassword"
+                        label="Current Password"
+                        value={oldPassword}
+                        onChange={(e) => setOldPassword(e.target.value)}
+                        disabled={loading || success}
+                    />
                     
-                    <div className="form-group">
-                        <label htmlFor="newPassword">New Password</label>
-                        <input 
-                            id="newPassword"
-                            type="password" 
-                            className="form-control" 
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            required
-                            disabled={loading || success}
-                        />
-                    </div>
+                    <PasswordInput
+                        id="newPassword"
+                        label="New Password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        disabled={loading || success}
+                    />
                     
-                    <div className="form-group">
-                        <label htmlFor="confirmPassword">Confirm New Password</label>
-                        <input 
-                            id="confirmPassword"
-                            type="password" 
-                            className="form-control" 
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            required
-                            disabled={loading || success}
-                        />
-                    </div>
+                    <PasswordInput
+                        id="confirmPassword"
+                        label="Confirm New Password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        disabled={loading || success}
+                    />
                     
                     <div className="modal-footer">
                         <button type="button" className="btn" onClick={onClose} disabled={loading}>
