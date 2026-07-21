@@ -11,3 +11,6 @@
 ## 2024-10-24 - Missing password visibility toggles in authentication forms
 **Learning:** Noticed that the main `Login.jsx` form lacked a way for users to toggle password visibility. This is a common point of friction during login, as users cannot verify mistyped passwords.
 **Action:** When working with password input fields in authentication flows, always implement an accessible "show/hide password" toggle button using semantic icons and dynamic `aria-label` attributes.
+## 2026-07-21 - Extracted reusable PasswordInput with visibility toggle
+**Learning:** Found that multiple password fields in `ChangePasswordModal.jsx` lacked a way for users to toggle password visibility and duplicated markup.
+**Action:** When working with multiple identical input components (like password fields), extract a reusable component outside the parent scope to prevent re-mounting and ensure it includes semantic ARIA labels and roles.
