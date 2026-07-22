@@ -9,12 +9,14 @@ const categoryColors = {
     Administration: { bg: '#fef2f2', border: '#fecaca', badge: '#dc2626' }
 };
 
-function ToggleSwitch({ enabled, onChange, disabled }) {
+function ToggleSwitch({ enabled, onChange, disabled, label }) {
     return (
         <button
+            role="switch"
             onClick={onChange}
             disabled={disabled}
-            aria-pressed={enabled}
+            aria-checked={enabled}
+            aria-label={label || 'Toggle switch'}
             style={{
                 position: 'relative', width: 48, height: 26, borderRadius: 13,
                 border: 'none', cursor: disabled ? 'not-allowed' : 'pointer',
@@ -245,6 +247,7 @@ function FeatureCard({ category, features, saving, onToggle }) {
                             enabled={f.enabled}
                             disabled={saving === f.feature_key}
                             onChange={() => onToggle(f.feature_key, f.enabled)}
+                            label={`Toggle ${f.feature_name}`}
                         />
                     </div>
                 </div>
