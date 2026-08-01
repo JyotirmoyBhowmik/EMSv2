@@ -14,7 +14,8 @@ function ToggleSwitch({ enabled, onChange, disabled }) {
         <button
             onClick={onChange}
             disabled={disabled}
-            aria-pressed={enabled}
+            role="switch"
+            aria-checked={enabled}
             style={{
                 position: 'relative', width: 48, height: 26, borderRadius: 13,
                 border: 'none', cursor: disabled ? 'not-allowed' : 'pointer',
