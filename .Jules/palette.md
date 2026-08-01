@@ -11,3 +11,7 @@
 ## 2024-10-24 - Missing password visibility toggles in authentication forms
 **Learning:** Noticed that the main `Login.jsx` form lacked a way for users to toggle password visibility. This is a common point of friction during login, as users cannot verify mistyped passwords.
 **Action:** When working with password input fields in authentication flows, always implement an accessible "show/hide password" toggle button using semantic icons and dynamic `aria-label` attributes.
+
+## 2024-11-20 - Accessible Toggle Switches
+**Learning:** Found that the `ToggleSwitch` component in `AdminSettings.jsx` used `aria-pressed` to indicate state. For a toggle switch, it is more semantically correct to use `role="switch"` and `aria-checked={state}` for assistive technologies.
+**Action:** When implementing custom toggle switches, always prefer `role="switch"` and `aria-checked` over `aria-pressed` for better screen reader support.
