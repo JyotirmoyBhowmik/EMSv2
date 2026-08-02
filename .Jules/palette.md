@@ -11,3 +11,7 @@
 ## 2024-10-24 - Missing password visibility toggles in authentication forms
 **Learning:** Noticed that the main `Login.jsx` form lacked a way for users to toggle password visibility. This is a common point of friction during login, as users cannot verify mistyped passwords.
 **Action:** When working with password input fields in authentication flows, always implement an accessible "show/hide password" toggle button using semantic icons and dynamic `aria-label` attributes.
+
+## $(date +%Y-%m-%d) - Adding submitting state to form buttons
+**Learning:** Forms performing async operations without a `submitting` state allow users to spam submit, causing duplicate data or errors, and feeling unresponsive.
+**Action:** Always add a boolean submitting state to async forms to disable buttons/inputs and change button text while the request is processing.

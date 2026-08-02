@@ -6,6 +6,7 @@ function ComputerManagement() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [showAddForm, setShowAddForm] = useState(false);
+    const [registering, setRegistering] = useState(false);
     const [newComputer, setNewComputer] = useState({
         name: '',
         ip: '',
@@ -33,6 +34,7 @@ function ComputerManagement() {
     const handleAddComputer = async (e) => {
         e.preventDefault();
         try {
+            setRegistering(true);
             await computerService.registerComputer(newComputer);
             setShowAddForm(false);
             setNewComputer({ name: '', ip: '', type: 'Desktop' });
@@ -40,6 +42,8 @@ function ComputerManagement() {
         } catch (err) {
             setError('Failed to register computer');
             console.error(err);
+        } finally {
+            setRegistering(false);
         }
     };
 
@@ -98,6 +102,7 @@ function ComputerManagement() {
                                     value={newComputer.name}
                                     onChange={(e) => setNewComputer({ ...newComputer, name: e.target.value })}
                                     placeholder="STANDALONE-PC-01"
+                                    disabled={registering}
                                     required
                                 />
                             </div>
@@ -109,6 +114,7 @@ function ComputerManagement() {
                                     value={newComputer.ip}
                                     onChange={(e) => setNewComputer({ ...newComputer, ip: e.target.value })}
                                     placeholder="192.168.1.100"
+                                    disabled={registering}
                                     required
                                 />
                             </div>
@@ -118,6 +124,7 @@ function ComputerManagement() {
                                     id="computerType"
                                     value={newComputer.type}
                                     onChange={(e) => setNewComputer({ ...newComputer, type: e.target.value })}
+                                    disabled={registering}
                                 >
                                     <option>Desktop</option>
                                     <option>Laptop</option>
@@ -126,7 +133,9 @@ function ComputerManagement() {
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" className="btn btn-success">Register</button>
+                        <button type="submit" className="btn btn-success" disabled={registering}>
+                            {registering ? 'Registering...' : 'Register'}
+                        </button>
                     </form>
                 </div>
             )}
