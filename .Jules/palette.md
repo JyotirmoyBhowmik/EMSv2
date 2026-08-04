@@ -14,3 +14,7 @@
 ## 2024-10-25 - Custom toggle switches need proper role
 **Learning:** Found an accessibility issue where the custom `ToggleSwitch` component in `AdminSettings.jsx` was using `aria-pressed` on a button instead of the more semantically correct `role="switch"` and `aria-checked`.
 **Action:** When creating or updating custom toggle switches, prefer `role="switch"` and `aria-checked={state}` over `aria-pressed` for better screen reader communication.
+
+## 2024-08-04 - Adding Accessible Roles to Custom Modals
+**Learning:** Custom modal overlays built with `<div>` elements across multiple components (like `ChangePasswordModal`, `EndpointLifecycle`, `RebootDashboard`, `UserManagement`) were missing accessibility attributes.
+**Action:** Added `role="dialog"`, `aria-modal="true"`, and an `aria-labelledby` attribute pointing to the modal's title to ensure screen readers correctly identify and read the modal content.

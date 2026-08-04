@@ -140,8 +140,13 @@ function EndpointLifecycle() {
             {/* Detail Panel */}
             {selectedEp && (
                 <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
-                    <div style={{ background: 'var(--bg-secondary)', borderRadius: '12px', padding: '30px', maxWidth: '600px', width: '90%', maxHeight: '80vh', overflowY: 'auto', boxShadow: '0 10px 40px rgba(0,0,0,0.3)' }}>
-                        <h2 style={{ marginBottom: '20px' }}>{selectedEp.computer_name}</h2>
+                    <div
+                        style={{ background: 'var(--bg-secondary)', borderRadius: '12px', padding: '30px', maxWidth: '600px', width: '90%', maxHeight: '80vh', overflowY: 'auto', boxShadow: '0 10px 40px rgba(0,0,0,0.3)' }}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="endpoint-details-title"
+                    >
+                        <h2 id="endpoint-details-title" style={{ marginBottom: '20px' }}>{selectedEp.computer_name}</h2>
 
                         {/* Tags */}
                         <h4 style={{ marginBottom: '10px' }}>Tags</h4>

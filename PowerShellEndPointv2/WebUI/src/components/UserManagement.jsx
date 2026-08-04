@@ -134,8 +134,13 @@ function UserManagement() {
             {/* Create/Edit Modal */}
             {showForm && (
                 <div style={modalOverlay}>
-                    <div style={modalBox}>
-                        <h2>{editUser ? 'Edit User' : 'Create User'}</h2>
+                    <div
+                        style={modalBox}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="user-modal-title"
+                    >
+                        <h2 id="user-modal-title">{editUser ? 'Edit User' : 'Create User'}</h2>
                         {['username', 'display_name', 'email', 'domain'].map(field => (
                             <div key={field} style={{ marginBottom: '12px' }}>
                                 <label style={{ display: 'block', marginBottom: '4px', fontWeight: '600', textTransform: 'capitalize' }}>{field.replace('_', ' ')}</label>
