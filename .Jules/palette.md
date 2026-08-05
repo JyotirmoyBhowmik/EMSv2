@@ -14,3 +14,7 @@
 ## 2024-10-25 - Custom toggle switches need proper role
 **Learning:** Found an accessibility issue where the custom `ToggleSwitch` component in `AdminSettings.jsx` was using `aria-pressed` on a button instead of the more semantically correct `role="switch"` and `aria-checked`.
 **Action:** When creating or updating custom toggle switches, prefer `role="switch"` and `aria-checked={state}` over `aria-pressed` for better screen reader communication.
+
+## 2026-08-05 - Dynamic IDs for Reusable Components
+**Learning:** In reusable components rendered multiple times (like MetricDetail), hardcoded IDs for linking labels to inputs cause ID collisions, breaking accessibility.
+**Action:** Use unique props (e.g., metricType) to generate dynamic IDs when adding htmlFor/id attributes in reusable components.
