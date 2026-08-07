@@ -47,9 +47,15 @@ const ChangePasswordModal = ({ isOpen, onClose }) => {
 
     return (
         <div className="modal-overlay">
-            <div className="modal-content" style={{ maxWidth: '400px' }}>
+            <div
+                className="modal-content"
+                style={{ maxWidth: '400px' }}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="change-password-title"
+            >
                 <div className="modal-header">
-                    <h2>Change Password</h2>
+                    <h2 id="change-password-title">Change Password</h2>
                     <button className="close-btn" aria-label="Close change password modal" onClick={onClose}>&times;</button>
                 </div>
                 
