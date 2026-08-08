@@ -134,8 +134,8 @@ function UserManagement() {
             {/* Create/Edit Modal */}
             {showForm && (
                 <div style={modalOverlay}>
-                    <div style={modalBox}>
-                        <h2>{editUser ? 'Edit User' : 'Create User'}</h2>
+                    <div style={modalBox} role="dialog" aria-modal="true" aria-labelledby="user-form-title">
+                        <h2 id="user-form-title">{editUser ? 'Edit User' : 'Create User'}</h2>
                         {['username', 'display_name', 'email', 'domain'].map(field => (
                             <div key={field} style={{ marginBottom: '12px' }}>
                                 <label style={{ display: 'block', marginBottom: '4px', fontWeight: '600', textTransform: 'capitalize' }}>{field.replace('_', ' ')}</label>
@@ -160,8 +160,8 @@ function UserManagement() {
             {/* Activity Modal */}
             {activityUser && (
                 <div style={modalOverlay}>
-                    <div style={{ ...modalBox, maxWidth: '600px' }}>
-                        <h2>Activity: {activityUser.username}</h2>
+                    <div style={{ ...modalBox, maxWidth: '600px' }} role="dialog" aria-modal="true" aria-labelledby="activity-modal-title">
+                        <h2 id="activity-modal-title">Activity: {activityUser.username}</h2>
                         {activities.length === 0 ? <p>No activity recorded.</p> :
                             activities.map((ev, i) => (
                                 <div key={i} style={{ padding: '10px 0', borderBottom: '1px solid var(--border-color)' }}>
