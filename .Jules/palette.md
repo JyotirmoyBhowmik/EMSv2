@@ -14,3 +14,6 @@
 ## 2024-10-25 - Custom toggle switches need proper role
 **Learning:** Found an accessibility issue where the custom `ToggleSwitch` component in `AdminSettings.jsx` was using `aria-pressed` on a button instead of the more semantically correct `role="switch"` and `aria-checked`.
 **Action:** When creating or updating custom toggle switches, prefer `role="switch"` and `aria-checked={state}` over `aria-pressed` for better screen reader communication.
+## 2024-11-06 - Missing semantic roles on custom modal overlays
+**Learning:** Found an accessibility issue pattern where custom modal dialogs built with non-semantic `<div>` tags in the WebUI lack required ARIA attributes, causing screen readers to incorrectly interpret or ignore the modal context and its boundaries.
+**Action:** Always ensure that custom modal components using `<div>` overlays include `role="dialog"`, `aria-modal="true"`, and an `aria-labelledby` attribute pointing to an `id` on the modal's primary heading element to correctly communicate state to assistive technologies.
